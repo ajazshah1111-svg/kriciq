@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KricIQ — RCB vs MI · Head to Head</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#07090f;--s1:#0d1018;--s2:#141820;--s3:#1c2230;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
+  --rcb:#e63535;--rcb2:rgba(230,53,53,0.15);
+  --mi:#004ba0;--mi2:rgba(0,75,160,0.15);
+  --acc:#00f5aa;--acc2:#ff5533;--acc3:#4d9fff;--acc4:#f7c948;
+  --text:#eef0f5;--muted:#5a6275;--muted2:#8892a4;
+  --font-d:'Bebas Neue',sans-serif;--font-b:'Outfit',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:14px;overflow-x:hidden;}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:rgba(7,9,15,.95);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;backdrop-filter:blur(20px);}
+.logo{font-family:var(--font-d);font-size:26px;letter-spacing:3px;color:var(--acc);text-decoration:none;}
+.logo em{color:var(--text);font-style:normal;}
+.nav-links{display:flex;gap:2px;}
+.nl{padding:6px 14px;border-radius:6px;font-size:13px;color:var(--muted2);cursor:pointer;transition:.15s;border:none;background:none;font-family:var(--font-b);text-decoration:none;}
+.nl:hover{color:var(--text);background:var(--s2);}
+.nl.active{color:var(--acc);}
+.btn-primary{padding:7px 18px;background:var(--acc);border:none;border-radius:7px;font-size:13px;color:#000;font-weight:600;cursor:pointer;font-family:var(--font-b);text-decoration:none;}
+
+/* TEAM SELECTOR */
+.selector{background:var(--s1);border-bottom:1px solid var(--border);padding:28px 32px;}
+.selector-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:20px;}
+.team-pick{flex:1;background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.2s;}
+.team-pick:hover{border-color:var(--border2);}
+.team-badge{width:52px;height:52px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:18px;font-weight:700;flex-shrink:0;}
+.team-badge.rcb{background:rgba(230,53,53,.15);color:var(--rcb);border:1px solid rgba(230,53,53,.3);}
+.team-badge.mi{background:rgba(0,75,160,.2);color:#4d9fff;border:1px solid rgba(77,159,255,.3);}
+.team-info h3{font-size:16px;font-weight:600;margin-bottom:2px;}
+.team-info p{font-size:12px;color:var(--muted2);}
+.vs-badge{font-family:var(--font-d);font-size:32px;color:var(--muted);flex-shrink:0;}
+.format-tabs{display:flex;gap:6px;margin-left:auto;}
+.ftab{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:500;border:1px solid var(--border);background:none;color:var(--muted2);cursor:pointer;transition:.15s;font-family:var(--font-b);}
+.ftab:hover{color:var(--text);border-color:var(--border2);}
+.ftab.on{background:var(--acc);color:#000;border-color:var(--acc);}
+
+/* HERO H2H */
+.h2h-hero{padding:40px 32px;max-width:1100px;margin:0 auto;}
+.h2h-title{font-family:var(--font-d);font-size:clamp(36px,5vw,64px);letter-spacing:2px;text-align:center;margin-bottom:8px;}
+.h2h-title .rcb-col{color:var(--rcb);}
+.h2h-title .mi-col{color:var(--acc3);}
+.h2h-sub{text-align:center;color:var(--muted2);font-size:14px;margin-bottom:36px;}
+
+/* WIN SPLIT BAR */
+.win-split{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:24px;}
+.ws-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.ws-team{text-align:center;}
+.ws-wins{font-family:var(--font-d);font-size:52px;line-height:1;}
+.ws-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.ws-bar-wrap{flex:1;margin:0 24px;}
+.ws-bar{height:14px;background:var(--s3);border-radius:7px;overflow:hidden;display:flex;}
+.ws-fill-rcb{height:100%;background:var(--rcb);border-radius:7px 0 0 7px;transition:width 1.2s;}
+.ws-fill-mi{height:100%;background:var(--acc3);border-radius:0 7px 7px 0;transition:width 1.2s;}
+.ws-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);}
+.ws-stat{text-align:center;}
+.ws-stat-v{font-family:var(--font-d);font-size:24px;}
+.ws-stat-k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-top:2px;}
+
+/* MAIN GRID */
+.main{max-width:1100px;margin:0 auto;padding:0 32px 60px;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.span2{grid-column:1/-1;}
+
+/* CARD */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);}
+.ct{font-family:var(--font-d);font-size:17px;letter-spacing:.5px;}
+.ct em{color:var(--acc);font-style:normal;}
+.csub{font-size:11px;color:var(--muted);}
+.cb{padding:18px;}
+
+/* VENUE CHART */
+.venue-list{padding:16px 18px;display:flex;flex-direction:column;gap:10px;}
+.vrow{display:flex;align-items:center;gap:12px;}
+.vname{font-size:13px;color:var(--muted2);width:140px;flex-shrink:0;}
+.vbar-wrap{flex:1;height:28px;background:var(--s2);border-radius:6px;overflow:hidden;display:flex;}
+.vbar-rcb{height:100%;display:flex;align-items:center;padding-left:8px;font-size:12px;font-weight:600;font-family:var(--font-d);}
+.vbar-mi{height:100%;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:12px;font-weight:600;font-family:var(--font-d);}
+.vmatches{font-size:11px;color:var(--muted);width:60px;text-align:right;flex-shrink:0;}
+
+/* PLAYER MATCHUPS */
+.matchup-list{padding:16px 18px;display:flex;flex-direction:column;gap:10px;}
+.mrow{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;display:flex;align-items:center;gap:12px;}
+.mplayer{flex:1;}
+.mname{font-size:13px;font-weight:500;}
+.mrole{font-size:11px;color:var(--muted);}
+.mvs{font-size:11px;color:var(--muted);padding:0 8px;}
+.mstats{display:flex;gap:14px;}
+.mstat{text-align:center;}
+.mstat-v{font-family:var(--font-d);font-size:16px;}
+.mstat-k{font-size:10px;color:var(--muted);text-transform:uppercase;}
+.mthreat{padding:3px 8px;border-radius:4px;font-size:11px;font-weight:500;flex-shrink:0;}
+.mthreat.rcb{background:rgba(230,53,53,.12);color:var(--rcb);border:1px solid rgba(230,53,53,.2);}
+.mthreat.mi{background:rgba(77,159,255,.12);color:var(--acc3);border:1px solid rgba(77,159,255,.2);}
+
+/* FORM COMPARISON */
+.form-comp{padding:16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.fc-team h4{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px;}
+.fc-innings{display:flex;flex-direction:column;gap:6px;}
+.fc-row{display:flex;align-items:center;gap:8px;font-size:13px;}
+.fc-opp{color:var(--muted2);flex:1;}
+.fc-score{font-family:var(--font-d);font-size:16px;min-width:60px;}
+.fc-result{font-size:11px;padding:2px 7px;border-radius:4px;}
+.fc-result.w{background:rgba(0,245,170,.1);color:var(--acc);}
+.fc-result.l{background:rgba(255,85,51,.1);color:var(--acc2);}
+
+/* AI PREDICTION */
+.ai-card{background:linear-gradient(135deg,#090f0d,#091018);border:1px solid rgba(0,245,170,.15);border-radius:12px;overflow:hidden;}
+.ai-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid rgba(0,245,170,.1);}
+.ai-icon{width:32px;height:32px;background:rgba(0,245,170,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.ai-ht{font-family:var(--font-d);font-size:16px;letter-spacing:.5px;color:var(--acc);}
+.ai-body{padding:18px;}
+.ai-teams{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.ai-team-block{text-align:center;flex:1;}
+.ai-team-name{font-family:var(--font-d);font-size:28px;}
+.ai-team-prob{font-size:13px;color:var(--muted);}
+.ai-prob-bar{height:10px;background:var(--s2);border-radius:5px;overflow:hidden;margin:0 20px 20px;display:flex;}
+.ai-prob-rcb{height:100%;border-radius:5px 0 0 5px;transition:width 1.2s;}
+.ai-prob-mi{height:100%;border-radius:0 5px 5px 0;transition:width 1.2s;}
+.ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.ai-gitem{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;}
+.ai-gv{font-family:var(--font-d);font-size:22px;}
+.ai-gk{font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.5px;}
+.ai-factors{display:flex;flex-direction:column;gap:7px;}
+.aif{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--muted2);line-height:1.5;}
+.aif-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.aif em{color:var(--text);font-style:normal;}
+.aif strong{color:var(--acc2);}
+
+/* RECENT RESULTS */
+.results-table{width:100%;border-collapse:collapse;}
+.results-table th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;padding:10px 18px;text-align:left;border-bottom:1px solid var(--border);font-weight:400;}
+.results-table td{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.03);font-size:13px;}
+.results-table tr:last-child td{border-bottom:none;}
+.results-table tr:hover td{background:var(--s2);}
+.winner-badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;}
+.winner-badge.rcb{background:rgba(230,53,53,.12);color:var(--rcb);}
+.winner-badge.mi{background:rgba(77,159,255,.12);color:var(--acc3);}
+.margin-chip{font-family:var(--font-d);font-size:14px;}
+
+/* BATTING COMPARISON CHART */
+.chart-wrap{height:220px;padding:16px 18px;}
+
+@media(max-width:768px){
+  .main{grid-template-columns:1fr;padding:0 16px 40px;}
+  .span2{grid-column:1;}
+  .selector-inner{flex-wrap:wrap;}
+  .format-tabs{width:100%;justify-content:center;}
+  nav{padding:0 16px;}
+  .nav-links{display:none;}
+  .h2h-hero{padding:24px 16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo">KRIC<em>IQ</em></a>
+  <div class="nav-links">
+    <a href="index.html" class="nl">Home</a>
+    <a href="player.html" class="nl">Players</a>
+    <a href="#" class="nl active">Teams</a>
+    <a href="#" class="nl">Match predictor</a>
+    <a href="#" class="nl">Live</a>
+  </div>
+  <a href="#" class="btn-primary">Get started free</a>
+</nav>
+
+<!-- TEAM SELECTOR -->
+<div class="selector">
+  <div class="selector-inner">
+    <div class="team-pick">
+      <div class="team-badge rcb">RCB</div>
+      <div class="team-info"><h3>Royal Challengers Bengaluru</h3><p>IPL · Chinnaswamy Stadium</p></div>
+    </div>
+    <div class="vs-badge">VS</div>
+    <div class="team-pick">
+      <div class="team-badge mi">MI</div>
+      <div class="team-info"><h3>Mumbai Indians</h3><p>IPL · Wankhede Stadium</p></div>
+    </div>
+    <div class="format-tabs">
+      <button class="ftab on">IPL</button>
+      <button class="ftab">T20I</button>
+      <button class="ftab">ODI</button>
+      <button class="ftab">Test</button>
+    </div>
+  </div>
+</div>
+
+<!-- H2H HERO -->
+<div class="h2h-hero">
+  <div class="h2h-title"><span class="rcb-col">RCB</span> vs <span class="mi-col">MI</span></div>
+  <div class="h2h-sub">IPL head-to-head · 2008–2025 · All matches · 32 encounters</div>
+
+  <!-- WIN SPLIT -->
+  <div class="win-split">
+    <div class="ws-top">
+      <div class="ws-team">
+        <div class="ws-wins" style="color:var(--rcb)">13</div>
+        <div class="ws-label">RCB wins</div>
+      </div>
+      <div class="ws-bar-wrap">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:6px;"><span>RCB 41%</span><span>MI 59%</span></div>
+        <div class="ws-bar">
+          <div class="ws-fill-rcb" style="width:41%"></div>
+          <div class="ws-fill-mi" style="width:59%"></div>
+        </div>
+        <div style="text-align:center;margin-top:8px;font-size:12px;color:var(--muted);">32 matches played · 6 abandoned</div>
+      </div>
+      <div class="ws-team">
+        <div class="ws-wins" style="color:var(--acc3)">19</div>
+        <div class="ws-label">MI wins</div>
+      </div>
+    </div>
+    <div class="ws-stats">
+      <div class="ws-stat"><div class="ws-stat-v" style="color:var(--rcb)">174.2</div><div class="ws-stat-k">RCB avg score</div></div>
+      <div class="ws-stat"><div class="ws-stat-v" style="color:var(--acc3)">168.4</div><div class="ws-stat-k">MI avg score</div></div>
+      <div class="ws-stat"><div class="ws-stat-v" style="color:var(--acc4)">7</div><div class="ws-stat-k">Highest margin (wkts)</div></div>
+      <div class="ws-stat"><div class="ws-stat-v">2016</div><div class="ws-stat-k">Last RCB dominance</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN GRID -->
+<div class="main">
+
+  <!-- SCORING TREND CHART -->
+  <div class="card span2">
+    <div class="ch">
+      <div><div class="ct">Scoring <em>Trend</em></div><div class="csub">Average scores per season in this fixture</div></div>
+    </div>
+    <div style="height:220px;padding:16px 18px;"><canvas id="trendChart"></canvas></div>
+  </div>
+
+  <!-- VENUE BREAKDOWN -->
+  <div class="card">
+    <div class="ch"><div><div class="ct">Venue <em>Breakdown</em></div><div class="csub">Win record at each ground</div></div></div>
+    <div class="venue-list">
+      <div class="vrow">
+        <div class="vname">Chinnaswamy</div>
+        <div class="vbar-wrap">
+          <div class="vbar-rcb" style="width:64%;background:rgba(230,53,53,.5);color:var(--rcb)">7</div>
+          <div class="vbar-mi" style="width:36%;background:rgba(77,159,255,.4);color:var(--acc3)">4</div>
+        </div>
+        <div class="vmatches">11 games</div>
+      </div>
+      <div class="vrow">
+        <div class="vname">Wankhede</div>
+        <div class="vbar-wrap">
+          <div class="vbar-rcb" style="width:27%;background:rgba(230,53,53,.4);color:var(--rcb)">3</div>
+          <div class="vbar-mi" style="width:73%;background:rgba(77,159,255,.5);color:var(--acc3)">8</div>
+        </div>
+        <div class="vmatches">11 games</div>
+      </div>
+      <div class="vrow">
+        <div class="vname">Neutral venues</div>
+        <div class="vbar-wrap">
+          <div class="vbar-rcb" style="width:30%;background:rgba(230,53,53,.4);color:var(--rcb)">3</div>
+          <div class="vbar-mi" style="width:70%;background:rgba(77,159,255,.4);color:var(--acc3)">7</div>
+        </div>
+        <div class="vmatches">10 games</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM COMPARISON -->
+  <div class="card">
+    <div class="ch"><div><div class="ct">Recent <em>Form</em></div><div class="csub">Last 5 IPL matches each team</div></div></div>
+    <div class="form-comp">
+      <div class="fc-team">
+        <h4 style="color:var(--rcb)">RCB</h4>
+        <div class="fc-innings">
+          <div class="fc-row"><span class="fc-opp">vs CSK</span><span class="fc-score" style="color:var(--acc)">W</span><span class="fc-result w">+23 runs</span></div>
+          <div class="fc-row"><span class="fc-opp">vs KKR</span><span class="fc-score" style="color:var(--acc)">W</span><span class="fc-result w">6 wkts</span></div>
+          <div class="fc-row"><span class="fc-opp">vs SRH</span><span class="fc-score" style="color:var(--acc2)">L</span><span class="fc-result l">-14 runs</span></div>
+          <div class="fc-row"><span class="fc-opp">vs DC</span><span class="fc-score" style="color:var(--acc)">W</span><span class="fc-result w">7 wkts</span></div>
+          <div class="fc-row"><span class="fc-opp">vs PBKS</span><span class="fc-score" style="color:var(--acc)">W</span><span class="fc-result w">+31 runs</span></div>
+        </div>
+      </div>
+      <div class="fc-team">
+        <h4 style="color:var(--acc3)">MI</h4>
+        <div class="fc-innings">
+          <div class="fc-row"><span class="fc-opp">vs LSG</span><span class="fc-score" style="color:var(--acc2)">L</span><span class="fc-result l">-8 runs</span></div>
+          <div class="fc-row"><span class="fc-opp">vs GT</span><span class="fc-score" style="color:var(--acc)">W</span><span class="fc-result w">4 wkts</span></div>
+          <div class="fc-row"><span class="fc-opp">vs CSK</span><span class="fc-score" style="color:var(--acc)">W</span><span class="fc-result w">+19 runs</span></div>
+          <div class="fc-row"><span class="fc-opp">vs KKR</span><span class="fc-score" style="color:var(--acc2)">L</span><span class="fc-result l">5 wkts</span></div>
+          <div class="fc-row"><span class="fc-opp">vs DC</span><span class="fc-score" style="color:var(--acc)">W</span><span class="fc-result w">+22 runs</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEY PLAYER MATCHUPS -->
+  <div class="card span2">
+    <div class="ch"><div><div class="ct">Key Player <em>Matchups</em></div><div class="csub">How RCB batters perform vs MI bowlers and vice versa</div></div></div>
+    <div class="matchup-list">
+      <div class="mrow">
+        <div class="mplayer"><div class="mname" style="color:var(--rcb)">Virat Kohli</div><div class="mrole">RCB · Top order bat</div></div>
+        <div class="mvs">vs</div>
+        <div class="mplayer"><div class="mname" style="color:var(--acc3)">Jasprit Bumrah</div><div class="mrole">MI · Right-arm fast</div></div>
+        <div class="mstats">
+          <div class="mstat"><div class="mstat-v" style="color:var(--acc2)">4</div><div class="mstat-k">Dismissals</div></div>
+          <div class="mstat"><div class="mstat-v">18.3</div><div class="mstat-k">Avg</div></div>
+          <div class="mstat"><div class="mstat-v" style="color:var(--acc2)">94</div><div class="mstat-k">SR</div></div>
+        </div>
+        <div class="mthreat mi">MI edge</div>
+      </div>
+      <div class="mrow">
+        <div class="mplayer"><div class="mname" style="color:var(--rcb)">Faf du Plessis</div><div class="mrole">RCB · Opener</div></div>
+        <div class="mvs">vs</div>
+        <div class="mplayer"><div class="mname" style="color:var(--acc3)">Hardik Pandya</div><div class="mrole">MI · Medium pace</div></div>
+        <div class="mstats">
+          <div class="mstat"><div class="mstat-v" style="color:var(--acc)">1</div><div class="mstat-k">Dismissals</div></div>
+          <div class="mstat"><div class="mstat-v" style="color:var(--acc)">52.4</div><div class="mstat-k">Avg</div></div>
+          <div class="mstat"><div class="mstat-v" style="color:var(--acc)">158</div><div class="mstat-k">SR</div></div>
+        </div>
+        <div class="mthreat rcb">RCB edge</div>
+      </div>
+      <div class="mrow">
+        <div class="mplayer"><div class="mname" style="color:var(--acc3)">Rohit Sharma</div><div class="mrole">MI · Top order bat</div></div>
+        <div class="mvs">vs</div>
+        <div class="mplayer"><div class="mname" style="color:var(--rcb)">Mohammed Siraj</div><div class="mrole">RCB · Right-arm fast</div></div>
+        <div class="mstats">
+          <div class="mstat"><div class="mstat-v" style="color:var(--acc2)">5</div><div class="mstat-k">Dismissals</div></div>
+          <div class="mstat"><div class="mstat-v" style="color:var(--acc2)">16.8</div><div class="mstat-k">Avg</div></div>
+          <div class="mstat"><div class="mstat-v" style="color:var(--acc2)">102</div><div class="mstat-k">SR</div></div>
+        </div>
+        <div class="mthreat rcb">RCB edge</div>
+      </div>
+      <div class="mrow">
+        <div class="mplayer"><div class="mname" style="color:var(--acc3)">Suryakumar Yadav</div><div class="mrole">MI · Middle order</div></div>
+        <div class="mvs">vs</div>
+        <div class="mplayer"><div class="mname" style="color:var(--rcb)">Wanindu Hasaranga</div><div class="mrole">RCB · Leg spin</div></div>
+        <div class="mstats">
+          <div class="mstat"><div class="mstat-v" style="color:var(--acc)">2</div><div class="mstat-k">Dismissals</div></div>
+          <div class="mstat"><div class="mstat-v" style="color:var(--acc)">34.2</div><div class="mstat-k">Avg</div></div>
+          <div class="mstat"><div class="mstat-v" style="color:var(--acc4)">144</div><div class="mstat-k">SR</div></div>
+        </div>
+        <div class="mthreat mi">MI edge</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI PREDICTION -->
+  <div class="ai-card span2">
+    <div class="ai-head">
+      <div class="ai-icon">✦</div>
+      <div><div class="ai-ht">AI Match Prediction</div></div>
+      <div style="font-size:12px;color:var(--muted);margin-left:auto;">Next encounter · Wankhede · D/N</div>
+    </div>
+    <div class="ai-body">
+      <div class="ai-teams">
+        <div class="ai-team-block">
+          <div class="ai-team-name" style="color:var(--rcb)">RCB</div>
+          <div style="font-family:var(--font-d);font-size:40px;color:var(--rcb)">38%</div>
+          <div class="ai-team-prob">Win probability</div>
+        </div>
+        <div style="font-family:var(--font-d);font-size:24px;color:var(--muted);">VS</div>
+        <div class="ai-team-block">
+          <div class="ai-team-name" style="color:var(--acc3)">MI</div>
+          <div style="font-family:var(--font-d);font-size:40px;color:var(--acc3)">62%</div>
+          <div class="ai-team-prob">Win probability</div>
+        </div>
+      </div>
+      <div class="ai-prob-bar">
+        <div class="ai-prob-rcb" style="width:38%;background:var(--rcb);"></div>
+        <div class="ai-prob-mi" style="width:62%;background:var(--acc3);"></div>
+      </div>
+      <div class="ai-grid">
+        <div class="ai-gitem"><div class="ai-gv" style="color:var(--rcb)">174</div><div class="ai-gk">RCB pred. score</div></div>
+        <div class="ai-gitem"><div class="ai-gv" style="color:var(--acc3)">181</div><div class="ai-gk">MI pred. score</div></div>
+        <div class="ai-gitem"><div class="ai-gv" style="color:var(--acc4)">71%</div><div class="ai-gk">Confidence</div></div>
+        <div class="ai-gitem"><div class="ai-gv" style="color:var(--acc3)">19-8</div><div class="ai-gk">MI H2H record</div></div>
+        <div class="ai-gitem"><div class="ai-gv" style="color:var(--acc3)">8-3</div><div class="ai-gk">MI at Wankhede</div></div>
+        <div class="ai-gitem"><div class="ai-gv" style="color:var(--acc4)">Dew</div><div class="ai-gk">Evening factor</div></div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">AI reasoning</div>
+      <div class="ai-factors">
+        <div class="aif"><div class="aif-dot" style="background:var(--acc3)"></div><div>MI have won <em>8 of 11</em> matches at Wankhede against RCB — home advantage is significant</div></div>
+        <div class="aif"><div class="aif-dot" style="background:var(--acc3)"></div><div>D/N match with dew expected — <em>chasing team wins 68%</em> of such encounters at this venue</div></div>
+        <div class="aif"><div class="aif-dot" style="background:var(--rcb)"></div><div>RCB in strong form — <em>4 wins from last 5</em> matches, Kohli averaging 54 this season</div></div>
+        <div class="aif"><div class="aif-dot" style="background:var(--acc2)"></div><div><strong>Bumrah vs Kohli</strong> is the defining matchup — Bumrah has dismissed Kohli 4 times in IPL</div></div>
+        <div class="aif"><div class="aif-dot" style="background:var(--acc4)"></div><div>Toss will be crucial — team winning toss likely to <em>field first</em> to exploit dew</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT RESULTS -->
+  <div class="card span2">
+    <div class="ch"><div><div class="ct">Recent <em>Results</em></div><div class="csub">Last 8 head-to-head encounters</div></div></div>
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>Season</th>
+          <th>Venue</th>
+          <th>RCB score</th>
+          <th>MI score</th>
+          <th>Winner</th>
+          <th>Margin</th>
+          <th>Player of match</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:var(--muted2)">IPL 2025</td>
+          <td><span style="background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:11px;">Wankhede</span></td>
+          <td style="font-family:var(--font-d);font-size:16px;color:var(--rcb)">198/4</td>
+          <td style="font-family:var(--font-d);font-size:16px;color:var(--muted2)">187/6</td>
+          <td><span class="winner-badge rcb">RCB</span></td>
+          <td><span class="margin-chip">11 runs</span></td>
+          <td style="color:var(--muted2)">V. Kohli (91*)</td>
+        </tr>
+        <tr>
+          <td style="color:var(--muted2)">IPL 2024</td>
+          <td><span style="background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:11px;">Chinnaswamy</span></td>
+          <td style="font-family:var(--font-d);font-size:16px;color:var(--muted2)">174/8</td>
+          <td style="font-family:var(--font-d);font-size:16px;color:var(--acc3)">178/4</td>
+          <td><span class="winner-badge mi">MI</span></td>
+          <td><span class="margin-chip">6 wkts</span></td>
+          <td style="color:var(--muted2)">SKY (74*)</td>
+        </tr>
+        <tr>
+          <td style="color:var(--muted2)">IPL 2024</td>
+          <td><span style="background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:11px;">Wankhede</span></td>
+          <td style="font-family:var(--font-d);font-size:16px;color:var(--muted2)">196/6</td>
+          <td style="font-family:var(--font-d);font-size:16px;color:var(--acc3)">197/3</td>
+          <td><span class="winner-badge mi">MI</span></td>
+          <td><span class="margin-chip">7 wkts</span></td>
+          <td style="color:var(--muted2)">R. Sharma (68)</td>
+        </tr>
+        <tr>
+          <td style="color:var(--muted2)">IPL 2023</td>
+          <td><span style="background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:11px;">Chinnaswamy</span></td>
+          <td style="font-family:var(--font-d);font-size:16px;color:var(--rcb)">199/1</td>
+          <td style="font-family:var(--font-d);font-size:16px;color:var(--muted2)">186/9</td>
+          <td><span class="winner-badge rcb">RCB</span></td>
+          <td><span class="margin-chip">13 runs</span></td>
+          <td style="color:var(--muted2)">V. Kohli (100*)</td>
+        </tr>
+        <tr>
+          <td style="color:var(--muted2)">IPL 2022</td>
+          <td><span style="background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:11px;">Wankhede</span></td>
+          <td style="font-family:var(--font-d);font-size:16px;color:var(--muted2)">181/6</td>
+          <td style="font-family:var(--font-d);font-size:16px;color:var(--acc3)">182/4</td>
+          <td><span class="winner-badge mi">MI</span></td>
+          <td><span class="margin-chip">6 wkts</span></td>
+          <td style="color:var(--muted2)">T. Stubbs (67*)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+Chart.defaults.color='#8892a4';
+Chart.defaults.borderColor='rgba(255,255,255,0.05)';
+Chart.defaults.font.family='Outfit';
+
+const trendCtx=document.getElementById('trendChart').getContext('2d');
+new Chart(trendCtx,{
+  type:'line',
+  data:{
+    labels:['2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'],
+    datasets:[
+      {label:'RCB avg score',data:[158,162,171,168,184,172,165,178,169,172,186,191,194,198],borderColor:'#e63535',backgroundColor:'rgba(230,53,53,0.1)',borderWidth:2,pointBackgroundColor:'#e63535',pointRadius:4,tension:.4,fill:true},
+      {label:'MI avg score',data:[162,168,174,175,171,179,168,182,176,168,178,184,189,194],borderColor:'#4d9fff',backgroundColor:'rgba(77,159,255,0.08)',borderWidth:2,pointBackgroundColor:'#4d9fff',pointRadius:4,tension:.4,fill:true}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{legend:{labels:{color:'#8892a4',boxWidth:10,padding:16}},tooltip:{backgroundColor:'rgba(13,16,24,.95)',borderColor:'rgba(255,255,255,0.08)',borderWidth:1,padding:12}},
+    scales:{
+      x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5a6275'}},
+      y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5a6275'},min:140}
+    }
+  }
+});
+</script>
+</body>
+</html>
