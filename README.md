@@ -1,0 +1,2 @@
+# kriciq
+Cricket intelligence platform
