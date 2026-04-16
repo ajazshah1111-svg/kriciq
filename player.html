@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CricIQ — Virat Kohli · Deep Profile</title>
+<title>KricIQ — Player Profile</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -212,7 +212,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 <nav>
   <a href="index.html" class="logo">KRIC<em>IQ</em></a>
   <div class="nav-links">
-    <a href="player.html" class="nl on">Players</a>
+    <a href="players.html" class="nl on">Players</a>
     <a href="teams.html" class="nl">Teams</a>
     <a href="teams.html" class="nl">Head-to-Head</a>
     <a href="#" class="nl">Match Predictor</a>
@@ -650,7 +650,7 @@ new Chart(consCtx, {
 (function() {
   const API_BASE = 'https://kriciq-api.onrender.com/api';
 
-  async function loadKohliStats() {
+  async function loadPlayerStats() {
     try {
       const response = await fetch(API_BASE + '/player/' + playerId);
       if (!response.ok) throw new Error('API error: ' + response.status);
@@ -676,9 +676,9 @@ new Chart(consCtx, {
 
   // Run when page is ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadKohliStats);
+    document.addEventListener('DOMContentLoaded', loadPlayerStats);
   } else {
-    loadKohliStats();
+    loadPlayerStats();
   }
 })();
 </script>
