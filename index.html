@@ -602,46 +602,53 @@ footer{background:var(--s1);border-top:1px solid var(--border);padding:48px 32px
 </div>
 
 <script>
-const API = 'https://kriciq-api.onrender.com/api';
-const inp = document.getElementById('hero-search');
-const res = document.getElementById('hero-results');
-const btn = document.getElementById('hero-btn');
-let st;
+var _api = 'https://kriciq-api.onrender.com/api';
+var _inp = null, _res = null, _btn = null, _st = null;
 
 function fillSearch(name) {
-  inp.value = name;
+  if (!_inp) return;
+  _inp.value = name;
   runSearch(name);
 }
 
-async function runSearch(q) {
-  if (!q || q.length < 2) { res.style.display='none'; return; }
-  try {
-    const r = await fetch(API + '/search/' + encodeURIComponent(q));
-    const players = await r.json();
-    res.innerHTML = !players.length
-      ? '<div style="padding:16px;font-size:14px;color:#5a6275;text-align:center;">No players found</div>'
-      : players.map(p => {
-          const id = p.player.replace(/ /g,'-');
-          return '<a href="player.html?id='+id+'" style="display:flex;justify-content:space-between;align-items:center;padding:13px 18px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='rgba(0,245,170,0.05)'" onmouseout="this.style.background='none'">'
+function runSearch(q) {
+  if (!q || q.length < 2) { if(_res) _res.style.display='none'; return; }
+  fetch(_api + '/search/' + encodeURIComponent(q))
+    .then(function(r){ return r.json(); })
+    .then(function(players){
+      if (!_res) return;
+      if (!players.length) {
+        _res.innerHTML = '<div style="padding:16px;font-size:14px;color:#5a6275;text-align:center;">No players found</div>';
+      } else {
+        _res.innerHTML = players.map(function(p){
+          var id = p.player.replace(/ /g,'-');
+          return '<a href="player.html?id='+id+'" style="display:flex;justify-content:space-between;align-items:center;padding:13px 18px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);">'
             +'<span style="font-size:14px;color:#eef0f5;font-weight:500;">'+p.player+'</span>'
-            +'<span style="font-size:12px;color:#5a6275;">'+Math.round(p.runs)+' runs · avg '+parseFloat(p.average).toFixed(1)+'</span>'
+            +'<span style="font-size:12px;color:#5a6275;">'+Math.round(p.runs)+' runs</span>'
             +'</a>';
         }).join('');
-    res.style.display = 'block';
-  } catch(e){ res.style.display='none'; }
+      }
+      _res.style.display = 'block';
+    })
+    .catch(function(){ if(_res) _res.style.display='none'; });
 }
 
-inp.addEventListener('input', function(){
-  clearTimeout(st);
-  const q = this.value.trim();
-  if (q.length < 2) { res.style.display='none'; return; }
-  st = setTimeout(() => runSearch(q), 300);
-});
-
-btn.addEventListener('click', () => runSearch(inp.value.trim()));
-inp.addEventListener('keydown', e => { if(e.key==='Enter') runSearch(inp.value.trim()); });
-document.addEventListener('click', e => {
-  if (!inp.contains(e.target) && !res.contains(e.target)) res.style.display='none';
+window.addEventListener('DOMContentLoaded', function(){
+  _inp = document.getElementById('hero-search');
+  _res = document.getElementById('hero-results');
+  _btn = document.getElementById('hero-btn');
+  if (!_inp) return;
+  _inp.addEventListener('input', function(){
+    clearTimeout(_st);
+    var q = this.value.trim();
+    if (q.length < 2) { _res.style.display='none'; return; }
+    _st = setTimeout(function(){ runSearch(q); }, 300);
+  });
+  if (_btn) _btn.addEventListener('click', function(){ runSearch(_inp.value.trim()); });
+  _inp.addEventListener('keydown', function(e){ if(e.key==='Enter') runSearch(this.value.trim()); });
+  document.addEventListener('click', function(e){
+    if (_inp && _res && !_inp.contains(e.target) && !_res.contains(e.target)) _res.style.display='none';
+  });
 });
 </script>
 </body>
