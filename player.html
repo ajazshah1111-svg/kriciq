@@ -656,22 +656,18 @@ new Chart(consCtx, {
       if (!response.ok) throw new Error('API error: ' + response.status);
       const data = await response.json();
 
-      // Inject real stats into the stat bar
-      if (data.runs     !== undefined) document.getElementById('stat-runs').textContent    = data.runs.toLocaleString();
-      if (data.average  !== undefined) document.getElementById('stat-avg').textContent     = data.average.toFixed(2);
-      if (data.strike_rate !== undefined) document.getElementById('stat-sr').textContent   = data.strike_rate.toFixed(1);
-
-      // Your API doesn't return matches/50s/100s yet — keeping dashes until API adds them
-      // When your API adds those fields, uncomment these:
-      // if (data.matches !== undefined) document.getElementById('stat-matches').textContent = data.matches;
-      // if (data.fifties !== undefined) document.getElementById('stat-50s').textContent     = data.fifties;
-      // if (data.hundreds !== undefined) document.getElementById('stat-100s').textContent   = data.hundreds;
+      // ── STAT BAR — all real data now ──
+      if (data.runs        !== undefined) document.getElementById('stat-runs').textContent    = Math.round(data.runs).toLocaleString();
+      if (data.matches     !== undefined) document.getElementById('stat-matches').textContent = Math.round(data.matches);
+      if (data.average     !== undefined) document.getElementById('stat-avg').textContent     = parseFloat(data.average).toFixed(2);
+      if (data.strike_rate !== undefined) document.getElementById('stat-sr').textContent      = parseFloat(data.strike_rate).toFixed(1);
+      if (data.hundreds    !== undefined) document.getElementById('stat-100s').textContent    = Math.round(data.hundreds);
+      if (data.fifties     !== undefined) document.getElementById('stat-50s').textContent     = Math.round(data.fifties);
 
       console.log('✅ KricIQ: Real Kohli stats loaded!', data);
     } catch (err) {
       console.error('KricIQ API error:', err);
-      // On failure — show a dash so page still looks clean
-      ['stat-runs','stat-avg','stat-sr'].forEach(id => {
+      ['stat-runs','stat-avg','stat-sr','stat-matches','stat-100s','stat-50s'].forEach(id => {
         const el = document.getElementById(id);
         if (el && el.textContent === '—') el.textContent = 'N/A';
       });
