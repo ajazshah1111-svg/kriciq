@@ -651,12 +651,13 @@ new Chart(consCtx, {
   const API_BASE = 'https://kriciq-api.onrender.com/api';
 
   async function loadPlayerStats() {
+    const params = new URLSearchParams(window.location.search);
+    const playerId = params.get('id') || 'V-Kohli';
     try {
       const response = await fetch(API_BASE + '/player/' + playerId);
       if (!response.ok) throw new Error('API error: ' + response.status);
       const data = await response.json();
 
-      // ── STAT BAR — all real data now ──
       if (data.runs        !== undefined) document.getElementById('stat-runs').textContent    = Math.round(data.runs).toLocaleString();
       if (data.matches     !== undefined) document.getElementById('stat-matches').textContent = Math.round(data.matches);
       if (data.average     !== undefined) document.getElementById('stat-avg').textContent     = parseFloat(data.average).toFixed(2);
@@ -664,7 +665,16 @@ new Chart(consCtx, {
       if (data.hundreds    !== undefined) document.getElementById('stat-100s').textContent    = Math.round(data.hundreds);
       if (data.fifties     !== undefined) document.getElementById('stat-50s').textContent     = Math.round(data.fifties);
 
-      console.log('✅ KricIQ: Real Kohli stats loaded!', data);
+      if (params.get('id') && data.player) {
+        const parts = data.player.trim().split(' ');
+        const last = parts[parts.length-1].toUpperCase();
+        const first = parts.slice(0,-1).join(' ').toUpperCase();
+        const el = document.querySelector('.pname');
+        if (el) el.innerHTML = first + ' <span>' + last + '</span>';
+        document.title = 'KricIQ — ' + data.player + ' · Deep Profile';
+      }
+
+      console.log('✅ KricIQ: Real stats loaded!', data);
     } catch (err) {
       console.error('KricIQ API error:', err);
       ['stat-runs','stat-avg','stat-sr','stat-matches','stat-100s','stat-50s'].forEach(id => {
@@ -674,7 +684,6 @@ new Chart(consCtx, {
     }
   }
 
-  // Run when page is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadPlayerStats);
   } else {
