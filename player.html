@@ -219,10 +219,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
     <a href="#" class="nl">Live</a>
   </div>
   <div class="nav-r">
-    <div class="search-box" style="position:relative;">
+    <div class="search-box">
       <svg width="13" height="13" fill="none" stroke="#5a6275" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="nav-search" placeholder="Search player…" autocomplete="off"/>
-      <div id="nav-search-results" style="display:none;position:absolute;top:calc(100% + 8px);left:-12px;right:-12px;background:#0f131c;border:1px solid rgba(255,255,255,0.1);border-radius:8px;z-index:999;max-height:280px;overflow-y:auto;"></div>
+      <input type="text" placeholder="Search player, team…" value="Virat Kohli"/>
     </div>
     <div class="pro-badge">PRO</div>
   </div>
@@ -649,37 +648,37 @@ new Chart(consCtx, {
 <!-- ✅ KRICIQ REAL API CONNECTION -->
 <script>
 (function() {
-  const API_BASE = 'https://kriciq-api.onrender.com/api';
+  var API_BASE = 'https://kriciq-api.onrender.com/api';
 
-  async function loadKohliStats() {
-    try {
-      const response = await fetch(API_BASE + '/player/V-Kohli');
-      if (!response.ok) throw new Error('API error: ' + response.status);
-      const data = await response.json();
+  function loadPlayerStats() {
+    var params = new URLSearchParams(window.location.search);
+    var playerId = params.get('id') || 'V-Kohli';
 
-      // ── STAT BAR — all real data now ──
-      if (data.runs        !== undefined) document.getElementById('stat-runs').textContent    = Math.round(data.runs).toLocaleString();
-      if (data.matches     !== undefined) document.getElementById('stat-matches').textContent = Math.round(data.matches);
-      if (data.average     !== undefined) document.getElementById('stat-avg').textContent     = parseFloat(data.average).toFixed(2);
-      if (data.strike_rate !== undefined) document.getElementById('stat-sr').textContent      = parseFloat(data.strike_rate).toFixed(1);
-      if (data.hundreds    !== undefined) document.getElementById('stat-100s').textContent    = Math.round(data.hundreds);
-      if (data.fifties     !== undefined) document.getElementById('stat-50s').textContent     = Math.round(data.fifties);
-
-      console.log('✅ KricIQ: Real Kohli stats loaded!', data);
-    } catch (err) {
-      console.error('KricIQ API error:', err);
-      ['stat-runs','stat-avg','stat-sr','stat-matches','stat-100s','stat-50s'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el && el.textContent === '—') el.textContent = 'N/A';
-      });
-    }
+    fetch(API_BASE + '/player/' + playerId)
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (data.runs !== undefined) document.getElementById('stat-runs').textContent = Math.round(data.runs).toLocaleString();
+        if (data.matches !== undefined) document.getElementById('stat-matches').textContent = Math.round(data.matches);
+        if (data.average !== undefined) document.getElementById('stat-avg').textContent = parseFloat(data.average).toFixed(2);
+        if (data.strike_rate !== undefined) document.getElementById('stat-sr').textContent = parseFloat(data.strike_rate).toFixed(1);
+        if (data.hundreds !== undefined) document.getElementById('stat-100s').textContent = Math.round(data.hundreds);
+        if (data.fifties !== undefined) document.getElementById('stat-50s').textContent = Math.round(data.fifties);
+        if (params.get('id') && data.player) {
+          var parts = data.player.trim().split(' ');
+          var last = parts[parts.length-1].toUpperCase();
+          var first = parts.slice(0,-1).join(' ').toUpperCase();
+          var el = document.querySelector('.pname');
+          if (el) el.innerHTML = first + ' <span>' + last + '</span>';
+          document.title = 'KricIQ - ' + data.player;
+        }
+      })
+      .catch(function(err){ console.error('KricIQ API error:', err); });
   }
 
-  // Run when page is ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadKohliStats);
+    document.addEventListener('DOMContentLoaded', loadPlayerStats);
   } else {
-    loadKohliStats();
+    loadPlayerStats();
   }
 })();
 </script>
@@ -690,37 +689,43 @@ new Chart(consCtx, {
     <a href="teams.html" class="mnav-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg><span>Teams</span></a>
     <a href="#" class="mnav-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg><span>Predictor</span></a>
     <a href="#" class="mnav-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h12a2.25 2.25 0 0 0 2.25-2.25V3m-4.5 0v11.25m-5.25 0V3M12 3v11.25M3.75 8.25h16.5"/></svg><span>Live</span></a>
-</div></div>
-<script>
+</div></div></body>
+</html><script>
 (function(){
-  const API = 'https://kriciq-api.onrender.com/api';
-  let t;
-  const input = document.getElementById('nav-search');
-  const results = document.getElementById('nav-search-results');
-  if (!input) return;
-  input.addEventListener('input', function() {
-    clearTimeout(t);
-    const q = this.value.trim();
-    if (q.length < 2) { results.style.display='none'; return; }
-    t = setTimeout(async () => {
-      try {
-        const res = await fetch(API + '/search/' + encodeURIComponent(q));
-        const players = await res.json();
-        results.innerHTML = !players.length
-          ? '<div style="padding:10px 14px;font-size:13px;color:#5a6275;">No players found</div>'
-          : players.map(p => {
-              const id = p.player.replace(/ /g,'-');
-              return '<a href="player.html?id='+id+'" style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='rgba(0,245,170,0.05)'" onmouseout="this.style.background='none'">'
-                +'<span style="font-size:13px;color:#eef0f4;">'+p.player+'</span>'
-                +'<span style="font-size:11px;color:#5a6275;">'+Math.round(p.runs)+' runs</span>'
-                +'</a>';
+  var API2 = 'https://kriciq-api.onrender.com/api';
+  var t2;
+  var input2 = document.getElementById('nav-search');
+  var results2 = document.getElementById('nav-search-results');
+  if (!input2) return;
+  input2.addEventListener('input', function() {
+    clearTimeout(t2);
+    var q = this.value.trim();
+    if (q.length < 2) { results2.style.display='none'; return; }
+    t2 = setTimeout(function() {
+      fetch(API2 + '/search/' + encodeURIComponent(q))
+        .then(function(r){ return r.json(); })
+        .then(function(players){
+          if (!players.length) {
+            results2.innerHTML = '<div style="padding:10px 14px;font-size:13px;color:#5a6275;">No players found</div>';
+          } else {
+            results2.innerHTML = players.map(function(p){
+              var id = p.player.replace(/ /g,'-');
+              var a = document.createElement('a');
+              a.href = 'player.html?id=' + id;
+              a.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:9px 14px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);';
+              a.onmouseover = function(){ this.style.background='rgba(0,245,170,0.05)'; };
+              a.onmouseout = function(){ this.style.background='none'; };
+              a.innerHTML = '<span style="font-size:13px;color:#eef0f4;">'+p.player+'</span><span style="font-size:11px;color:#5a6275;">'+Math.round(p.runs)+' runs</span>';
+              return a.outerHTML;
             }).join('');
-        results.style.display = 'block';
-      } catch(e){ results.style.display='none'; }
+          }
+          results2.style.display = 'block';
+        })
+        .catch(function(){ results2.style.display='none'; });
     }, 300);
   });
-  document.addEventListener('click', e => {
-    if (!input.contains(e.target) && !results.contains(e.target)) results.style.display='none';
+  document.addEventListener('click', function(e) {
+    if (!input2.contains(e.target) && !results2.contains(e.target)) results2.style.display='none';
   });
 })();
 </script>
