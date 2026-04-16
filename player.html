@@ -212,7 +212,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 <nav>
   <a href="index.html" class="logo">KRIC<em>IQ</em></a>
   <div class="nav-links">
-    <a href="player.html" class="nl on">Players</a>
+    <a href="players.html" class="nl on">Players</a>
     <a href="teams.html" class="nl">Teams</a>
     <a href="teams.html" class="nl">Head-to-Head</a>
     <a href="#" class="nl">Match Predictor</a>
@@ -221,7 +221,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
   <div class="nav-r">
     <div class="search-box">
       <svg width="13" height="13" fill="none" stroke="#5a6275" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" placeholder="Search player, team…" value="Virat Kohli"/>
+      <input type="text" id="nav-search" placeholder="Search player..." autocomplete="off"/>
     </div>
     <div class="pro-badge">PRO</div>
   </div>
@@ -647,87 +647,71 @@ new Chart(consCtx, {
 </script>
 <!-- ✅ KRICIQ REAL API CONNECTION -->
 <script>
-(function() {
-  var API_BASE = 'https://kriciq-api.onrender.com/api';
+var _kapi = 'https://kriciq-api.onrender.com/api';
 
-  function loadPlayerStats() {
-    var params = new URLSearchParams(window.location.search);
-    var playerId = params.get('id') || 'V-Kohli';
+function _loadPlayer() {
+  var params = new URLSearchParams(window.location.search);
+  var pid = params.get('id') || 'V-Kohli';
+  fetch(_kapi + '/player/' + pid)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.runs) document.getElementById('stat-runs').textContent = Math.round(d.runs).toLocaleString();
+      if(d.matches) document.getElementById('stat-matches').textContent = Math.round(d.matches);
+      if(d.average) document.getElementById('stat-avg').textContent = parseFloat(d.average).toFixed(2);
+      if(d.strike_rate) document.getElementById('stat-sr').textContent = parseFloat(d.strike_rate).toFixed(1);
+      if(d.hundreds !== undefined) document.getElementById('stat-100s').textContent = Math.round(d.hundreds);
+      if(d.fifties) document.getElementById('stat-50s').textContent = Math.round(d.fifties);
+      if(params.get('id') && d.player){
+        var pts = d.player.trim().split(' ');
+        var el = document.querySelector('.pname');
+        if(el) el.innerHTML = pts.slice(0,-1).join(' ').toUpperCase() + ' <span>' + pts[pts.length-1].toUpperCase() + '</span>';
+        document.title = 'KricIQ - ' + d.player;
+      }
+    }).catch(function(e){ console.error('API error',e); });
+}
 
-    fetch(API_BASE + '/player/' + playerId)
-      .then(function(r){ return r.json(); })
-      .then(function(data){
-        if (data.runs !== undefined) document.getElementById('stat-runs').textContent = Math.round(data.runs).toLocaleString();
-        if (data.matches !== undefined) document.getElementById('stat-matches').textContent = Math.round(data.matches);
-        if (data.average !== undefined) document.getElementById('stat-avg').textContent = parseFloat(data.average).toFixed(2);
-        if (data.strike_rate !== undefined) document.getElementById('stat-sr').textContent = parseFloat(data.strike_rate).toFixed(1);
-        if (data.hundreds !== undefined) document.getElementById('stat-100s').textContent = Math.round(data.hundreds);
-        if (data.fifties !== undefined) document.getElementById('stat-50s').textContent = Math.round(data.fifties);
-        if (params.get('id') && data.player) {
-          var parts = data.player.trim().split(' ');
-          var last = parts[parts.length-1].toUpperCase();
-          var first = parts.slice(0,-1).join(' ').toUpperCase();
-          var el = document.querySelector('.pname');
-          if (el) el.innerHTML = first + ' <span>' + last + '</span>';
-          document.title = 'KricIQ - ' + data.player;
-        }
-      })
-      .catch(function(err){ console.error('KricIQ API error:', err); });
-  }
+function _initSearch() {
+  var inp = document.getElementById('nav-search');
+  if(!inp) return;
+  var drop = document.createElement('div');
+  drop.style.cssText = 'display:none;position:absolute;top:calc(100% + 8px);left:-12px;right:-12px;background:#0f131c;border:1px solid rgba(255,255,255,0.1);border-radius:8px;z-index:999;max-height:280px;overflow-y:auto;';
+  inp.parentNode.style.position = 'relative';
+  inp.parentNode.appendChild(drop);
+  var t;
+  inp.addEventListener('input', function(){
+    clearTimeout(t);
+    var q = this.value.trim();
+    if(q.length < 2){ drop.style.display='none'; return; }
+    t = setTimeout(function(){
+      fetch(_kapi + '/search/' + encodeURIComponent(q))
+        .then(function(r){ return r.json(); })
+        .then(function(players){
+          drop.innerHTML = players.length
+            ? players.map(function(p){
+                var id = p.player.replace(/ /g,'-');
+                return '<a href="player.html?id='+id+'" style="display:flex;justify-content:space-between;padding:9px 14px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);color:#eef0f4;font-size:13px;">'+p.player+'<span style="color:#5a6275;font-size:11px;">'+Math.round(p.runs)+' runs</span></a>';
+              }).join('')
+            : '<div style="padding:10px 14px;color:#5a6275;font-size:13px;">No players found</div>';
+          drop.style.display = 'block';
+        }).catch(function(){ drop.style.display='none'; });
+    }, 300);
+  });
+  document.addEventListener('click', function(e){
+    if(!inp.parentNode.contains(e.target)) drop.style.display='none';
+  });
+}
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadPlayerStats);
-  } else {
-    loadPlayerStats();
-  }
-})();
+window.addEventListener('DOMContentLoaded', function(){
+  _loadPlayer();
+  _initSearch();
+});
 </script>
 
 <div class="mobile-nav"><div class="mobile-nav-inner">
     <a href="index.html" class="mnav-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955a1.5 1.5 0 0 1 2.092 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg><span>Home</span></a>
-    <a href="player.html" class="mnav-item active"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg><span>Players</span></a>
+    <a href="players.html" class="mnav-item active"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg><span>Players</span></a>
     <a href="teams.html" class="mnav-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg><span>Teams</span></a>
     <a href="#" class="mnav-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg><span>Predictor</span></a>
     <a href="#" class="mnav-item"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h12a2.25 2.25 0 0 0 2.25-2.25V3m-4.5 0v11.25m-5.25 0V3M12 3v11.25M3.75 8.25h16.5"/></svg><span>Live</span></a>
 </div></div></body>
-</html><script>
-(function(){
-  var API2 = 'https://kriciq-api.onrender.com/api';
-  var t2;
-  var input2 = document.getElementById('nav-search');
-  var results2 = document.getElementById('nav-search-results');
-  if (!input2) return;
-  input2.addEventListener('input', function() {
-    clearTimeout(t2);
-    var q = this.value.trim();
-    if (q.length < 2) { results2.style.display='none'; return; }
-    t2 = setTimeout(function() {
-      fetch(API2 + '/search/' + encodeURIComponent(q))
-        .then(function(r){ return r.json(); })
-        .then(function(players){
-          if (!players.length) {
-            results2.innerHTML = '<div style="padding:10px 14px;font-size:13px;color:#5a6275;">No players found</div>';
-          } else {
-            results2.innerHTML = players.map(function(p){
-              var id = p.player.replace(/ /g,'-');
-              var a = document.createElement('a');
-              a.href = 'player.html?id=' + id;
-              a.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:9px 14px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);';
-              a.onmouseover = function(){ this.style.background='rgba(0,245,170,0.05)'; };
-              a.onmouseout = function(){ this.style.background='none'; };
-              a.innerHTML = '<span style="font-size:13px;color:#eef0f4;">'+p.player+'</span><span style="font-size:11px;color:#5a6275;">'+Math.round(p.runs)+' runs</span>';
-              return a.outerHTML;
-            }).join('');
-          }
-          results2.style.display = 'block';
-        })
-        .catch(function(){ results2.style.display='none'; });
-    }, 300);
-  });
-  document.addEventListener('click', function(e) {
-    if (!input2.contains(e.target) && !results2.contains(e.target)) results2.style.display='none';
-  });
-})();
-</script>
-</body>
 </html>
