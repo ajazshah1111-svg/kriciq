@@ -219,10 +219,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
     <a href="#" class="nl">Live</a>
   </div>
   <div class="nav-r">
-    <div class="search-box" style="position:relative;">
+    <div class="search-box">
       <svg width="13" height="13" fill="none" stroke="#5a6275" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="nav-search" placeholder="Search player…" autocomplete="off"/>
-      <div id="nav-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:#0f131c;border:1px solid rgba(255,255,255,0.1);border-radius:8px;margin-top:4px;z-index:999;max-height:260px;overflow-y:auto;"></div>
+      <input type="text" placeholder="Search player, team…" value="Virat Kohli"/>
     </div>
     <div class="pro-badge">PRO</div>
   </div>
@@ -651,17 +650,13 @@ new Chart(consCtx, {
 (function() {
   const API_BASE = 'https://kriciq-api.onrender.com/api';
 
-  // ── LOAD PLAYER STATS ──
-  async function loadPlayerStats() {
-    // Get player id from URL e.g. player.html?id=V-Kohli, default to V-Kohli
-    const params = new URLSearchParams(window.location.search);
-    const playerId = params.get('id') || 'V-Kohli';
-
+  async function loadKohliStats() {
     try {
-      const response = await fetch(API_BASE + '/player/' + encodeURIComponent(playerId));
+      const response = await fetch(API_BASE + '/player/' + playerId);
       if (!response.ok) throw new Error('API error: ' + response.status);
       const data = await response.json();
 
+      // ── STAT BAR — all real data now ──
       if (data.runs        !== undefined) document.getElementById('stat-runs').textContent    = Math.round(data.runs).toLocaleString();
       if (data.matches     !== undefined) document.getElementById('stat-matches').textContent = Math.round(data.matches);
       if (data.average     !== undefined) document.getElementById('stat-avg').textContent     = parseFloat(data.average).toFixed(2);
@@ -669,17 +664,7 @@ new Chart(consCtx, {
       if (data.hundreds    !== undefined) document.getElementById('stat-100s').textContent    = Math.round(data.hundreds);
       if (data.fifties     !== undefined) document.getElementById('stat-50s').textContent     = Math.round(data.fifties);
 
-      // Update player name in hero if coming from players list
-      if (params.get('id') && data.player) {
-        const nameParts = data.player.trim().split(' ');
-        const lastName = nameParts[nameParts.length - 1].toUpperCase();
-        const firstName = nameParts.slice(0, -1).join(' ').toUpperCase();
-        const pnameEl = document.querySelector('.pname');
-        if (pnameEl) pnameEl.innerHTML = firstName + ' <span>' + lastName + '</span>';
-        document.title = 'KricIQ — ' + data.player + ' · Deep Profile';
-      }
-
-      console.log('✅ KricIQ: Real stats loaded!', data);
+      console.log('✅ KricIQ: Real Kohli stats loaded!', data);
     } catch (err) {
       console.error('KricIQ API error:', err);
       ['stat-runs','stat-avg','stat-sr','stat-matches','stat-100s','stat-50s'].forEach(id => {
@@ -689,52 +674,11 @@ new Chart(consCtx, {
     }
   }
 
-  // ── SEARCH BAR ──
-  const searchInput = document.getElementById('nav-search');
-  const searchResults = document.getElementById('nav-search-results');
-  let searchTimer;
-
-  if (searchInput) {
-    searchInput.addEventListener('input', function() {
-      clearTimeout(searchTimer);
-      const q = this.value.trim();
-      if (q.length < 2) { searchResults.style.display = 'none'; return; }
-      searchTimer = setTimeout(() => doSearch(q), 300);
-    });
-
-    document.addEventListener('click', function(e) {
-      if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-        searchResults.style.display = 'none';
-      }
-    });
-  }
-
-  async function doSearch(query) {
-    try {
-      const res = await fetch(API_BASE + '/search/' + encodeURIComponent(query));
-      const players = await res.json();
-      if (!players.length) {
-        searchResults.innerHTML = '<div style="padding:12px 14px;font-size:13px;color:#5a6275;">No players found</div>';
-      } else {
-        searchResults.innerHTML = players.map(p => {
-          const id = p.player.replace(/ /g, '-');
-          return '<a href="player.html?id=' + encodeURIComponent(id) + '" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);transition:.1s;" onmouseover="this.style.background='rgba(0,245,170,0.05)'" onmouseout="this.style.background='none'">'
-            + '<span style="font-size:13px;color:#eef0f4;">' + p.player + '</span>'
-            + '<span style="font-size:11px;color:#5a6275;">' + Math.round(p.runs) + ' runs · ' + parseFloat(p.average).toFixed(1) + ' avg</span>'
-            + '</a>';
-        }).join('');
-      }
-      searchResults.style.display = 'block';
-    } catch(e) {
-      searchResults.style.display = 'none';
-    }
-  }
-
-  // Run on page load
+  // Run when page is ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadPlayerStats);
+    document.addEventListener('DOMContentLoaded', loadKohliStats);
   } else {
-    loadPlayerStats();
+    loadKohliStats();
   }
 })();
 </script>
