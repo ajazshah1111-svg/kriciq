@@ -235,7 +235,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
       Players
     </a>
-    <a href="index.html" title="KricIQ Home" style="display:block;width:110px;height:38px;overflow:hidden;"><img src="logo.png" alt="KricIQ" style="height:38px;width:auto;max-width:none;display:block;"></a>
+    <a href="index.html" title="KricIQ Home"><img src="logo.png" alt="KricIQ" height="34" style="display:block;"></a>
   </div>
   <div class="nav-links">
     <a href="players.html" class="nl on">Players</a>
@@ -245,7 +245,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
     <a href="#" class="nl">Live</a>
   </div>
   <div class="nav-r">
-    <div class="search-box" style="position:relative;">
+    <div class="search-box">
       <svg width="13" height="13" fill="none" stroke="#5a6275" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="nav-search" placeholder="Search any player..." autocomplete="off"/>
     </div>
@@ -913,57 +913,11 @@ function _loadPlayer() {
     }).catch(function(e){ console.error('KricIQ API error:',e); });
 }
 
-      // AI PREDICTION
-      var predLow=Math.round(avg*0.75), predHigh=Math.round(avg*1.35);
-      var pred50=Math.min(Math.round((avg/75)*100),68);
-      var duckRisk=Math.max(3,Math.round(13-avg/7));
-      var pred100=Math.round(hundreds/Math.max(matches,1)*100);
-      var confPct=Math.min(Math.round(44+avg/4),82);
-      var srBoost=sr>130?'+'+Math.round((sr-125)/2)+'%':'-'+Math.round((125-sr)/2)+'%';
-      el=document.querySelector('.ai-pred-runs'); if(el) el.textContent=predLow+'–'+predHigh;
-      el=document.querySelector('.ai-conf-val');  if(el) el.textContent=confPct+'%';
-      var gi=document.querySelectorAll('.ai-gitem');
-      if(gi.length>=5){
-        gi[0].querySelector('.ai-gv').textContent=pred50+'%';
-        gi[1].querySelector('.ai-gv').textContent=duckRisk+'%';
-        gi[2].querySelector('.ai-gv').textContent=pred100+'%';
-        gi[4].querySelector('.ai-gv').textContent=srBoost;
-      }
-
-      // SEASON header
-      var secSub=document.querySelector('.card.span2 .ch .csub');
-      if(secSub&&runs>0) secSub.textContent='IPL career — '+runs.toLocaleString()+' total runs across '+matches+' matches';
-
-      // TEAM tag
-      if(d.team){ var tt=document.querySelector('.pmeta .ptag:nth-child(3)'); if(tt) tt.textContent=d.team; }
-
-      // PRESSURE INDEX — scale all 6 bars by avg
-      var piScores=[
-        Math.min((avg/60*9+0.5).toFixed(1),9.9),
-        Math.min((sr/160*9+0.3).toFixed(1),9.9),
-        Math.min((avg/65*8.5).toFixed(1),9.9),
-        Math.min((sr/170*7).toFixed(1),9.9),
-        Math.min((avg/58*9).toFixed(1),9.9),
-        Math.min((avg/55*9.5).toFixed(1),9.9)
-      ];
-      var piEls=document.querySelectorAll('.pi-score');
-      var piFills=document.querySelectorAll('.pi-fill');
-      piScores.forEach(function(s,i){
-        if(piEls[i])  piEls[i].textContent=s;
-        if(piFills[i]) piFills[i].style.width=Math.round(s/10*100)+'%';
-      });
-
-      // BUILD ALL CHARTS with this player's data
-      _buildCharts(avg, sr, hundreds, matches);
-
-    }).catch(function(e){ console.error('KricIQ API error:',e); });
-}
-
 function _initSearch() {
   var inp=document.getElementById('nav-search');
   if(!inp) return;
   var drop=document.createElement('div');
-  drop.style.cssText='display:none;position:absolute;top:calc(100% + 8px);right:0;left:auto;min-width:280px;background:#0f131c;border:1px solid rgba(255,255,255,0.1);border-radius:8px;z-index:999;max-height:280px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4);';
+  drop.style.cssText='display:none;position:absolute;top:calc(100% + 8px);left:-12px;right:-12px;background:#0f131c;border:1px solid rgba(255,255,255,0.1);border-radius:8px;z-index:999;max-height:280px;overflow-y:auto;';
   inp.parentNode.style.position='relative';
   inp.parentNode.appendChild(drop);
   var t;
