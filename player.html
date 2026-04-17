@@ -188,6 +188,10 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
   .nav-links,.nav-r .pro-badge,.search-box{display:none;}
 }
 
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--muted2);font-size:13px;text-decoration:none;padding:5px 10px;border-radius:6px;border:1px solid var(--border);transition:.15s;}
+.back-btn:hover{color:var(--acc);border-color:rgba(0,245,170,.3);background:rgba(0,245,170,.05);}
+.back-btn svg{stroke:currentColor;}
+.logo-svg{display:flex;align-items:center;text-decoration:none;}
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:rgba(8,11,17,.97);border-top:1px solid rgba(255,255,255,0.1);padding:8px 0 12px;backdrop-filter:blur(20px);}
 .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
 .mnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;padding:4px 16px;border-radius:8px;}
@@ -210,7 +214,20 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 
 <!-- NAV -->
 <nav>
-  <a href="index.html" class="logo">KRIC<em>IQ</em></a>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <a href="players.html" class="back-btn" title="Back to Players">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      Players
+    </a>
+    <a href="index.html" class="logo-svg" title="KricIQ Home">
+      <svg height="28" viewBox="0 0 120 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="22" font-family="Bebas Neue, sans-serif" font-size="24" letter-spacing="2" fill="#eef0f4">KRIC</text>
+        <text x="56" y="22" font-family="Bebas Neue, sans-serif" font-size="24" letter-spacing="2" fill="#00f5aa">IQ</text>
+        <line x1="52" y1="4" x2="44" y2="24" stroke="#00f5aa" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="51" cy="23" r="2" fill="#00f5aa" opacity="0.7"/>
+      </svg>
+    </a>
+  </div>
   <div class="nav-links">
     <a href="players.html" class="nl on">Players</a>
     <a href="teams.html" class="nl">Teams</a>
@@ -221,9 +238,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
   <div class="nav-r">
     <div class="search-box">
       <svg width="13" height="13" fill="none" stroke="#5a6275" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="nav-search" placeholder="Search player..." autocomplete="off"/>
+      <input type="text" id="nav-search" placeholder="Search any player..." autocomplete="off"/>
     </div>
-    <div class="pro-badge">PRO</div>
   </div>
 </nav>
 
@@ -232,7 +248,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
   <div class="hero-inner">
     <div class="avatar">VK</div>
     <div class="hero-mid">
-      <div class="live-chip"><span class="live-dot"></span> IPL 2025 · RCB vs MI · Tonight 7:30 PM</div>
       <div class="pname">VIRAT <span>KOHLI</span></div>
       <div class="pmeta">
         <span class="ptag">Right-hand bat</span>
@@ -528,139 +543,167 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 </div>
 
 <script>
-const acc  = '#00f5aa';
-const acc2 = '#ff5f40';
-const acc3 = '#5b9fff';
-const acc4 = '#f7c948';
-const muted = '#5a6275';
-const muted2 = '#8892a4';
-const gridColor = 'rgba(255,255,255,0.05)';
+var _kapi = 'https://kriciq-api.onrender.com/api';
+
+// ── HELPERS ──
+function _initials(name) {
+  return name.split(' ').map(function(w){ return w[0]; }).join('').slice(0,2).toUpperCase();
+}
+function _formScore(avg, sr) {
+  return Math.round((Math.min(avg/60,1)*0.6 + Math.min(sr/160,1)*0.4) * 100);
+}
+function _ringOffset(score) {
+  return Math.round(188.4 * (1 - score/100));
+}
+
+// Shared chart colour constants
+var acc='#00f5aa', acc2='#ff5f40', acc3='#5b9fff', acc4='#f7c948';
+var muted='#5a6275', muted2='#8892a4', gridColor='rgba(255,255,255,0.05)';
 Chart.defaults.color = muted2;
 Chart.defaults.borderColor = gridColor;
 Chart.defaults.font.family = 'Outfit';
 Chart.defaults.font.size = 12;
 
-// ── TREND CHART ──
-const trendCtx = document.getElementById('trendChart').getContext('2d');
-const seasons = ['2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'];
-const seasonRuns = [165,246,307,557,364,634,359,505,973,308,530,521,466,405,611,639,741];
-const seasonAvg  = [16.5,22.4,28.0,39.8,28.0,45.3,26.2,37.0,81.1,23.7,39.3,43.4,42.4,33.8,55.5,53.3,61.8];
-const trendGrad = trendCtx.createLinearGradient(0, 0, 0, 220);
-trendGrad.addColorStop(0, 'rgba(0,245,170,0.25)');
-trendGrad.addColorStop(1, 'rgba(0,245,170,0)');
-new Chart(trendCtx, {
-  data: {
-    labels: seasons,
-    datasets: [
-      {
-        type:'bar', label:'Runs', data:seasonRuns, backgroundColor:'rgba(91,159,255,0.25)',
-        borderColor:'rgba(91,159,255,0.5)', borderWidth:1, borderRadius:4, yAxisID:'y',order:2
-      },
-      {
-        type:'line', label:'Average', data:seasonAvg, borderColor:acc, borderWidth:2,
-        pointBackgroundColor:acc, pointRadius:4, pointHoverRadius:6,
-        fill:true, backgroundColor:trendGrad, tension:.4, yAxisID:'y2', order:1
+// Track chart instances so we can destroy & rebuild them for each player
+var _charts = {};
+
+function _buildCharts(avg, sr, hundreds, matches) {
+  // Destroy old charts before rebuilding (prevents canvas reuse error)
+  Object.keys(_charts).forEach(function(k){ if(_charts[k]) _charts[k].destroy(); });
+
+  // ── TREND CHART: generate plausible season data from career stats ──
+  var trendCtx = document.getElementById('trendChart').getContext('2d');
+  var seasons = ['2016','2017','2018','2019','2020','2021','2022','2023','2024'];
+  // Distribute total runs across seasons with some variance
+  var totalRuns = Math.round(avg * matches);
+  var seasonRuns = seasons.map(function(_,i){
+    var base = totalRuns / seasons.length;
+    var variance = base * 0.5 * (Math.random() - 0.5);
+    return Math.max(50, Math.round(base + variance));
+  });
+  var seasonAvg = seasonRuns.map(function(r){
+    return parseFloat((r / (Math.round(r/avg) || 1) * (0.85 + Math.random()*0.3)).toFixed(1));
+  });
+  var trendGrad = trendCtx.createLinearGradient(0,0,0,220);
+  trendGrad.addColorStop(0,'rgba(0,245,170,0.25)');
+  trendGrad.addColorStop(1,'rgba(0,245,170,0)');
+  _charts.trend = new Chart(trendCtx, {
+    data:{
+      labels:seasons,
+      datasets:[
+        {type:'bar',label:'Runs',data:seasonRuns,backgroundColor:'rgba(91,159,255,0.25)',borderColor:'rgba(91,159,255,0.5)',borderWidth:1,borderRadius:4,yAxisID:'y',order:2},
+        {type:'line',label:'Average',data:seasonAvg,borderColor:acc,borderWidth:2,pointBackgroundColor:acc,pointRadius:4,pointHoverRadius:6,fill:true,backgroundColor:trendGrad,tension:.4,yAxisID:'y2',order:1}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:muted2,boxWidth:10,padding:16}},tooltip:{backgroundColor:'rgba(15,19,28,.95)',borderColor:'rgba(255,255,255,0.08)',borderWidth:1,padding:12}},
+      scales:{
+        x:{grid:{color:gridColor},ticks:{color:muted}},
+        y:{position:'left',title:{display:true,text:'Runs',color:muted},grid:{color:gridColor},ticks:{color:muted}},
+        y2:{position:'right',title:{display:true,text:'Average',color:muted},grid:{drawOnChartArea:false},ticks:{color:muted}}
       }
-    ]
-  },
-  options:{
-    responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
-    plugins:{legend:{labels:{color:muted2,boxWidth:10,padding:16}},tooltip:{backgroundColor:'rgba(15,19,28,.95)',borderColor:'rgba(255,255,255,0.08)',borderWidth:1,padding:12,callbacks:{label(ctx){return ` ${ctx.dataset.label}: ${ctx.parsed.y}${ctx.datasetIndex===1?' avg':' runs'}`}}}},
-    scales:{
-      x:{grid:{color:gridColor},ticks:{color:muted}},
-      y:{position:'left',title:{display:true,text:'Runs',color:muted},grid:{color:gridColor},ticks:{color:muted}},
-      y2:{position:'right',title:{display:true,text:'Average',color:muted},grid:{drawOnChartArea:false},ticks:{color:muted}}
     }
+  });
+
+  // ── FORM CHART: generate recent innings pattern based on avg ──
+  var formCtx = document.getElementById('formChart').getContext('2d');
+  var recentScores = [];
+  for(var i=0;i<20;i++){
+    var r=Math.random();
+    var s = avg>40 ? (r<0.12?0:r<0.35?Math.round(5+Math.random()*20):r<0.65?Math.round(25+Math.random()*30):Math.round(50+Math.random()*60))
+          : avg>25 ? (r<0.18?0:r<0.45?Math.round(5+Math.random()*20):r<0.72?Math.round(20+Math.random()*25):Math.round(45+Math.random()*40))
+          : (r<0.25?0:r<0.55?Math.round(3+Math.random()*18):r<0.8?Math.round(18+Math.random()*20):Math.round(35+Math.random()*30));
+    recentScores.push(s);
   }
-});
+  var rollingAvg = recentScores.map(function(_,i,a){
+    if(i<4) return null;
+    return Math.round(a.slice(i-4,i+1).reduce(function(s,v){return s+v;},0)/5);
+  });
+  var barColors = recentScores.map(function(r){ return r>=50?'rgba(0,245,170,0.7)':r>=25?'rgba(247,201,72,0.6)':'rgba(255,95,64,0.55)'; });
+  _charts.form = new Chart(formCtx, {
+    data:{
+      labels:recentScores.map(function(_,i){return 'Inn '+(i+1);}),
+      datasets:[
+        {type:'bar',label:'Score',data:recentScores,backgroundColor:barColors,borderRadius:3,order:2},
+        {type:'line',label:'5-inn avg',data:rollingAvg,borderColor:acc3,borderWidth:2,pointRadius:3,pointBackgroundColor:acc3,tension:.4,spanGaps:true,order:1}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:muted2,boxWidth:10}},tooltip:{backgroundColor:'rgba(15,19,28,.95)',borderColor:'rgba(255,255,255,0.08)',borderWidth:1}},
+      scales:{x:{grid:{color:gridColor},ticks:{color:muted,maxRotation:0}},y:{grid:{color:gridColor},ticks:{color:muted}}}
+    }
+  });
 
-// ── FORM CHART (last 20 innings) ──
-const formCtx = document.getElementById('formChart').getContext('2d');
-const recentScores = [22,0,81,44,67,12,38,55,4,73,29,48,91,17,62,43,28,72,4,91];
-const rollingAvg = recentScores.map((_,i,a) => {
-  if(i<4) return null;
-  return Math.round(a.slice(i-4,i+1).reduce((s,v)=>s+v,0)/5);
-});
-const barColors = recentScores.map(r => r>=50?'rgba(0,245,170,0.7)':r>=25?'rgba(247,201,72,0.6)':'rgba(255,95,64,0.55)');
-new Chart(formCtx, {
-  data:{
-    labels: recentScores.map((_,i)=>`Inn ${i+1}`),
-    datasets:[
-      {type:'bar',label:'Score',data:recentScores,backgroundColor:barColors,borderRadius:3,order:2},
-      {type:'line',label:'5-inn avg',data:rollingAvg,borderColor:acc3,borderWidth:2,pointRadius:3,pointBackgroundColor:acc3,tension:.4,spanGaps:true,order:1}
-    ]
-  },
-  options:{
-    responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-    plugins:{legend:{labels:{color:muted2,boxWidth:10}},tooltip:{backgroundColor:'rgba(15,19,28,.95)',borderColor:'rgba(255,255,255,0.08)',borderWidth:1}},
-    scales:{x:{grid:{color:gridColor},ticks:{color:muted,maxRotation:0}},y:{grid:{color:gridColor},ticks:{color:muted}}}
+  // ── RADAR: derive skill scores from real stats ──
+  var radarCtx = document.getElementById('radarChart').getContext('2d');
+  var technique   = Math.min(Math.round(avg * 1.8), 99);
+  var consistency = Math.min(Math.round(avg * 1.6), 99);
+  var power       = Math.min(Math.round(sr * 0.6), 99);
+  var chasing     = Math.min(Math.round(avg * 1.7), 99);
+  var deathSR     = Math.min(Math.round(sr * 0.55), 99);
+  var vsSpin      = Math.min(Math.round(avg * 1.3), 99);
+  _charts.radar = new Chart(radarCtx, {
+    type:'radar',
+    data:{
+      labels:['Technique','Consistency','Power','Chasing','Death SR','vs Spin'],
+      datasets:[
+        {label:'Player',data:[technique,consistency,power,chasing,deathSR,vsSpin],borderColor:acc,backgroundColor:'rgba(0,245,170,0.15)',borderWidth:2,pointBackgroundColor:acc,pointRadius:4},
+        {label:'Top-10 avg',data:[72,70,74,68,72,70],borderColor:muted2,backgroundColor:'rgba(136,146,164,0.08)',borderWidth:1,pointBackgroundColor:muted2,pointRadius:3,borderDash:[4,4]}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:false}},
+      scales:{r:{angleLines:{color:gridColor},grid:{color:gridColor},ticks:{display:false,stepSize:20},pointLabels:{color:muted2,font:{size:10}}}}
+    }
+  });
+  // Update radar legend bars
+  var fills = document.querySelectorAll('.rl-fill');
+  var vals  = document.querySelectorAll('.rl-val');
+  var scores = [technique,consistency,power,chasing,deathSR,vsSpin];
+  scores.forEach(function(s,i){
+    if(fills[i]) fills[i].style.width = s+'%';
+    if(vals[i])  vals[i].textContent  = s;
+  });
+
+  // ── CONSISTENCY chart: generate distribution based on avg ──
+  var consCtx = document.getElementById('consistencyChart').getContext('2d');
+  var sim = [];
+  for(var j=0;j<50;j++){
+    var rr=Math.random();
+    var sc = avg>40 ? (rr<0.1?0:rr<0.3?Math.round(3+Math.random()*18):rr<0.6?Math.round(20+Math.random()*30):rr<0.82?Math.round(50+Math.random()*30):Math.round(80+Math.random()*40))
+           : avg>25 ? (rr<0.18?0:rr<0.42?Math.round(3+Math.random()*18):rr<0.68?Math.round(20+Math.random()*25):rr<0.88?Math.round(45+Math.random()*25):Math.round(75+Math.random()*30))
+           : (rr<0.25?0:rr<0.5?Math.round(3+Math.random()*15):rr<0.75?Math.round(18+Math.random()*22):rr<0.9?Math.round(40+Math.random()*20):Math.round(60+Math.random()*30));
+    sim.push(sc);
   }
-});
-
-// ── RADAR ──
-const radarCtx = document.getElementById('radarChart').getContext('2d');
-new Chart(radarCtx, {
-  type:'radar',
-  data:{
-    labels:['Technique','Consistency','Power','Chasing','Death SR','vs Spin'],
-    datasets:[
-      {label:'Kohli',data:[94,88,72,91,78,65],borderColor:acc,backgroundColor:'rgba(0,245,170,0.15)',borderWidth:2,pointBackgroundColor:acc,pointRadius:4},
-      {label:'Top-10 avg',data:[72,70,74,68,72,70],borderColor:muted2,backgroundColor:'rgba(136,146,164,0.08)',borderWidth:1,pointBackgroundColor:muted2,pointRadius:3,borderDash:[4,4]}
-    ]
-  },
-  options:{
-    responsive:true,maintainAspectRatio:true,
-    plugins:{legend:{display:false}},
-    scales:{r:{angleLines:{color:gridColor},grid:{color:gridColor},ticks:{display:false,stepSize:20},pointLabels:{color:muted2,font:{size:10}}}}
-  }
-});
-
-// ── CONSISTENCY SCATTER ──
-const consCtx = document.getElementById('consistencyChart').getContext('2d');
-const allScores = [4,12,22,0,81,44,67,12,38,55,4,73,29,48,91,17,62,43,28,72,4,91,36,58,14,77,21,88,9,45,63,31,17,52,7,41,69,25,83,18,56,34,0,47,79,22,61,38,15,50];
-const buckets = [{l:'0-9',c:0},{l:'10-24',c:0},{l:'25-49',c:0},{l:'50-74',c:0},{l:'75-99',c:0},{l:'100+',c:0}];
-allScores.forEach(s => {
-  if(s<10)buckets[0].c++;
-  else if(s<25)buckets[1].c++;
-  else if(s<50)buckets[2].c++;
-  else if(s<75)buckets[3].c++;
-  else if(s<100)buckets[4].c++;
-  else buckets[5].c++;
-});
-new Chart(consCtx, {
-  type:'bar',
-  data:{
-    labels:buckets.map(b=>b.l),
-    datasets:[{
-      label:'Innings',data:buckets.map(b=>b.c),
-      backgroundColor:['rgba(255,95,64,0.5)','rgba(247,201,72,0.4)','rgba(91,159,255,0.5)','rgba(0,245,170,0.5)','rgba(0,245,170,0.7)','rgba(0,245,170,0.9)'],
-      borderColor:['rgba(255,95,64,0.8)','rgba(247,201,72,0.7)','rgba(91,159,255,0.8)','rgba(0,245,170,0.8)','rgba(0,245,170,0.9)','rgba(0,245,170,1)'],
-      borderWidth:1,borderRadius:5
-    }]
-  },
-  options:{
-    responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y} innings`}}},
-    scales:{x:{grid:{color:gridColor},ticks:{color:muted}},y:{grid:{color:gridColor},ticks:{color:muted,stepSize:2}}}
-  }
-});
-</script>
-<!-- ✅ KRICIQ REAL API CONNECTION -->
-<script>
-var _kapi = 'https://kriciq-api.onrender.com/api';
-
-function _initials(name) {
-  return name.split(' ').map(function(w){ return w[0]; }).join('').slice(0,2).toUpperCase();
-}
-
-function _formScore(avg, sr) {
-  var a = Math.min(avg / 60, 1);
-  var s = Math.min(sr / 160, 1);
-  return Math.round((a * 0.6 + s * 0.4) * 100);
-}
-
-function _ringOffset(score) {
-  return Math.round(188.4 * (1 - score / 100));
+  var buckets=[{l:'0-9',c:0},{l:'10-24',c:0},{l:'25-49',c:0},{l:'50-74',c:0},{l:'75-99',c:0},{l:'100+',c:0}];
+  sim.forEach(function(s){
+    if(s<10)buckets[0].c++;
+    else if(s<25)buckets[1].c++;
+    else if(s<50)buckets[2].c++;
+    else if(s<75)buckets[3].c++;
+    else if(s<100)buckets[4].c++;
+    else buckets[5].c++;
+  });
+  _charts.cons = new Chart(consCtx, {
+    type:'bar',
+    data:{
+      labels:buckets.map(function(b){return b.l;}),
+      datasets:[{
+        label:'Innings',data:buckets.map(function(b){return b.c;}),
+        backgroundColor:['rgba(255,95,64,0.5)','rgba(247,201,72,0.4)','rgba(91,159,255,0.5)','rgba(0,245,170,0.5)','rgba(0,245,170,0.7)','rgba(0,245,170,0.9)'],
+        borderColor:['rgba(255,95,64,0.8)','rgba(247,201,72,0.7)','rgba(91,159,255,0.8)','rgba(0,245,170,0.8)','rgba(0,245,170,0.9)','rgba(0,245,170,1)'],
+        borderWidth:1,borderRadius:5
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.parsed.y+' innings';}}}},
+      scales:{x:{grid:{color:gridColor},ticks:{color:muted}},y:{grid:{color:gridColor},ticks:{color:muted,stepSize:2}}}
+    }
+  });
 }
 
 function _loadPlayer() {
@@ -670,128 +713,133 @@ function _loadPlayer() {
     .then(function(r){ return r.json(); })
     .then(function(d){
       var name     = d.player || pid.replace(/-/g,' ');
-      var runs     = d.runs        ? Math.round(d.runs)             : 0;
-      var matches  = d.matches     ? Math.round(d.matches)          : 0;
-      var avg      = d.average     ? parseFloat(d.average)          : 0;
-      var sr       = d.strike_rate ? parseFloat(d.strike_rate)      : 0;
+      var runs     = d.runs        ? Math.round(d.runs)        : 0;
+      var matches  = d.matches     ? Math.round(d.matches)     : 0;
+      var avg      = d.average     ? parseFloat(d.average)     : 0;
+      var sr       = d.strike_rate ? parseFloat(d.strike_rate) : 0;
       var hundreds = d.hundreds !== undefined ? Math.round(d.hundreds) : 0;
-      var fifties  = d.fifties     ? Math.round(d.fifties)          : 0;
+      var fifties  = d.fifties     ? Math.round(d.fifties)     : 0;
 
       // PAGE TITLE
       document.title = 'KricIQ — ' + name;
 
-      // PLAYER NAME in hero
+      // PLAYER NAME
       var pts = name.trim().split(' ');
       var nameEl = document.querySelector('.pname');
-      if (nameEl) {
-        nameEl.innerHTML = pts.slice(0,-1).join(' ').toUpperCase()
-          + ' <span>' + pts[pts.length-1].toUpperCase() + '</span>';
-      }
+      if(nameEl) nameEl.innerHTML = pts.slice(0,-1).join(' ').toUpperCase() + ' <span>' + pts[pts.length-1].toUpperCase() + '</span>';
 
-      // AVATAR initials
+      // AVATAR
       var avatarEl = document.querySelector('.avatar');
-      if (avatarEl) avatarEl.textContent = _initials(name);
+      if(avatarEl) avatarEl.textContent = _initials(name);
 
-      // STAT BAR — all 6 real stats
+      // STAT BAR
       var el;
-      el = document.getElementById('stat-runs');    if(el) el.textContent = runs.toLocaleString();
-      el = document.getElementById('stat-matches'); if(el) el.textContent = matches;
-      el = document.getElementById('stat-avg');     if(el) el.textContent = avg > 0 ? avg.toFixed(2) : '—';
-      el = document.getElementById('stat-sr');      if(el) el.textContent = sr > 0 ? sr.toFixed(1) : '—';
-      el = document.getElementById('stat-100s');    if(el) el.textContent = hundreds;
-      el = document.getElementById('stat-50s');     if(el) el.textContent = fifties;
+      el=document.getElementById('stat-runs');    if(el) el.textContent=runs.toLocaleString();
+      el=document.getElementById('stat-matches'); if(el) el.textContent=matches;
+      el=document.getElementById('stat-avg');     if(el) el.textContent=avg>0?avg.toFixed(2):'—';
+      el=document.getElementById('stat-sr');      if(el) el.textContent=sr>0?sr.toFixed(1):'—';
+      el=document.getElementById('stat-100s');    if(el) el.textContent=hundreds;
+      el=document.getElementById('stat-50s');     if(el) el.textContent=fifties;
 
-      // FORM RING — calculated from avg + SR
-      var score = _formScore(avg, sr);
-      var numEl = document.querySelector('.form-num');
-      var ringCircle = document.querySelectorAll('.form-ring circle')[1];
-      if (numEl) numEl.textContent = score;
-      if (ringCircle) ringCircle.setAttribute('stroke-dashoffset', _ringOffset(score));
+      // Win rate & Pressure index — derived
+      var winRate = Math.min(Math.round(45 + avg/3), 88);
+      var pressure = (avg/60*9 + 1).toFixed(1);
+      el=document.querySelector('.sbar-inner .si:nth-child(7) .sv'); if(el) el.textContent=winRate+'%';
+      el=document.querySelector('.sbar-inner .si:nth-child(8) .sv'); if(el) el.textContent=pressure;
 
-      // FORM DOTS — generated based on avg
-      var dotsEl = document.querySelector('.fdots');
-      if (dotsEl) {
-        var dotHtml = '';
-        for (var i = 0; i < 5; i++) {
-          var r = Math.random();
-          var cls = avg > 45 ? (r > 0.3 ? 'w' : r > 0.15 ? 'm' : 'l')
-                  : avg > 28 ? (r > 0.5 ? 'w' : r > 0.25 ? 'm' : 'l')
-                  : (r > 0.6 ? 'w' : r > 0.35 ? 'm' : 'l');
-          var sc = cls === 'w' ? Math.round(40 + Math.random()*60)
-                 : cls === 'm' ? Math.round(15 + Math.random()*25)
-                 : Math.round(Math.random()*14);
-          dotHtml += '<div class="fdot ' + cls + '" title="' + sc + '"></div>';
+      // FORM RING
+      var score=_formScore(avg,sr);
+      var numEl=document.querySelector('.form-num');
+      var ringCircle=document.querySelectorAll('.form-ring circle')[1];
+      if(numEl) numEl.textContent=score;
+      if(ringCircle) ringCircle.setAttribute('stroke-dashoffset',_ringOffset(score));
+
+      // FORM DOTS
+      var dotsEl=document.querySelector('.fdots');
+      if(dotsEl){
+        var dotHtml='';
+        for(var i=0;i<5;i++){
+          var r=Math.random();
+          var cls=avg>45?(r>0.3?'w':r>0.15?'m':'l'):avg>28?(r>0.5?'w':r>0.25?'m':'l'):(r>0.6?'w':r>0.35?'m':'l');
+          var sc=cls==='w'?Math.round(40+Math.random()*60):cls==='m'?Math.round(15+Math.random()*25):Math.round(Math.random()*14);
+          dotHtml+='<div class="fdot '+cls+'" title="'+sc+'"></div>';
         }
-        dotsEl.innerHTML = dotHtml;
+        dotsEl.innerHTML=dotHtml;
       }
 
-      // AI PREDICTION — calculated from real stats
-      var predLow  = Math.round(avg * 0.75);
-      var predHigh = Math.round(avg * 1.35);
-      var pred50   = Math.min(Math.round((avg / 75) * 100), 68);
-      var duckRisk = Math.max(3, Math.round(13 - avg / 7));
-      var pred100  = Math.round(hundreds / Math.max(matches, 1) * 100);
-      var confPct  = Math.min(Math.round(44 + avg / 4), 82);
-      var srBoost  = sr > 130 ? '+' + Math.round((sr - 125) / 2) + '%' : '-' + Math.round((125 - sr) / 2) + '%';
-
-      el = document.querySelector('.ai-pred-runs');  if(el) el.textContent = predLow + '–' + predHigh;
-      el = document.querySelector('.ai-conf-val');   if(el) el.textContent = confPct + '%';
-
-      var gi = document.querySelectorAll('.ai-gitem');
-      if (gi.length >= 5) {
-        gi[0].querySelector('.ai-gv').textContent = pred50 + '%';
-        gi[1].querySelector('.ai-gv').textContent = duckRisk + '%';
-        gi[2].querySelector('.ai-gv').textContent = pred100 + '%';
-        gi[4].querySelector('.ai-gv').textContent = srBoost;
+      // AI PREDICTION
+      var predLow=Math.round(avg*0.75), predHigh=Math.round(avg*1.35);
+      var pred50=Math.min(Math.round((avg/75)*100),68);
+      var duckRisk=Math.max(3,Math.round(13-avg/7));
+      var pred100=Math.round(hundreds/Math.max(matches,1)*100);
+      var confPct=Math.min(Math.round(44+avg/4),82);
+      var srBoost=sr>130?'+'+Math.round((sr-125)/2)+'%':'-'+Math.round((125-sr)/2)+'%';
+      el=document.querySelector('.ai-pred-runs'); if(el) el.textContent=predLow+'–'+predHigh;
+      el=document.querySelector('.ai-conf-val');  if(el) el.textContent=confPct+'%';
+      var gi=document.querySelectorAll('.ai-gitem');
+      if(gi.length>=5){
+        gi[0].querySelector('.ai-gv').textContent=pred50+'%';
+        gi[1].querySelector('.ai-gv').textContent=duckRisk+'%';
+        gi[2].querySelector('.ai-gv').textContent=pred100+'%';
+        gi[4].querySelector('.ai-gv').textContent=srBoost;
       }
 
-      // SEASON BREAKDOWN header — real career total
-      var secSub = document.querySelector('.card.span2 .ch .csub');
-      if (secSub && runs > 0) {
-        secSub.textContent = 'IPL career — ' + runs.toLocaleString() + ' total runs across ' + matches + ' matches';
-      }
+      // SEASON header
+      var secSub=document.querySelector('.card.span2 .ch .csub');
+      if(secSub&&runs>0) secSub.textContent='IPL career — '+runs.toLocaleString()+' total runs across '+matches+' matches';
 
-      // TEAM tag in pmeta
-      if (d.team) {
-        var teamTag = document.querySelector('.pmeta .ptag:nth-child(3)');
-        if (teamTag) teamTag.textContent = d.team;
-      }
+      // TEAM tag
+      if(d.team){ var tt=document.querySelector('.pmeta .ptag:nth-child(3)'); if(tt) tt.textContent=d.team; }
 
-    }).catch(function(e){ console.error('KricIQ API error:', e); });
+      // PRESSURE INDEX — scale all 6 bars by avg
+      var piScores=[
+        Math.min((avg/60*9+0.5).toFixed(1),9.9),
+        Math.min((sr/160*9+0.3).toFixed(1),9.9),
+        Math.min((avg/65*8.5).toFixed(1),9.9),
+        Math.min((sr/170*7).toFixed(1),9.9),
+        Math.min((avg/58*9).toFixed(1),9.9),
+        Math.min((avg/55*9.5).toFixed(1),9.9)
+      ];
+      var piEls=document.querySelectorAll('.pi-score');
+      var piFills=document.querySelectorAll('.pi-fill');
+      piScores.forEach(function(s,i){
+        if(piEls[i])  piEls[i].textContent=s;
+        if(piFills[i]) piFills[i].style.width=Math.round(s/10*100)+'%';
+      });
+
+      // BUILD ALL CHARTS with this player's data
+      _buildCharts(avg, sr, hundreds, matches);
+
+    }).catch(function(e){ console.error('KricIQ API error:',e); });
 }
 
 function _initSearch() {
-  var inp = document.getElementById('nav-search');
+  var inp=document.getElementById('nav-search');
   if(!inp) return;
-  var drop = document.createElement('div');
-  drop.style.cssText = 'display:none;position:absolute;top:calc(100% + 8px);left:-12px;right:-12px;background:#0f131c;border:1px solid rgba(255,255,255,0.1);border-radius:8px;z-index:999;max-height:280px;overflow-y:auto;';
-  inp.parentNode.style.position = 'relative';
+  var drop=document.createElement('div');
+  drop.style.cssText='display:none;position:absolute;top:calc(100% + 8px);left:-12px;right:-12px;background:#0f131c;border:1px solid rgba(255,255,255,0.1);border-radius:8px;z-index:999;max-height:280px;overflow-y:auto;';
+  inp.parentNode.style.position='relative';
   inp.parentNode.appendChild(drop);
   var t;
-  inp.addEventListener('input', function(){
+  inp.addEventListener('input',function(){
     clearTimeout(t);
-    var q = this.value.trim();
-    if(q.length < 2){ drop.style.display='none'; return; }
-    t = setTimeout(function(){
-      fetch(_kapi + '/search/' + encodeURIComponent(q))
-        .then(function(r){ return r.json(); })
+    var q=this.value.trim();
+    if(q.length<2){drop.style.display='none';return;}
+    t=setTimeout(function(){
+      fetch(_kapi+'/search/'+encodeURIComponent(q))
+        .then(function(r){return r.json();})
         .then(function(players){
-          drop.innerHTML = players.length
-            ? players.map(function(p){
-                var id = p.player.replace(/ /g,'-');
-                return '<a href="player.html?id='+id+'" style="display:flex;justify-content:space-between;padding:9px 14px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);color:#eef0f4;font-size:13px;">'+p.player+'<span style="color:#5a6275;font-size:11px;">'+Math.round(p.runs)+' runs</span></a>';
-              }).join('')
-            : '<div style="padding:10px 14px;color:#5a6275;font-size:13px;">No players found</div>';
-          drop.style.display = 'block';
-        }).catch(function(){ drop.style.display='none'; });
-    }, 300);
+          drop.innerHTML=players.length
+            ?players.map(function(p){var id=p.player.replace(/ /g,'-');return '<a href="player.html?id='+id+'" style="display:flex;justify-content:space-between;padding:9px 14px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);color:#eef0f4;font-size:13px;">'+p.player+'<span style="color:#5a6275;font-size:11px;">'+Math.round(p.runs)+' runs</span></a>';}).join('')
+            :'<div style="padding:10px 14px;color:#5a6275;font-size:13px;">No players found</div>';
+          drop.style.display='block';
+        }).catch(function(){drop.style.display='none';});
+    },300);
   });
-  document.addEventListener('click', function(e){
-    if(!inp.parentNode.contains(e.target)) drop.style.display='none';
-  });
+  document.addEventListener('click',function(e){if(!inp.parentNode.contains(e.target))drop.style.display='none';});
 }
 
-window.addEventListener('DOMContentLoaded', function(){
+window.addEventListener('DOMContentLoaded',function(){
   _loadPlayer();
   _initSearch();
 });
