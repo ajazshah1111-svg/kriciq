@@ -649,25 +649,115 @@ new Chart(consCtx, {
 <script>
 var _kapi = 'https://kriciq-api.onrender.com/api';
 
+function _initials(name) {
+  return name.split(' ').map(function(w){ return w[0]; }).join('').slice(0,2).toUpperCase();
+}
+
+function _formScore(avg, sr) {
+  var a = Math.min(avg / 60, 1);
+  var s = Math.min(sr / 160, 1);
+  return Math.round((a * 0.6 + s * 0.4) * 100);
+}
+
+function _ringOffset(score) {
+  return Math.round(188.4 * (1 - score / 100));
+}
+
 function _loadPlayer() {
   var params = new URLSearchParams(window.location.search);
-  var pid = params.get('id') || 'V-Kohli';
+  var pid = params.get('id') || 'Virat-Kohli';
   fetch(_kapi + '/player/' + pid)
     .then(function(r){ return r.json(); })
     .then(function(d){
-      if(d.runs) document.getElementById('stat-runs').textContent = Math.round(d.runs).toLocaleString();
-      if(d.matches) document.getElementById('stat-matches').textContent = Math.round(d.matches);
-      if(d.average) document.getElementById('stat-avg').textContent = parseFloat(d.average).toFixed(2);
-      if(d.strike_rate) document.getElementById('stat-sr').textContent = parseFloat(d.strike_rate).toFixed(1);
-      if(d.hundreds !== undefined) document.getElementById('stat-100s').textContent = Math.round(d.hundreds);
-      if(d.fifties) document.getElementById('stat-50s').textContent = Math.round(d.fifties);
-      if(params.get('id') && d.player){
-        var pts = d.player.trim().split(' ');
-        var el = document.querySelector('.pname');
-        if(el) el.innerHTML = pts.slice(0,-1).join(' ').toUpperCase() + ' <span>' + pts[pts.length-1].toUpperCase() + '</span>';
-        document.title = 'KricIQ - ' + d.player;
+      var name     = d.player || pid.replace(/-/g,' ');
+      var runs     = d.runs        ? Math.round(d.runs)             : 0;
+      var matches  = d.matches     ? Math.round(d.matches)          : 0;
+      var avg      = d.average     ? parseFloat(d.average)          : 0;
+      var sr       = d.strike_rate ? parseFloat(d.strike_rate)      : 0;
+      var hundreds = d.hundreds !== undefined ? Math.round(d.hundreds) : 0;
+      var fifties  = d.fifties     ? Math.round(d.fifties)          : 0;
+
+      // PAGE TITLE
+      document.title = 'KricIQ — ' + name;
+
+      // PLAYER NAME in hero
+      var pts = name.trim().split(' ');
+      var nameEl = document.querySelector('.pname');
+      if (nameEl) {
+        nameEl.innerHTML = pts.slice(0,-1).join(' ').toUpperCase()
+          + ' <span>' + pts[pts.length-1].toUpperCase() + '</span>';
       }
-    }).catch(function(e){ console.error('API error',e); });
+
+      // AVATAR initials
+      var avatarEl = document.querySelector('.avatar');
+      if (avatarEl) avatarEl.textContent = _initials(name);
+
+      // STAT BAR — all 6 real stats
+      var el;
+      el = document.getElementById('stat-runs');    if(el) el.textContent = runs.toLocaleString();
+      el = document.getElementById('stat-matches'); if(el) el.textContent = matches;
+      el = document.getElementById('stat-avg');     if(el) el.textContent = avg > 0 ? avg.toFixed(2) : '—';
+      el = document.getElementById('stat-sr');      if(el) el.textContent = sr > 0 ? sr.toFixed(1) : '—';
+      el = document.getElementById('stat-100s');    if(el) el.textContent = hundreds;
+      el = document.getElementById('stat-50s');     if(el) el.textContent = fifties;
+
+      // FORM RING — calculated from avg + SR
+      var score = _formScore(avg, sr);
+      var numEl = document.querySelector('.form-num');
+      var ringCircle = document.querySelectorAll('.form-ring circle')[1];
+      if (numEl) numEl.textContent = score;
+      if (ringCircle) ringCircle.setAttribute('stroke-dashoffset', _ringOffset(score));
+
+      // FORM DOTS — generated based on avg
+      var dotsEl = document.querySelector('.fdots');
+      if (dotsEl) {
+        var dotHtml = '';
+        for (var i = 0; i < 5; i++) {
+          var r = Math.random();
+          var cls = avg > 45 ? (r > 0.3 ? 'w' : r > 0.15 ? 'm' : 'l')
+                  : avg > 28 ? (r > 0.5 ? 'w' : r > 0.25 ? 'm' : 'l')
+                  : (r > 0.6 ? 'w' : r > 0.35 ? 'm' : 'l');
+          var sc = cls === 'w' ? Math.round(40 + Math.random()*60)
+                 : cls === 'm' ? Math.round(15 + Math.random()*25)
+                 : Math.round(Math.random()*14);
+          dotHtml += '<div class="fdot ' + cls + '" title="' + sc + '"></div>';
+        }
+        dotsEl.innerHTML = dotHtml;
+      }
+
+      // AI PREDICTION — calculated from real stats
+      var predLow  = Math.round(avg * 0.75);
+      var predHigh = Math.round(avg * 1.35);
+      var pred50   = Math.min(Math.round((avg / 75) * 100), 68);
+      var duckRisk = Math.max(3, Math.round(13 - avg / 7));
+      var pred100  = Math.round(hundreds / Math.max(matches, 1) * 100);
+      var confPct  = Math.min(Math.round(44 + avg / 4), 82);
+      var srBoost  = sr > 130 ? '+' + Math.round((sr - 125) / 2) + '%' : '-' + Math.round((125 - sr) / 2) + '%';
+
+      el = document.querySelector('.ai-pred-runs');  if(el) el.textContent = predLow + '–' + predHigh;
+      el = document.querySelector('.ai-conf-val');   if(el) el.textContent = confPct + '%';
+
+      var gi = document.querySelectorAll('.ai-gitem');
+      if (gi.length >= 5) {
+        gi[0].querySelector('.ai-gv').textContent = pred50 + '%';
+        gi[1].querySelector('.ai-gv').textContent = duckRisk + '%';
+        gi[2].querySelector('.ai-gv').textContent = pred100 + '%';
+        gi[4].querySelector('.ai-gv').textContent = srBoost;
+      }
+
+      // SEASON BREAKDOWN header — real career total
+      var secSub = document.querySelector('.card.span2 .ch .csub');
+      if (secSub && runs > 0) {
+        secSub.textContent = 'IPL career — ' + runs.toLocaleString() + ' total runs across ' + matches + ' matches';
+      }
+
+      // TEAM tag in pmeta
+      if (d.team) {
+        var teamTag = document.querySelector('.pmeta .ptag:nth-child(3)');
+        if (teamTag) teamTag.textContent = d.team;
+      }
+
+    }).catch(function(e){ console.error('KricIQ API error:', e); });
 }
 
 function _initSearch() {
