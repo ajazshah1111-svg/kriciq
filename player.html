@@ -192,6 +192,22 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 .back-btn:hover{color:var(--acc);border-color:rgba(0,245,170,.3);background:rgba(0,245,170,.05);}
 .back-btn svg{stroke:currentColor;}
 .logo-svg{display:flex;align-items:center;text-decoration:none;}
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--s1);padding:0 28px;}
+.tab-btn{padding:12px 20px;font-family:var(--font-b);font-size:13px;font-weight:500;color:var(--muted2);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--acc);border-bottom-color:var(--acc);}
+.tab-badge{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:10px;font-size:10px;background:rgba(0,245,170,.1);color:var(--acc);}
+.tab-badge.grey{background:rgba(255,255,255,.06);color:var(--muted);}
+.tab-panel{display:none;}
+.tab-panel.active{display:contents;}
+.field-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:18px;}
+.fstat{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center;}
+.fstat-v{font-family:var(--font-d);font-size:32px;line-height:1;margin-bottom:4px;}
+.fstat-k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;}
+.coming-soon{padding:48px 18px;text-align:center;}
+.cs-icon{font-size:40px;margin-bottom:12px;}
+.cs-title{font-family:var(--font-d);font-size:22px;letter-spacing:1px;margin-bottom:8px;color:var(--muted2);}
+.cs-sub{font-size:13px;color:var(--muted);line-height:1.6;}
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:rgba(8,11,17,.97);border-top:1px solid rgba(255,255,255,0.1);padding:8px 0 12px;backdrop-filter:blur(20px);}
 .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
 .mnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;padding:4px 16px;border-radius:8px;}
@@ -219,14 +235,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
       Players
     </a>
-    <a href="index.html" class="logo-svg" title="KricIQ Home">
-      <svg height="28" viewBox="0 0 120 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <text x="0" y="22" font-family="Bebas Neue, sans-serif" font-size="24" letter-spacing="2" fill="#eef0f4">KRIC</text>
-        <text x="56" y="22" font-family="Bebas Neue, sans-serif" font-size="24" letter-spacing="2" fill="#00f5aa">IQ</text>
-        <line x1="52" y1="4" x2="44" y2="24" stroke="#00f5aa" stroke-width="1.5" stroke-linecap="round"/>
-        <circle cx="51" cy="23" r="2" fill="#00f5aa" opacity="0.7"/>
-      </svg>
-    </a>
+    <a href="index.html" title="KricIQ Home"><img src="logo.png" alt="KricIQ" height="34" style="display:block;"></a>
   </div>
   <div class="nav-links">
     <a href="players.html" class="nl on">Players</a>
@@ -249,12 +258,11 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
     <div class="avatar">VK</div>
     <div class="hero-mid">
       <div class="pname">VIRAT <span>KOHLI</span></div>
-      <div class="pmeta">
-        <span class="ptag">Right-hand bat</span>
-        <span class="ptag">Top order · #3</span>
-        <span class="ptag">Royal Challengers Bengaluru</span>
-        <span class="ptag">India · Age 36</span>
-        <span class="ptag" style="color:var(--acc);border-color:rgba(0,245,170,.25)">#1 IPL Run scorer</span>
+      <div class="pmeta" id="player-meta">
+        <span class="ptag" id="tag-hand">Right-hand bat</span>
+        <span class="ptag" id="tag-role">Batsman</span>
+        <span class="ptag" id="tag-hs" style="color:var(--acc4);">HS: —</span>
+        <span class="ptag" id="tag-dots">Dot%: —</span>
       </div>
     </div>
     <div class="hero-right">
@@ -284,18 +292,27 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 <!-- STAT BAR -->
 <div class="sbar">
   <div class="sbar-inner">
-    <div class="si"><div class="sv" id="stat-runs" style="color:var(--acc)">—</div><div class="sk">IPL Runs</div><div class="sd up">↑ All-time #1</div></div>
+    <div class="si"><div class="sv" id="stat-runs" style="color:var(--acc)">—</div><div class="sk">IPL Runs</div></div>
     <div class="si"><div class="sv" id="stat-matches">—</div><div class="sk">Matches</div></div>
     <div class="si"><div class="sv" id="stat-avg" style="color:var(--acc3)">—</div><div class="sk">Average</div></div>
     <div class="si"><div class="sv" id="stat-sr" style="color:var(--acc4)">—</div><div class="sk">Strike Rate</div></div>
-    <div class="si"><div class="sv" id="stat-100s">—</div><div class="sk">Centuries</div></div>
-    <div class="si"><div class="sv" id="stat-50s">—</div><div class="sk">Half-cents</div></div>
-    <div class="si"><div class="sv" style="color:var(--acc2)">78%</div><div class="sk">Win rate when 50+</div></div>
-    <div class="si"><div class="sv">9.4</div><div class="sk">Pressure Index</div><div class="sd up">↑ Elite tier</div></div>
+    <div class="si"><div class="sv" id="stat-hs" style="color:var(--acc2)">—</div><div class="sk">Best Score</div></div>
+    <div class="si"><div class="sv" id="stat-6s" style="color:var(--acc4)">—</div><div class="sk">Sixes</div></div>
+    <div class="si"><div class="sv" id="stat-4s">—</div><div class="sk">Fours</div></div>
+    <div class="si"><div class="sv" id="stat-100s">—</div><div class="sk">100s</div></div>
+    <div class="si"><div class="sv" id="stat-50s">—</div><div class="sk">50s</div></div>
+    <div class="si"><div class="sv" id="stat-dots" style="color:var(--muted2)">—</div><div class="sk">Dot Ball %</div></div>
   </div>
 </div>
 
+<!-- TABS -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('batting',this)">Batting <span class="tab-badge" id="badge-bat">—</span></button>
+  <button class="tab-btn" onclick="switchTab('fielding',this)">Fielding <span class="tab-badge grey" id="badge-field">—</span></button>
+  <button class="tab-btn" onclick="switchTab('bowling',this)">Bowling <span class="tab-badge grey">Soon</span></button>
+</div>
 <!-- MAIN GRID -->
+<div id="tab-batting" class="tab-panel active">
 <div class="wrap">
 
   <!-- RUN TREND LINE CHART (full width) -->
@@ -541,6 +558,53 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
   </div>
 
 </div>
+</div><!-- end batting -->
+
+<!-- FIELDING TAB -->
+<div id="tab-fielding" class="tab-panel">
+<div class="wrap">
+  <div class="card span2">
+    <div class="ch"><div><div class="ct">Fielding <em>Summary</em></div><div class="csub" id="field-sub">Career fielding statistics</div></div></div>
+    <div class="field-grid">
+      <div class="fstat"><div class="fstat-v" id="field-dismissals" style="color:var(--acc)">—</div><div class="fstat-k">Total Dismissals</div></div>
+      <div class="fstat"><div class="fstat-v" id="field-innings" style="color:var(--acc3)">—</div><div class="fstat-k">Innings Played</div></div>
+      <div class="fstat"><div class="fstat-v" id="field-dis-rate" style="color:var(--acc4)">—</div><div class="fstat-k">Dismissals / Match</div></div>
+      <div class="fstat"><div class="fstat-v" id="field-impact" style="color:var(--acc2)">—</div><div class="fstat-k">Impact Rating</div></div>
+    </div>
+  </div>
+  <div class="card span2">
+    <div class="ch"><div><div class="ct">Fielding <em>Insight</em></div><div class="csub">Role analysis based on career data</div></div></div>
+    <div style="padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="ai-gitem"><div class="ai-gv" id="fi-role" style="color:var(--acc);font-size:15px;">—</div><div class="ai-gk">Primary Role</div></div>
+      <div class="ai-gitem"><div class="ai-gv" id="fi-dis100" style="color:var(--acc3)">—</div><div class="ai-gk">Dismissals per 100 balls</div></div>
+      <div class="ai-gitem"><div class="ai-gv" id="fi-balls" style="color:var(--acc4)">—</div><div class="ai-gk">Total Balls Faced</div></div>
+      <div class="ai-gitem"><div class="ai-gv" id="fi-dot" style="color:var(--muted2)">—</div><div class="ai-gk">Dot Ball % Faced</div></div>
+    </div>
+  </div>
+</div>
+</div><!-- end fielding -->
+
+<!-- BOWLING TAB -->
+<div id="tab-bowling" class="tab-panel">
+<div class="wrap">
+  <div class="card span2">
+    <div class="coming-soon">
+      <div class="cs-icon">🏏</div>
+      <div class="cs-title">Bowling Stats Coming Soon</div>
+      <div class="cs-sub">We're adding ball-by-ball bowling data to the KricIQ API.<br>Wickets, economy, bowling avg, spell analysis — arriving soon.</div>
+    </div>
+  </div>
+</div>
+</div><!-- end bowling -->
+
+<script>
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
 
 <script>
 var _kapi = 'https://kriciq-api.onrender.com/api';
@@ -706,21 +770,38 @@ function _buildCharts(avg, sr, hundreds, matches) {
   });
 }
 
+function _autoRole(avg, sr, dismissals, matches, sixes) {
+  var dpm = dismissals / Math.max(matches, 1);
+  if (dpm > 0.5) return 'WK-Batsman';
+  if (avg < 15 && sr > 100) return 'Lower-order';
+  if (avg > 35 && sixes > 50) return 'Aggressive Bat';
+  if (avg > 35) return 'Batsman';
+  if (avg > 25 && sr > 140) return 'All-rounder';
+  if (avg < 20) return 'Tail / Bowler';
+  return 'Batsman';
+}
+
 function _loadPlayer() {
   var params = new URLSearchParams(window.location.search);
   var pid = params.get('id') || 'Virat-Kohli';
   fetch(_kapi + '/player/' + pid)
     .then(function(r){ return r.json(); })
     .then(function(d){
-      var name     = d.player || pid.replace(/-/g,' ');
-      var runs     = d.runs        ? Math.round(d.runs)        : 0;
-      var matches  = d.matches     ? Math.round(d.matches)     : 0;
-      var avg      = d.average     ? parseFloat(d.average)     : 0;
-      var sr       = d.strike_rate ? parseFloat(d.strike_rate) : 0;
-      var hundreds = d.hundreds !== undefined ? Math.round(d.hundreds) : 0;
-      var fifties  = d.fifties     ? Math.round(d.fifties)     : 0;
+      var name       = d.player        || pid.replace(/-/g,' ');
+      var runs       = d.runs          ? Math.round(d.runs)          : 0;
+      var matches    = d.matches       ? Math.round(d.matches)       : 0;
+      var innings    = d.innings       ? Math.round(d.innings)       : matches;
+      var avg        = d.average       ? parseFloat(d.average)       : 0;
+      var sr         = d.strike_rate   ? parseFloat(d.strike_rate)   : 0;
+      var hundreds   = d.hundreds      !== undefined ? Math.round(d.hundreds) : 0;
+      var fifties    = d.fifties       ? Math.round(d.fifties)       : 0;
+      var fours      = d.fours         ? Math.round(d.fours)         : 0;
+      var sixes      = d.sixes         ? Math.round(d.sixes)         : 0;
+      var hs         = d.highest_score ? Math.round(d.highest_score) : 0;
+      var dotPct     = d.dot_pct       ? parseFloat(d.dot_pct)       : 0;
+      var balls      = d.balls         ? Math.round(d.balls)         : 0;
+      var dismissals = d.dismissals    ? Math.round(d.dismissals)    : 0;
 
-      // PAGE TITLE
       document.title = 'KricIQ — ' + name;
 
       // PLAYER NAME
@@ -732,20 +813,28 @@ function _loadPlayer() {
       var avatarEl = document.querySelector('.avatar');
       if(avatarEl) avatarEl.textContent = _initials(name);
 
-      // STAT BAR
+      // AUTO ROLE + META TAGS
+      var role = _autoRole(avg, sr, dismissals, matches, sixes);
       var el;
+      el=document.getElementById('tag-role'); if(el) el.textContent=role;
+      el=document.getElementById('tag-hs');   if(el) el.textContent='Best: '+hs;
+      el=document.getElementById('tag-dots'); if(el) el.textContent='Dot%: '+dotPct.toFixed(1)+'%';
+
+      // TAB BADGES
+      el=document.getElementById('badge-bat');   if(el) el.textContent=runs.toLocaleString()+' runs';
+      el=document.getElementById('badge-field'); if(el) el.textContent=dismissals+' dis';
+
+      // STAT BAR — all real fields
       el=document.getElementById('stat-runs');    if(el) el.textContent=runs.toLocaleString();
       el=document.getElementById('stat-matches'); if(el) el.textContent=matches;
       el=document.getElementById('stat-avg');     if(el) el.textContent=avg>0?avg.toFixed(2):'—';
       el=document.getElementById('stat-sr');      if(el) el.textContent=sr>0?sr.toFixed(1):'—';
+      el=document.getElementById('stat-hs');      if(el) el.textContent=hs||'—';
+      el=document.getElementById('stat-6s');      if(el) el.textContent=sixes;
+      el=document.getElementById('stat-4s');      if(el) el.textContent=fours;
       el=document.getElementById('stat-100s');    if(el) el.textContent=hundreds;
       el=document.getElementById('stat-50s');     if(el) el.textContent=fifties;
-
-      // Win rate & Pressure index — derived
-      var winRate = Math.min(Math.round(45 + avg/3), 88);
-      var pressure = (avg/60*9 + 1).toFixed(1);
-      el=document.querySelector('.sbar-inner .si:nth-child(7) .sv'); if(el) el.textContent=winRate+'%';
-      el=document.querySelector('.sbar-inner .si:nth-child(8) .sv'); if(el) el.textContent=pressure;
+      el=document.getElementById('stat-dots');    if(el) el.textContent=dotPct.toFixed(1)+'%';
 
       // FORM RING
       var score=_formScore(avg,sr);
@@ -766,6 +855,63 @@ function _loadPlayer() {
         }
         dotsEl.innerHTML=dotHtml;
       }
+
+      // AI PREDICTION
+      var predLow=Math.round(avg*0.75),predHigh=Math.round(avg*1.35);
+      var pred50=Math.min(Math.round((avg/75)*100),68);
+      var duckRisk=Math.max(3,Math.round(13-avg/7));
+      var pred100=Math.round(hundreds/Math.max(matches,1)*100);
+      var confPct=Math.min(Math.round(44+avg/4),82);
+      var srBoost=sr>130?'+'+Math.round((sr-125)/2)+'%':'-'+Math.round((125-sr)/2)+'%';
+      el=document.querySelector('.ai-pred-runs'); if(el) el.textContent=predLow+'–'+predHigh;
+      el=document.querySelector('.ai-conf-val');  if(el) el.textContent=confPct+'%';
+      var gi=document.querySelectorAll('.ai-gitem');
+      if(gi.length>=5){
+        gi[0].querySelector('.ai-gv').textContent=pred50+'%';
+        gi[1].querySelector('.ai-gv').textContent=duckRisk+'%';
+        gi[2].querySelector('.ai-gv').textContent=pred100+'%';
+        gi[4].querySelector('.ai-gv').textContent=srBoost;
+      }
+
+      // SEASON header
+      var secSub=document.querySelector('#tab-batting .card.span2 .ch .csub');
+      if(!secSub) secSub=document.querySelector('.card.span2 .ch .csub');
+      if(secSub&&runs>0) secSub.textContent='IPL career — '+runs.toLocaleString()+' total runs across '+matches+' matches';
+
+      // PRESSURE INDEX
+      var piScores=[
+        Math.min((avg/60*9+0.5),9.9).toFixed(1),
+        Math.min((sr/160*9+0.3),9.9).toFixed(1),
+        Math.min((avg/65*8.5),9.9).toFixed(1),
+        Math.min((sr/170*7),9.9).toFixed(1),
+        Math.min((avg/58*9),9.9).toFixed(1),
+        Math.min((avg/55*9.5),9.9).toFixed(1)
+      ];
+      var piEls=document.querySelectorAll('.pi-score');
+      var piFills=document.querySelectorAll('.pi-fill');
+      piScores.forEach(function(s,i){
+        if(piEls[i])  piEls[i].textContent=s;
+        if(piFills[i]) piFills[i].style.width=Math.round(s/10*100)+'%';
+      });
+
+      // FIELDING TAB
+      var disRate=(dismissals/Math.max(matches,1)).toFixed(2);
+      var impact=Math.min(((dismissals/Math.max(matches,1))*3+avg/25),9.9).toFixed(1);
+      el=document.getElementById('field-dismissals'); if(el) el.textContent=dismissals;
+      el=document.getElementById('field-innings');    if(el) el.textContent=innings;
+      el=document.getElementById('field-dis-rate');   if(el) el.textContent=disRate;
+      el=document.getElementById('field-impact');     if(el) el.textContent=impact;
+      el=document.getElementById('field-sub');        if(el) el.textContent=name+' — '+dismissals+' career dismissals in '+matches+' matches';
+      el=document.getElementById('fi-role');          if(el) el.textContent=role;
+      el=document.getElementById('fi-dis100');        if(el) el.textContent=balls>0?(dismissals/balls*100).toFixed(2):'—';
+      el=document.getElementById('fi-balls');         if(el) el.textContent=balls.toLocaleString();
+      el=document.getElementById('fi-dot');           if(el) el.textContent=dotPct.toFixed(1)+'%';
+
+      // CHARTS
+      _buildCharts(avg, sr, hundreds, matches);
+
+    }).catch(function(e){ console.error('KricIQ API error:',e); });
+}
 
       // AI PREDICTION
       var predLow=Math.round(avg*0.75), predHigh=Math.round(avg*1.35);
