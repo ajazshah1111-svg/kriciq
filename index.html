@@ -668,27 +668,40 @@ window.addEventListener('DOMContentLoaded', function(){
   });
 });
 </script>
-  
 <script>
 fetch("https://kriciq-api.onrender.com/api/player_of_day")
   .then(res => res.json())
   .then(data => {
     const section = document.createElement("div");
 
-    section.style.padding = "20px";
-    section.style.margin = "20px";
-    section.style.background = "#141820";
-    section.style.borderRadius = "10px";
+    section.style.maxWidth = "1200px";
+    section.style.margin = "12px auto";
+    section.style.padding = "16px 20px";
+    section.style.background = "#0f1720";
+    section.style.border = "1px solid rgba(0,255,170,0.15)";
+    section.style.borderRadius = "12px";
+    section.style.display = "flex";
+    section.style.justifyContent = "space-between";
+    section.style.alignItems = "center";
 
     section.innerHTML = `
-      <h2 style="color:#00f5aa;">🔥 Player of the Day</h2>
-      <p><strong>${data.player}</strong></p>
-      <p>Runs: ${data.runs}</p>
-      <p>Average: ${data.average}</p>
-      <p>Strike Rate: ${data.strike_rate}</p>
+      <div>
+        <div style="color:#00f5aa; font-size:12px; margin-bottom:4px;">
+          🔥 PLAYER OF THE DAY
+        </div>
+        <div style="font-size:18px; font-weight:600;">
+          ${data.player}
+        </div>
+      </div>
+
+      <div style="display:flex; gap:20px; font-size:14px; color:#9aa4b2;">
+        <div>Runs: <strong>${data.runs}</strong></div>
+        <div>Avg: <strong>${data.average}</strong></div>
+        <div>SR: <strong>${data.strike_rate}</strong></div>
+      </div>
     `;
 
-    document.body.prepend(section);
+    document.body.insertBefore(section, document.body.children[1]);
   });
 </script>  
 </body>
