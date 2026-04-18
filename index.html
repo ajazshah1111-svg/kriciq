@@ -668,5 +668,28 @@ window.addEventListener('DOMContentLoaded', function(){
   });
 });
 </script>
+  
+<script>
+fetch("https://kriciq-api.onrender.com/api/player_of_day")
+  .then(res => res.json())
+  .then(data => {
+    const section = document.createElement("div");
+
+    section.style.padding = "20px";
+    section.style.margin = "20px";
+    section.style.background = "#141820";
+    section.style.borderRadius = "10px";
+
+    section.innerHTML = `
+      <h2 style="color:#00f5aa;">🔥 Player of the Day</h2>
+      <p><strong>${data.player}</strong></p>
+      <p>Runs: ${data.runs}</p>
+      <p>Average: ${data.average}</p>
+      <p>Strike Rate: ${data.strike_rate}</p>
+    `;
+
+    document.body.prepend(section);
+  });
+</script>  
 </body>
 </html>
