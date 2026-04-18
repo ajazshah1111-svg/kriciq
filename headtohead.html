@@ -255,41 +255,125 @@ function renderResults(t1, t2, data){
   // Stats comparison
   function statRow(label, v1, v2, higherIsBetter){
     var c1='', c2='';
-    if(higherIsBetter){
-      c1 = v1>v2?'winner':'loser';
-      c2 = v2>v1?'winner':'loser';
-    } else {
-      c1 = v1<v2?'winner':'loser';
-      c2 = v2<v1?'winner':'loser';
+    if(higherIsBetter !== null){
+      if(higherIsBetter){
+        c1 = v1>v2?'winner':'loser';
+        c2 = v2>v1?'winner':'loser';
+      } else {
+        c1 = v1<v2?'winner':'loser';
+        c2 = v2<v1?'winner':'loser';
+      }
     }
     return '<div class="sc-row">'
-      +'<div class="sc-val t1 '+c1+'" style="color:'+(c1==='winner'?t1.color:'var(--muted2)')+'">'+v1+'</div>'
+      +'<div class="sc-val t1" style="color:'+(c1==='winner'?t1.color:c1==='loser'?'var(--muted2)':'var(--text)')+'">'+v1+'</div>'
       +'<div class="sc-label">'+label+'</div>'
-      +'<div class="sc-val t2 '+c2+'" style="color:'+(c2==='winner'?t2.color:'var(--muted2)')+'">'+v2+'</div>'
+      +'<div class="sc-val t2" style="color:'+(c2==='winner'?t2.color:c2==='loser'?'var(--muted2)':'var(--text)')+'">'+v2+'</div>'
       +'</div>';
   }
 
+  var t1wins = data.team1_wins || 0;
+  var t2wins = data.team2_wins || 0;
+  var totalM = data.total_matches || matches;
+  var t1winPct2 = totalM > 0 ? Math.round(t1wins/totalM*100) : 0;
+  var t2winPct2 = 100 - t1winPct2;
+  var t1highest = data.team1_highest || '—';
+  var t2highest = data.team2_highest || '—';
+  var winner = t1wins > t2wins ? t1 : t2wins > t1wins ? t2 : null;
+
   html += '<div class="stats-grid">'
+    // Win/Loss card
     +'<div class="stat-card">'
-    +'<div class="sc-title">Batting <em>vs Each Other</em></div>'
+    +'<div class="sc-title">Win / <em>Loss Record</em></div>'
+    +'<div style="padding:16px 18px;">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'
+    +'<div style="text-align:center;"><div style="font-family:var(--font-d);font-size:48px;color:'+t1.color+'">'+t1wins+'</div><div style="font-size:11px;color:var(--muted);">'+t1.abbr+' WINS</div></div>'
+    +'<div style="text-align:center;font-family:var(--font-d);font-size:24px;color:var(--muted)">VS</div>'
+    +'<div style="text-align:center;"><div style="font-family:var(--font-d);font-size:48px;color:'+t2.color+'">'+t2wins+'</div><div style="font-size:11px;color:var(--muted);">'+t2.abbr+' WINS</div></div>'
+    +'</div>'
+    +'<div style="height:8px;border-radius:4px;background:var(--s3);overflow:hidden;display:flex;margin-bottom:8px;">'
+    +'<div style="width:'+t1winPct2+'%;background:'+t1.color+';border-radius:4px 0 0 4px;transition:width .8s;"></div>'
+    +'<div style="width:'+t2winPct2+'%;background:'+t2.color+';border-radius:0 4px 4px 0;"></div>'
+    +'</div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);">'
+    +'<span style="color:'+t1.color+'">'+t1winPct2+'%</span>'
+    +'<span>'+totalM+' matches played</span>'
+    +'<span style="color:'+t2.color+'">'+t2winPct2+'%</span>'
+    +'</div>'
+    +'</div>'
+    +'</div>'
+    // Batting stats card
+    +'<div class="stat-card">'
+    +'<div class="sc-title">Batting <em>Stats</em></div>'
     +statRow('Total Runs', t1runs.toLocaleString(), t2runs.toLocaleString(), true)
     +statRow('Avg Score per Innings', t1avg, t2avg, true)
+    +statRow('Highest Score', t1highest, t2highest, true)
     +statRow('Wickets Lost', t1wkts, t2wkts, false)
-    +statRow('Matches Played', b1.matches||0, b2.matches||0, true)
-    +'</div>'
-    +'<div class="stat-card">'
-    +'<div class="sc-title">Quick <em>Verdict</em></div>'
-    +'<div style="padding:20px 18px;">'
-    +(t1avg > t2avg
-      ? '<p style="font-size:13px;color:var(--muted2);line-height:1.7;"><span style="color:'+t1.color+';font-weight:600">'+t1.name+'</span> scores more runs per innings when batting against '+t2.name+' (avg '+t1avg+' vs '+t2avg+'). They also lose fewer wickets on average, suggesting they bat more comfortably against this opponent.</p>'
-      : '<p style="font-size:13px;color:var(--muted2);line-height:1.7;"><span style="color:'+t2.color+';font-weight:600">'+t2.name+'</span> scores more runs per innings when batting against '+t1.name+' (avg '+t2avg+' vs '+t1avg+'). They also tend to lose fewer wickets on average.</p>'
-    )
-    +'<p style="font-size:12px;color:var(--muted);margin-top:12px;">Based on all IPL matches between these teams in our database.</p>'
-    +'</div>'
     +'</div>'
     +'</div>';
 
   document.getElementById('results-content').innerHTML = html;
+
+  // Now fetch top performers
+  var apiT1 = t1.apiName.replace(/ /g,'-');
+  var apiT2 = t2.apiName.replace(/ /g,'-');
+  fetch(_kapi+'/h2h-performers/'+encodeURIComponent(apiT1)+'/'+encodeURIComponent(apiT2))
+    .then(function(r){return r.json();})
+    .then(function(perf){
+      var perfHtml = '<div class="stats-grid" style="margin-top:16px;">'
+        // Team 1 performers
+        +'<div class="stat-card">'
+        +'<div class="sc-title" style="color:'+t1.color+'">'+t1.abbr+' <em>Top Performers</em></div>'
+        +'<div style="padding:14px 18px;">'
+        +'<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">Top Batters vs '+t2.abbr+'</div>'
+        +perf.t1_batters.map(function(p,i){
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">'
+            +'<div style="display:flex;align-items:center;gap:8px;">'
+            +'<span style="font-family:var(--font-d);font-size:13px;color:var(--muted);width:16px;">'+(i+1)+'</span>'
+            +'<span style="font-size:13px;">'+p.player+'</span>'
+            +'</div>'
+            +'<span style="font-family:var(--font-d);font-size:16px;color:'+t1.color+'">'+p.runs+'</span>'
+            +'</div>';
+        }).join('')
+        +'<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:14px 0 10px;">Top Wicket Takers vs '+t2.abbr+'</div>'
+        +perf.t1_bowlers.map(function(p,i){
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">'
+            +'<div style="display:flex;align-items:center;gap:8px;">'
+            +'<span style="font-family:var(--font-d);font-size:13px;color:var(--muted);width:16px;">'+(i+1)+'</span>'
+            +'<span style="font-size:13px;">'+p.player+'</span>'
+            +'</div>'
+            +'<span style="font-family:var(--font-d);font-size:16px;color:var(--acc2)">'+p.wickets+' wkts</span>'
+            +'</div>';
+        }).join('')
+        +'</div></div>'
+        // Team 2 performers
+        +'<div class="stat-card">'
+        +'<div class="sc-title" style="color:'+t2.color+'">'+t2.abbr+' <em>Top Performers</em></div>'
+        +'<div style="padding:14px 18px;">'
+        +'<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">Top Batters vs '+t1.abbr+'</div>'
+        +perf.t2_batters.map(function(p,i){
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">'
+            +'<div style="display:flex;align-items:center;gap:8px;">'
+            +'<span style="font-family:var(--font-d);font-size:13px;color:var(--muted);width:16px;">'+(i+1)+'</span>'
+            +'<span style="font-size:13px;">'+p.player+'</span>'
+            +'</div>'
+            +'<span style="font-family:var(--font-d);font-size:16px;color:'+t2.color+'">'+p.runs+'</span>'
+            +'</div>';
+        }).join('')
+        +'<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:14px 0 10px;">Top Wicket Takers vs '+t1.abbr+'</div>'
+        +perf.t2_bowlers.map(function(p,i){
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">'
+            +'<div style="display:flex;align-items:center;gap:8px;">'
+            +'<span style="font-family:var(--font-d);font-size:13px;color:var(--muted);width:16px;">'+(i+1)+'</span>'
+            +'<span style="font-size:13px;">'+p.player+'</span>'
+            +'</div>'
+            +'<span style="font-family:var(--font-d);font-size:16px;color:var(--acc2)">'+p.wickets+' wkts</span>'
+            +'</div>';
+        }).join('')
+        +'</div></div>'
+        +'</div>';
+
+      document.getElementById('results-content').innerHTML += perfHtml;
+    }).catch(function(){});
 }
 
 // Nav search

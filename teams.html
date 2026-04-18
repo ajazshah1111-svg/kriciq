@@ -191,12 +191,19 @@ function loadTeamStats(){
         TEAMS.forEach(function(t){
           if(t.aliases.some(function(a){return a===row.team;})){
             if(!_teamStats[t.id]){
-              _teamStats[t.id]={matches:0,total_runs:0};
+              _teamStats[t.id]={matches:0,total_runs:0,avg_score_per_match:0,count:0};
             }
             _teamStats[t.id].matches += row.matches;
             _teamStats[t.id].total_runs += row.total_runs;
+            _teamStats[t.id].avg_score_per_match += row.avg_score_per_match||0;
+            _teamStats[t.id].count += 1;
           }
         });
+      });
+      // Average the avg_score_per_match across aliases
+      Object.keys(_teamStats).forEach(function(id){
+        var ts = _teamStats[id];
+        if(ts.count > 1) ts.avg_score_per_match = ts.avg_score_per_match / ts.count;
       });
     }).catch(function(){});
 }
@@ -227,8 +234,7 @@ function selectTeam(teamId){
   if(ts){
     document.getElementById('td-matches').textContent = ts.matches;
     document.getElementById('td-runs').textContent = ts.total_runs.toLocaleString();
-    // avg score per innings ~ total_runs / matches / 2 (both innings)
-    document.getElementById('td-avgscore').textContent = Math.round(ts.total_runs / ts.matches / 2);
+    document.getElementById('td-avgscore').textContent = Math.round(ts.avg_score_per_match || ts.total_runs / ts.matches);
   }
 
   // Load players
@@ -240,38 +246,36 @@ function loadTeamPlayers(team){
   document.getElementById('players-container').innerHTML =
     '<div class="loading-msg"><div class="spinner"></div>Loading squad...</div>';
 
-  // Use first alias for API query
-  var apiTeam = team.aliases[0].replace(/ /g,'-');
-  fetch(_kapi+'/team/'+encodeURIComponent(apiTeam))
-    .then(function(r){return r.json();})
-    .then(function(players){
-      // If team has multiple aliases, fetch and merge
-      if(team.aliases.length > 1){
-        var fetches = team.aliases.slice(1).map(function(alias){
-          return fetch(_kapi+'/team/'+encodeURIComponent(alias.replace(/ /g,'-')))
-            .then(function(r){return r.json();})
-            .catch(function(){return [];});
-        });
-        Promise.all(fetches).then(function(results){
-          results.forEach(function(extra){
-            extra.forEach(function(p){
-              if(!players.find(function(x){return x.player===p.player;})){
-                players.push(p);
-              }
-            });
-          });
-          players.sort(function(a,b){return b.runs-a.runs;});
-          document.getElementById('td-players').textContent = players.length;
-          renderPlayers(players, team);
-        });
-      } else {
-        document.getElementById('td-players').textContent = players.length;
-        renderPlayers(players, team);
-      }
-    }).catch(function(){
-      document.getElementById('players-container').innerHTML =
-        '<div class="loading-msg">Could not load players.</div>';
+  // Use /api/squad/ which queries balls table directly — accurate per-team stats
+  // For teams with multiple aliases (RCB, DC, PBKS), fetch all and merge
+  var fetches = team.aliases.map(function(alias){
+    return fetch(_kapi+'/squad/'+encodeURIComponent(alias.replace(/ /g,'-')))
+      .then(function(r){return r.json();})
+      .catch(function(){return [];});
+  });
+  Promise.all(fetches).then(function(results){
+    var players = [];
+    results.forEach(function(batch){
+      batch.forEach(function(p){
+        var existing = players.find(function(x){return x.player===p.player;});
+        if(existing){
+          // Merge — add runs and matches from both alias names
+          existing.runs += p.runs;
+          existing.matches += p.matches;
+          existing.sixes += p.sixes||0;
+          existing.fours += p.fours||0;
+        } else {
+          players.push(p);
+        }
+      });
     });
+    players.sort(function(a,b){return b.runs-a.runs;});
+    document.getElementById('td-players').textContent = players.length;
+    renderPlayers(players, team);
+  }).catch(function(){
+    document.getElementById('players-container').innerHTML =
+      '<div class="loading-msg">Could not load players.</div>';
+  });
 }
 
 // ── RENDER PLAYERS TABLE ──
