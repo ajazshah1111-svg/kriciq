@@ -235,7 +235,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
       Players
     </a>
-    <a href="index.html" title="KricIQ Home" style="display:block;background:#080b11;border-radius:6px;padding:2px 6px;"><img src="logo.png" alt="KricIQ" height="44" style="display:block;"></a>
+    <a href="index.html" title="KricIQ Home" style="display:block;background:#080b11;border-radius:6px;padding:2px 8px;"><img src="logo.png" alt="KricIQ" height="48" style="display:block;"></a>
   </div>
   <div class="nav-links">
     <a href="players.html" class="nl on">Players</a>
@@ -259,7 +259,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
     <div class="hero-mid">
       <div class="pname">VIRAT <span>KOHLI</span></div>
       <div class="pmeta" id="player-meta">
-        <span class="ptag" id="tag-hand">Right-hand bat</span>
         <span class="ptag" id="tag-role">Batsman</span>
         <span class="ptag" id="tag-hs" style="color:var(--acc4);">HS: —</span>
         <span class="ptag" id="tag-dots">Dot%: —</span>
@@ -628,44 +627,76 @@ Chart.defaults.font.size = 12;
 // Track chart instances so we can destroy & rebuild them for each player
 var _charts = {};
 
-function _buildCharts(avg, sr, hundreds, matches) {
-  // Destroy old charts before rebuilding (prevents canvas reuse error)
-  Object.keys(_charts).forEach(function(k){ if(_charts[k]) _charts[k].destroy(); });
+// Store trend data globally so tab buttons can access it
+var _trendData = {seasons:[], runs:[], avg:[], sr:[]};
 
-  // ── TREND CHART: generate plausible season data from career stats ──
+function _buildTrendChart(mode) {
+  // mode = 'runs', 'avg', or 'sr'
+  // Destroys and rebuilds just the trend chart with selected metric
+  if(_charts.trend) _charts.trend.destroy();
   var trendCtx = document.getElementById('trendChart').getContext('2d');
-  var seasons = ['2016','2017','2018','2019','2020','2021','2022','2023','2024'];
-  // Distribute total runs across seasons with some variance
-  var totalRuns = Math.round(avg * matches);
-  var seasonRuns = seasons.map(function(_,i){
-    var base = totalRuns / seasons.length;
-    var variance = base * 0.5 * (Math.random() - 0.5);
-    return Math.max(50, Math.round(base + variance));
-  });
-  var seasonAvg = seasonRuns.map(function(r){
-    return parseFloat((r / (Math.round(r/avg) || 1) * (0.85 + Math.random()*0.3)).toFixed(1));
-  });
   var trendGrad = trendCtx.createLinearGradient(0,0,0,220);
   trendGrad.addColorStop(0,'rgba(0,245,170,0.25)');
   trendGrad.addColorStop(1,'rgba(0,245,170,0)');
+  var datasets;
+  if(mode === 'avg'){
+    datasets = [{type:'line',label:'Average',data:_trendData.avg,borderColor:acc,borderWidth:2,pointBackgroundColor:acc,pointRadius:4,fill:true,backgroundColor:trendGrad,tension:.4}];
+  } else if(mode === 'sr'){
+    datasets = [{type:'line',label:'Strike Rate',data:_trendData.sr,borderColor:acc4,borderWidth:2,pointBackgroundColor:acc4,pointRadius:4,fill:false,tension:.4}];
+  } else {
+    datasets = [
+      {type:'bar',label:'Runs',data:_trendData.runs,backgroundColor:'rgba(91,159,255,0.25)',borderColor:'rgba(91,159,255,0.5)',borderWidth:1,borderRadius:4,yAxisID:'y',order:2},
+      {type:'line',label:'Average',data:_trendData.avg,borderColor:acc,borderWidth:2,pointBackgroundColor:acc,pointRadius:4,fill:true,backgroundColor:trendGrad,tension:.4,yAxisID:'y2',order:1}
+    ];
+  }
   _charts.trend = new Chart(trendCtx, {
-    data:{
-      labels:seasons,
-      datasets:[
-        {type:'bar',label:'Runs',data:seasonRuns,backgroundColor:'rgba(91,159,255,0.25)',borderColor:'rgba(91,159,255,0.5)',borderWidth:1,borderRadius:4,yAxisID:'y',order:2},
-        {type:'line',label:'Average',data:seasonAvg,borderColor:acc,borderWidth:2,pointBackgroundColor:acc,pointRadius:4,pointHoverRadius:6,fill:true,backgroundColor:trendGrad,tension:.4,yAxisID:'y2',order:1}
-      ]
-    },
+    data:{ labels:_trendData.seasons, datasets:datasets },
     options:{
       responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
       plugins:{legend:{labels:{color:muted2,boxWidth:10,padding:16}},tooltip:{backgroundColor:'rgba(15,19,28,.95)',borderColor:'rgba(255,255,255,0.08)',borderWidth:1,padding:12}},
       scales:{
         x:{grid:{color:gridColor},ticks:{color:muted}},
-        y:{position:'left',title:{display:true,text:'Runs',color:muted},grid:{color:gridColor},ticks:{color:muted}},
-        y2:{position:'right',title:{display:true,text:'Average',color:muted},grid:{drawOnChartArea:false},ticks:{color:muted}}
+        y:{position:'left',grid:{color:gridColor},ticks:{color:muted}},
+        y2:{position:'right',grid:{drawOnChartArea:false},ticks:{color:muted},display: mode==='runs'}
       }
     }
   });
+}
+
+// Wire up tab buttons for Season Run Trend
+document.addEventListener('DOMContentLoaded', function(){
+  var ctabs = document.querySelectorAll('.ctab');
+  var modes = ['runs','avg','sr'];
+  ctabs.forEach(function(btn, i){
+    btn.addEventListener('click', function(){
+      ctabs.forEach(function(b){ b.classList.remove('on'); });
+      btn.classList.add('on');
+      _buildTrendChart(modes[i] || 'runs');
+    });
+  });
+});
+
+function _buildCharts(avg, sr, hundreds, matches) {
+  // Destroy old charts before rebuilding (prevents canvas reuse error)
+  Object.keys(_charts).forEach(function(k){ if(_charts[k]) _charts[k].destroy(); });
+
+  // ── TREND CHART: generate plausible season data from career stats ──
+  var seasons = ['2016','2017','2018','2019','2020','2021','2022','2023','2024'];
+  var totalRuns = Math.round(avg * matches);
+  var seasonRuns = seasons.map(function(){
+    var base = totalRuns / seasons.length;
+    var variance = base * 0.5 * (Math.random() - 0.5);
+    return Math.max(50, Math.round(base + variance));
+  });
+  var seasonAvg = seasonRuns.map(function(r){
+    return parseFloat((avg * (0.8 + Math.random()*0.4)).toFixed(1));
+  });
+  var seasonSR = seasonRuns.map(function(){
+    return parseFloat((sr * (0.85 + Math.random()*0.3)).toFixed(1));
+  });
+  // Store globally for tab switching
+  _trendData = { seasons:seasons, runs:seasonRuns, avg:seasonAvg, sr:seasonSR };
+  _buildTrendChart('runs');
 
   // ── FORM CHART: generate recent innings pattern based on avg ──
   var formCtx = document.getElementById('formChart').getContext('2d');
@@ -803,16 +834,16 @@ function _loadPlayer() {
 
       document.title = 'KricIQ — ' + name;
 
-      // PLAYER NAME — fixed: handles 1-word, 2-word, 3-word names correctly
+      // PLAYER NAME — always show full name, last word in green
+      // e.g. "Virat Kohli" → "VIRAT <green>KOHLI</green>"
+      // e.g. "MS Dhoni" → "MS <green>DHONI</green>"  
+      // e.g. "DA Warner" → "DA <green>WARNER</green>" (API stores it this way)
       var pts = name.trim().split(' ');
       var nameEl = document.querySelector('.pname');
       if(nameEl){
         if(pts.length === 1){
           nameEl.innerHTML = '<span>' + pts[0].toUpperCase() + '</span>';
-        } else if(pts.length === 2){
-          nameEl.innerHTML = pts[0].toUpperCase() + ' <span>' + pts[1].toUpperCase() + '</span>';
         } else {
-          // 3+ words: first name(s) white, last name green
           nameEl.innerHTML = pts.slice(0,-1).join(' ').toUpperCase() + ' <span>' + pts[pts.length-1].toUpperCase() + '</span>';
         }
       }
