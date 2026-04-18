@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CricIQ — Virat Kohli · Deep Profile</title>
+<title>KricIQ — Player Profile</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -358,10 +358,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
   <div class="ai-card span2">
     <div class="ai-head">
       <div class="ai-icon">✦</div>
-      <div><div class="ai-ht">AI Match Prediction Engine</div><div class="ai-hsub">Based on 16 seasons · 247 matches · opposition bowling analysis · pitch report</div></div>
+      <div><div class="ai-ht">AI Match Prediction Engine</div><div class="ai-hsub" id="ai-hsub">Based on career stats · IPL data · form analysis</div></div>
     </div>
     <div class="ai-body">
-      <div class="ai-match">Next match: <strong>RCB vs MI · Wankhede Stadium</strong> &nbsp;·&nbsp; D/N · Toss: unknown &nbsp;·&nbsp; Pitch: good batting</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         <div>
           <div class="ai-pred-big">
@@ -379,25 +378,23 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
         </div>
         <div>
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">AI reasoning factors</div>
-          <div class="ai-factors">
-            <div class="aif"><div class="aif-dot" style="background:var(--acc)"></div><div>Wankhede is his <em>2nd best ground</em> — historical average 46.2 in 18 innings</div></div>
-            <div class="aif"><div class="aif-dot" style="background:var(--acc)"></div><div><em>3 consecutive 40+ scores</em> in last 4 outings — form trending strong</div></div>
-            <div class="aif"><div class="aif-dot" style="background:var(--acc2)"></div><div><strong>Bumrah has dismissed him 4×</strong> in IPL — highest threat bowler tonight</div></div>
-            <div class="aif"><div class="aif-dot" style="background:var(--acc2)"></div><div>MI have <strong>2 quality off-spinners</strong> — his avg vs off-spin is only 22.8</div></div>
-            <div class="aif"><div class="aif-dot" style="background:var(--acc4)"></div><div>D/N conditions at Wankhede — dew expected in 2nd innings, slight edge to chasing team</div></div>
-            <div class="aif"><div class="aif-dot" style="background:var(--acc3)"></div><div>Last 3 matches vs MI: <em>72, 43, 28</em> — comfortable record against this opponent</div></div>
+          <div class="ai-factors" id="ai-factors-list">
+            <div class="aif"><div class="aif-dot" style="background:var(--acc)"></div><div id="ai-f1">Loading...</div></div>
+            <div class="aif"><div class="aif-dot" style="background:var(--acc)"></div><div id="ai-f2">Loading...</div></div>
+            <div class="aif"><div class="aif-dot" style="background:var(--acc2)"></div><div id="ai-f3">Loading...</div></div>
+            <div class="aif"><div class="aif-dot" style="background:var(--acc4)"></div><div id="ai-f4">Loading...</div></div>
           </div>
         </div>
       </div>
       <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,.05);padding-top:14px;">
         <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">Score probability distribution</div>
-        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">
-          <div><div class="prob-row"><span>0–9</span><span style="color:var(--acc2)">8%</span></div><div class="prob-bar"><div class="prob-fill" style="width:8%;background:var(--acc2)"></div></div></div>
-          <div><div class="prob-row"><span>10–29</span><span style="color:var(--acc4)">18%</span></div><div class="prob-bar"><div class="prob-fill" style="width:18%;background:var(--acc4)"></div></div></div>
-          <div><div class="prob-row"><span>30–49</span><span style="color:var(--acc3)">30%</span></div><div class="prob-bar"><div class="prob-fill" style="width:30%;background:var(--acc3)"></div></div></div>
-          <div><div class="prob-row"><span>50–74</span><span style="color:var(--acc)">27%</span></div><div class="prob-bar"><div class="prob-fill" style="width:27%;background:var(--acc)"></div></div></div>
-          <div><div class="prob-row"><span>75–99</span><span style="color:var(--acc)">13%</span></div><div class="prob-bar"><div class="prob-fill" style="width:13%;background:var(--acc)"></div></div></div>
-          <div><div class="prob-row"><span>100+</span><span style="color:var(--acc4)">4%</span></div><div class="prob-bar"><div class="prob-fill" style="width:4%;background:var(--acc4)"></div></div></div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;" id="prob-dist">
+          <div><div class="prob-row"><span>0–9</span><span id="p0" style="color:var(--acc2)">8%</span></div><div class="prob-bar"><div id="pb0" class="prob-fill" style="width:8%;background:var(--acc2)"></div></div></div>
+          <div><div class="prob-row"><span>10–29</span><span id="p1" style="color:var(--acc4)">18%</span></div><div class="prob-bar"><div id="pb1" class="prob-fill" style="width:18%;background:var(--acc4)"></div></div></div>
+          <div><div class="prob-row"><span>30–49</span><span id="p2" style="color:var(--acc3)">30%</span></div><div class="prob-bar"><div id="pb2" class="prob-fill" style="width:30%;background:var(--acc3)"></div></div></div>
+          <div><div class="prob-row"><span>50–74</span><span id="p3" style="color:var(--acc)">27%</span></div><div class="prob-bar"><div id="pb3" class="prob-fill" style="width:27%;background:var(--acc)"></div></div></div>
+          <div><div class="prob-row"><span>75–99</span><span id="p4" style="color:var(--acc)">13%</span></div><div class="prob-bar"><div id="pb4" class="prob-fill" style="width:13%;background:var(--acc)"></div></div></div>
+          <div><div class="prob-row"><span>100+</span><span id="p5" style="color:var(--acc4)">4%</span></div><div class="prob-bar"><div id="pb5" class="prob-fill" style="width:4%;background:var(--acc4)"></div></div></div>
         </div>
       </div>
     </div>
@@ -405,7 +402,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 
   <!-- WAGON WHEEL -->
   <div class="card">
-    <div class="ch"><div><div class="ct">Scoring <em>Zones</em></div><div class="csub">Wagon wheel — IPL career shot distribution</div></div></div>
+    <div class="ch"><div><div class="ct">Scoring <em>Zones</em></div><div class="csub">Wagon wheel — IPL career shot distribution</div></div><span style="font-size:10px;padding:2px 8px;background:rgba(247,201,72,.1);color:var(--acc4);border:1px solid rgba(247,201,72,.2);border-radius:4px;">Sample data</span></div>
     <div class="wagon-container">
       <svg class="wagon-svg" width="200" height="200" viewBox="0 0 200 200">
         <!-- Ground circles -->
@@ -457,7 +454,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
   <div class="card">
     <div class="ch">
       <div><div class="ct">Bowler <em>Threats</em></div><div class="csub">Head-to-head vs MI bowlers tonight</div></div>
-      <div style="font-size:11px;color:var(--muted2);background:rgba(255,95,64,.08);border:1px solid rgba(255,95,64,.15);border-radius:5px;padding:3px 8px;">Tonight's XI</div>
+      <span style="font-size:10px;padding:2px 8px;background:rgba(247,201,72,.1);color:var(--acc4);border:1px solid rgba(247,201,72,.2);border-radius:4px;">Sample data</span>
     </div>
     <div class="bowler-grid">
       <div class="brow">
@@ -506,7 +503,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
   <!-- SEASON BY SEASON -->
   <div class="card span2">
     <div class="ch">
-      <div><div class="ct">Season by Season <em>Breakdown</em></div><div class="csub">IPL career arc — runs, average, strike rate</div></div>
+      <div><div class="ct">Season by Season <em>Breakdown</em></div><div class="csub">IPL career arc — runs, average, strike rate</div></div><span style="font-size:10px;padding:2px 8px;background:rgba(247,201,72,.1);color:var(--acc4);border:1px solid rgba(247,201,72,.2);border-radius:4px;">Sample data</span>
     </div>
     <div class="milestone-list">
       <div class="ms-row"><div class="ms-yr">2016</div><div class="ms-bar-track"><div class="ms-fill" style="width:100%"></div></div><div class="ms-runs" style="color:var(--acc)">973</div><div class="ms-avg" style="color:var(--muted2)">avg 81.1</div></div>
@@ -770,14 +767,16 @@ function _buildCharts(avg, sr, hundreds, matches) {
   });
 }
 
-function _autoRole(avg, sr, dismissals, matches, sixes) {
-  var dpm = dismissals / Math.max(matches, 1);
-  if (dpm > 0.5) return 'WK-Batsman';
-  if (avg < 15 && sr > 100) return 'Lower-order';
-  if (avg > 35 && sixes > 50) return 'Aggressive Bat';
-  if (avg > 35) return 'Batsman';
-  if (avg > 25 && sr > 140) return 'All-rounder';
-  if (avg < 20) return 'Tail / Bowler';
+function _autoRole(avg, sr, sixes) {
+  // Role detected from batting stats only
+  // dismissals field = times batter got OUT (not keeper catches) so excluded
+  if (avg > 45 && sixes > 100) return 'Power Hitter';
+  if (avg > 40 && sr > 145) return 'Aggressive Bat';
+  if (avg > 38) return 'Batsman';
+  if (avg > 28 && sr > 148) return 'All-rounder';
+  if (avg > 25) return 'Batsman';
+  if (avg > 15 && sr > 145) return 'Finisher';
+  if (avg < 15) return 'Lower-order';
   return 'Batsman';
 }
 
@@ -804,17 +803,26 @@ function _loadPlayer() {
 
       document.title = 'KricIQ — ' + name;
 
-      // PLAYER NAME
+      // PLAYER NAME — fixed: handles 1-word, 2-word, 3-word names correctly
       var pts = name.trim().split(' ');
       var nameEl = document.querySelector('.pname');
-      if(nameEl) nameEl.innerHTML = pts.slice(0,-1).join(' ').toUpperCase() + ' <span>' + pts[pts.length-1].toUpperCase() + '</span>';
+      if(nameEl){
+        if(pts.length === 1){
+          nameEl.innerHTML = '<span>' + pts[0].toUpperCase() + '</span>';
+        } else if(pts.length === 2){
+          nameEl.innerHTML = pts[0].toUpperCase() + ' <span>' + pts[1].toUpperCase() + '</span>';
+        } else {
+          // 3+ words: first name(s) white, last name green
+          nameEl.innerHTML = pts.slice(0,-1).join(' ').toUpperCase() + ' <span>' + pts[pts.length-1].toUpperCase() + '</span>';
+        }
+      }
 
       // AVATAR
       var avatarEl = document.querySelector('.avatar');
       if(avatarEl) avatarEl.textContent = _initials(name);
 
       // AUTO ROLE + META TAGS
-      var role = _autoRole(avg, sr, dismissals, matches, sixes);
+      var role = _autoRole(avg, sr, sixes);
       var el;
       el=document.getElementById('tag-role'); if(el) el.textContent=role;
       el=document.getElementById('tag-hs');   if(el) el.textContent='Best: '+hs;
@@ -873,10 +881,44 @@ function _loadPlayer() {
         gi[4].querySelector('.ai-gv').textContent=srBoost;
       }
 
+      // AI REASONING FACTORS — calculated from real stats
+      // Each factor is a plain English sentence derived from the player's actual numbers
+      var formLevel = avg > 45 ? 'excellent' : avg > 35 ? 'strong' : avg > 25 ? 'moderate' : 'below average';
+      var srLevel   = sr > 150 ? 'explosive' : sr > 135 ? 'aggressive' : sr > 120 ? 'solid' : 'conservative';
+      var f1 = el=document.getElementById('ai-f1');
+      var f2 = el=document.getElementById('ai-f2');
+      var f3 = el=document.getElementById('ai-f3');
+      var f4 = el=document.getElementById('ai-f4');
+      if(f1) f1.innerHTML = 'Career average of <em>'+avg.toFixed(1)+'</em> indicates '+formLevel+' batting ability across '+matches+' IPL matches';
+      if(f2) f2.innerHTML = 'Strike rate of <em>'+sr.toFixed(1)+'</em> — '+srLevel+' scoring pace, predicted range '+predLow+'–'+predHigh+' runs';
+      if(f3) f3.innerHTML = '<strong>'+hundreds+'</strong> centuries and <strong>'+fifties+'</strong> half-centuries — big innings conversion rate: '+(hundreds>0?Math.round(hundreds/(hundreds+fifties)*100)+'%':'low');
+      if(f4) f4.innerHTML = 'Dot ball % of <em>'+dotPct.toFixed(1)+'%</em> — '+( dotPct < 35 ? 'finds gaps well, low dot pressure' : dotPct < 45 ? 'balanced approach under pressure' : 'tends to anchor under pressure');
+
+      // SCORE PROBABILITY DISTRIBUTION — calculated from avg
+      // Higher avg = more weight towards bigger scores
+      // These 6 buckets always add up to 100%
+      var p = [0,0,0,0,0,0];
+      if(avg > 45){      p = [5, 12, 22, 30, 20, 11]; }
+      else if(avg > 35){ p = [7, 15, 25, 28, 17,  8]; }
+      else if(avg > 28){ p = [9, 18, 28, 26, 13,  6]; }
+      else if(avg > 20){ p = [12, 22, 30, 22, 10,  4]; }
+      else {             p = [18, 28, 30, 16,  6,  2]; }
+      var pIds  = ['p0','p1','p2','p3','p4','p5'];
+      var pbIds = ['pb0','pb1','pb2','pb3','pb4','pb5'];
+      p.forEach(function(v,i){
+        var pEl = document.getElementById(pIds[i]);
+        var pbEl = document.getElementById(pbIds[i]);
+        if(pEl)  pEl.textContent = v+'%';
+        if(pbEl) pbEl.style.width = v+'%';
+      });
+
       // SEASON header
       var secSub=document.querySelector('#tab-batting .card.span2 .ch .csub');
       if(!secSub) secSub=document.querySelector('.card.span2 .ch .csub');
       if(secSub&&runs>0) secSub.textContent='IPL career — '+runs.toLocaleString()+' total runs across '+matches+' matches';
+      // AI hsub update
+      var aiSub=document.getElementById('ai-hsub');
+      if(aiSub) aiSub.textContent='Based on '+matches+' matches · '+runs.toLocaleString()+' runs · career form analysis';
 
       // PRESSURE INDEX
       var piScores=[
