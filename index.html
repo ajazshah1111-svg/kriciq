@@ -289,30 +289,11 @@ footer{background:var(--s1);border-top:1px solid var(--border);padding:48px 32px
 </nav>
 
 <!-- LIVE TICKER -->
-<div style="margin-top:60px;" class="ticker-wrap">
+<div style="margin-top:60px;" class="ticker-wrap" id="ticker-wrap">
   <div class="ticker-label">LIVE</div>
-  <div style="overflow:hidden;flex:1;">
-    <div class="ticker-track">
-      <div class="ticker-item"><span class="team">IND vs AUS</span> · <span class="score">287/4 (42.3)</span> · 3rd ODI · Wankhede</div>
-      <div class="ticker-dot"></div>
-      <div class="ticker-item"><span class="team">ENG vs SA</span> · <span class="score">143/6 (17.2)</span> · T20I · Lords</div>
-      <div class="ticker-dot"></div>
-      <div class="ticker-item"><span class="team">RCB vs MI</span> · <span class="score">198/3 (20)</span> · Kohli: <span class="score">91*</span></div>
-      <div class="ticker-dot"></div>
-      <div class="ticker-item"><span class="team">PAK vs NZ</span> · <span class="score">312/8 (85)</span> · 2nd Test · Day 2</div>
-      <div class="ticker-dot"></div>
-      <div class="ticker-item"><span class="team">WI vs SL</span> · <span class="score">156/2 (28)</span> · 2nd ODI</div>
-      <div class="ticker-dot"></div>
-      <div class="ticker-item"><span class="team">IND vs AUS</span> · <span class="score">287/4 (42.3)</span> · 3rd ODI · Wankhede</div>
-      <div class="ticker-dot"></div>
-      <div class="ticker-item"><span class="team">ENG vs SA</span> · <span class="score">143/6 (17.2)</span> · T20I · Lords</div>
-      <div class="ticker-dot"></div>
-      <div class="ticker-item"><span class="team">RCB vs MI</span> · <span class="score">198/3 (20)</span> · Kohli: <span class="score">91*</span></div>
-      <div class="ticker-dot"></div>
-      <div class="ticker-item"><span class="team">PAK vs NZ</span> · <span class="score">312/8 (85)</span> · 2nd Test · Day 2</div>
-      <div class="ticker-dot"></div>
-      <div class="ticker-item"><span class="team">WI vs SL</span> · <span class="score">156/2 (28)</span> · 2nd ODI</div>
-      <div class="ticker-dot"></div>
+  <div style="overflow:hidden;flex:1;" id="ticker-outer">
+    <div class="ticker-track" id="ticker-track">
+      <div class="ticker-item"><span class="team">Loading cricket news...</span></div>
     </div>
   </div>
 </div>
@@ -434,7 +415,7 @@ footer{background:var(--s1);border-top:1px solid var(--border);padding:48px 32px
   <h2 class="section-title fade-up d2">Deep profiles.<br>Real insights.</h2>
   <p class="section-sub fade-up d3">Click any player to see their complete analytics — form, matchups, ground splits, AI prediction for their next match.</p>
   <div class="player-cards">
-    <div class="player-card fade-up d1">
+    <div class="player-card fade-up d1" onclick="window.location.href='player.html?id=V-Kohli'" style="cursor:pointer;">
       <div class="player-avatar">VK</div>
       <div class="player-name">Virat Kohli</div>
       <div class="player-team">India · RCB</div>
@@ -446,7 +427,7 @@ footer{background:var(--s1);border-top:1px solid var(--border);padding:48px 32px
         <div class="fdot w"></div><div class="fdot w"></div><div class="fdot m"></div><div class="fdot w"></div><div class="fdot l"></div>
       </div>
     </div>
-    <div class="player-card fade-up d2">
+    <div class="player-card fade-up d2" onclick="window.location.href='player.html?id=JJ-Bumrah'" style="cursor:pointer;">
       <div class="player-avatar" style="color:var(--acc3);">JB</div>
       <div class="player-name">Jasprit Bumrah</div>
       <div class="player-team">India · MI</div>
@@ -458,7 +439,7 @@ footer{background:var(--s1);border-top:1px solid var(--border);padding:48px 32px
         <div class="fdot w"></div><div class="fdot w"></div><div class="fdot w"></div><div class="fdot m"></div><div class="fdot w"></div>
       </div>
     </div>
-    <div class="player-card fade-up d3">
+    <div class="player-card fade-up d3" onclick="window.location.href='player.html?id=BA-Stokes'" style="cursor:pointer;">
       <div class="player-avatar" style="color:var(--acc2);">BS</div>
       <div class="player-name">Ben Stokes</div>
       <div class="player-team">England</div>
@@ -470,7 +451,7 @@ footer{background:var(--s1);border-top:1px solid var(--border);padding:48px 32px
         <div class="fdot w"></div><div class="fdot m"></div><div class="fdot w"></div><div class="fdot w"></div><div class="fdot m"></div>
       </div>
     </div>
-    <div class="player-card fade-up d4">
+    <div class="player-card fade-up d4" onclick="window.location.href='player.html?id=KS-Williamson'" style="cursor:pointer;">
       <div class="player-avatar" style="color:var(--acc4);">KW</div>
       <div class="player-name">Kane Williamson</div>
       <div class="player-team">New Zealand</div>
@@ -684,6 +665,12 @@ fetch("https://kriciq-api.onrender.com/api/player_of_day")
     section.style.justifyContent = "space-between";
     section.style.alignItems = "center";
 
+    var playerId = data.player.replace(/ /g,'-');
+    section.style.cursor = 'pointer';
+    section.style.transition = 'border-color 0.2s, background 0.2s';
+    section.addEventListener('mouseover', function(){ section.style.borderColor='rgba(0,245,170,0.4)'; section.style.background='#131f2a'; });
+    section.addEventListener('mouseout', function(){ section.style.borderColor='rgba(0,255,170,0.15)'; section.style.background='#0f1720'; });
+    section.addEventListener('click', function(){ window.location.href='player.html?id='+playerId; });
     section.innerHTML = `
       <div>
         <div style="color:#00f5aa; font-size:12px; margin-bottom:4px;">
@@ -692,6 +679,7 @@ fetch("https://kriciq-api.onrender.com/api/player_of_day")
         <div style="font-size:18px; font-weight:600;">
           ${data.player}
         </div>
+        <div style="font-size:11px; color:#5a6275; margin-top:3px;">Click to view full profile →</div>
       </div>
 
       <div style="display:flex; gap:20px; font-size:14px; color:#9aa4b2;">
@@ -704,5 +692,72 @@ fetch("https://kriciq-api.onrender.com/api/player_of_day")
     document.body.insertBefore(section, document.body.children[1]);
   });
 </script>  
+<script>
+// ── AI-POWERED LIVE CRICKET NEWS TICKER ──
+(function loadLiveTicker(){
+  var track = document.getElementById('ticker-track');
+  if(!track) return;
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 600,
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+      system: 'You are a cricket live ticker generator. Search for the very latest cricket news and scores from today. Return ONLY a JSON array of 8 short ticker items, no preamble, no markdown. Each item has: "teams" (e.g. "IND vs AUS"), "score" (short score or headline stat), "detail" (brief context like "3rd ODI · Wankhede" or "won by 6 wkts"). Keep each item concise for a scrolling ticker. If no live matches, show recent results or breaking news.',
+      messages: [{ role: 'user', content: 'Get today\'s latest cricket scores and news for a live ticker. Return JSON array only.' }]
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    var text = '';
+    if(data.content){
+      data.content.forEach(function(block){
+        if(block.type === 'text') text += block.text;
+      });
+    }
+    // Parse JSON from response
+    var items;
+    try {
+      var clean = text.replace(/```json|```/g,'').trim();
+      var match = clean.match(/\[[\s\S]*\]/);
+      items = match ? JSON.parse(match[0]) : null;
+    } catch(e){ items = null; }
+
+    if(!items || !items.length) {
+      // Fallback: show AI error gracefully
+      items = [
+        {teams:'Cricket News', score:'Loading...', detail:'Refreshing live data'},
+      ];
+    }
+
+    // Build ticker HTML — duplicate for seamless loop
+    var html = '';
+    function buildItems(arr){
+      arr.forEach(function(item){
+        html += '<div class="ticker-item"><span class="team">'+(item.teams||'')+'</span>'
+          + (item.score ? ' · <span class="score">'+item.score+'</span>' : '')
+          + (item.detail ? ' · '+item.detail : '')
+          + '</div><div class="ticker-dot"></div>';
+      });
+    }
+    buildItems(items);
+    buildItems(items); // duplicate for seamless scroll
+    track.innerHTML = html;
+
+    // Adjust animation speed based on content length
+    var speed = Math.max(20, items.length * 5);
+    track.style.animationDuration = speed + 's';
+  })
+  .catch(function(){
+    // Silent fail — keep loading state or show static fallback
+    track.innerHTML = '<div class="ticker-item"><span class="team">IPL 2025</span> · <span class="score">Season underway</span> · Check live scores tab</div>'
+      + '<div class="ticker-dot"></div>'
+      + '<div class="ticker-item"><span class="team">KricIQ</span> · Live data updating soon</div>'
+      + '<div class="ticker-dot"></div>';
+  });
+})();
+</script>
+
 </body>
-</html>

@@ -264,14 +264,35 @@ function loadTeamPlayers(team){
           existing.matches += p.matches;
           existing.sixes += p.sixes||0;
           existing.fours += p.fours||0;
+          existing.hundreds = (existing.hundreds||0) + (p.hundreds||0);
+          existing.fifties  = (existing.fifties||0)  + (p.fifties||0);
         } else {
           players.push(p);
         }
       });
     });
     players.sort(function(a,b){return b.runs-a.runs;});
-    document.getElementById('td-players').textContent = players.length;
-    renderPlayers(players, team);
+
+    // Enrich each player with real 100s/50s via individual stat fetch
+    var enrichFetches = players.map(function(p){
+      return fetch(_kapi+'/player-stats/'+encodeURIComponent(p.player.replace(/ /g,'-')))
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(d){
+          if(d && d.hundreds != null){ p.hundreds = d.hundreds; p.fifties = d.fifties; }
+        })
+        .catch(function(){});
+    });
+
+    Promise.all(enrichFetches).then(function(){
+      document.getElementById('td-players').textContent = players.length;
+      var totalH = players.reduce(function(s,p){ return s+(p.hundreds||0); },0);
+      var totalF = players.reduce(function(s,p){ return s+(p.fifties||0); },0);
+      var hEl = document.getElementById('td-hundreds');
+      var fEl = document.getElementById('td-fifties');
+      if(hEl) hEl.textContent = totalH || '—';
+      if(fEl) fEl.textContent = totalF || '—';
+      renderPlayers(players, team);
+    });
   }).catch(function(){
     document.getElementById('players-container').innerHTML =
       '<div class="loading-msg">Could not load players.</div>';
@@ -301,8 +322,8 @@ function renderPlayers(players, team){
       +'<td><span class="sv" style="color:var(--acc)">'+Math.round(p.runs).toLocaleString()+'</span></td>'
       +'<td><span class="sv" style="color:var(--acc3)">'+(p.average?parseFloat(p.average).toFixed(1):'—')+'</span></td>'
       +'<td><span class="sv" style="color:var(--acc4)">'+(p.strike_rate?parseFloat(p.strike_rate).toFixed(1):'—')+'</span></td>'
-      +'<td><span class="sv">'+(p.hundreds||0)+'</span></td>'
-      +'<td><span class="sv">'+(p.fifties||0)+'</span></td>'
+      +'<td><span class="sv" style="color:var(--acc)">'  +(p.hundreds > 0 ? p.hundreds : (p.hundreds===0 && p.runs > 500 ? '—' : p.hundreds||0))+'</span></td>'
+      +'<td><span class="sv" style="color:var(--acc3)">'+(p.fifties  > 0 ? p.fifties  : (p.fifties===0  && p.runs > 200 ? '—' : p.fifties||0)) +'</span></td>'
       +'</tr>';
   });
   html += '</tbody></table>';
