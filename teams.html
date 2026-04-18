@@ -128,6 +128,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
       <div class="td-stat"><div class="td-sv" id="td-matches">—</div><div class="td-sk">Matches</div></div>
       <div class="td-stat"><div class="td-sv" id="td-runs" style="color:var(--acc)">—</div><div class="td-sk">Total Runs</div></div>
       <div class="td-stat"><div class="td-sv" id="td-avgscore" style="color:var(--acc4)">—</div><div class="td-sk">Avg Score/Inn</div></div>
+      <div class="td-stat"><div class="td-sv" id="td-hundreds" style="color:var(--acc2)">—</div><div class="td-sk">Team 100s</div></div>
+      <div class="td-stat"><div class="td-sv" id="td-fifties" style="color:var(--acc3)">—</div><div class="td-sk">Team 50s</div></div>
       <div class="td-stat"><div class="td-sv" id="td-players">—</div><div class="td-sk">Players Used</div></div>
     </div>
     <div class="players-section">
@@ -200,10 +202,10 @@ function loadTeamStats(){
           }
         });
       });
-      // Average the avg_score_per_match across aliases
+      // Always compute avg from total_runs / matches for accuracy
       Object.keys(_teamStats).forEach(function(id){
         var ts = _teamStats[id];
-        if(ts.count > 1) ts.avg_score_per_match = ts.avg_score_per_match / ts.count;
+        ts.avg_score_per_match = ts.matches > 0 ? Math.round(ts.total_runs / ts.matches) : 0;
       });
     }).catch(function(){});
 }
@@ -234,8 +236,11 @@ function selectTeam(teamId){
   if(ts){
     document.getElementById('td-matches').textContent = ts.matches;
     document.getElementById('td-runs').textContent = ts.total_runs.toLocaleString();
-    document.getElementById('td-avgscore').textContent = Math.round(ts.avg_score_per_match || ts.total_runs / ts.matches);
+    document.getElementById('td-avgscore').textContent = ts.avg_score_per_match || Math.round(ts.total_runs / ts.matches);
   }
+  // Reset 100s/50s — will be filled once squad loads
+  document.getElementById('td-hundreds').textContent = '—';
+  document.getElementById('td-fifties').textContent  = '—';
 
   // Load players
   loadTeamPlayers(team);
@@ -259,11 +264,10 @@ function loadTeamPlayers(team){
       batch.forEach(function(p){
         var existing = players.find(function(x){return x.player===p.player;});
         if(existing){
-          // Merge — add runs and matches from both alias names
-          existing.runs += p.runs;
-          existing.matches += p.matches;
-          existing.sixes += p.sixes||0;
-          existing.fours += p.fours||0;
+          existing.runs     += p.runs;
+          existing.matches  += p.matches;
+          existing.sixes    += p.sixes||0;
+          existing.fours    += p.fours||0;
           existing.hundreds = (existing.hundreds||0) + (p.hundreds||0);
           existing.fifties  = (existing.fifties||0)  + (p.fifties||0);
         } else {
@@ -273,26 +277,17 @@ function loadTeamPlayers(team){
     });
     players.sort(function(a,b){return b.runs-a.runs;});
 
-    // Enrich each player with real 100s/50s via individual stat fetch
-    var enrichFetches = players.map(function(p){
-      return fetch(_kapi+'/player-stats/'+encodeURIComponent(p.player.replace(/ /g,'-')))
-        .then(function(r){ return r.ok ? r.json() : null; })
-        .then(function(d){
-          if(d && d.hundreds != null){ p.hundreds = d.hundreds; p.fifties = d.fifties; }
-        })
-        .catch(function(){});
-    });
+    // Populate banner
+    document.getElementById('td-players').textContent = players.length;
+    var totalH = players.reduce(function(s,p){return s+(p.hundreds||0);},0);
+    var totalF = players.reduce(function(s,p){return s+(p.fifties||0);},0);
+    // Show total only if API actually returned non-zero data for at least one player
+    var hasRealH = players.some(function(p){return (p.hundreds||0) > 0;});
+    var hasRealF = players.some(function(p){return (p.fifties||0) > 0;});
+    document.getElementById('td-hundreds').textContent = hasRealH ? totalH : '—';
+    document.getElementById('td-fifties').textContent  = hasRealF ? totalF : '—';
 
-    Promise.all(enrichFetches).then(function(){
-      document.getElementById('td-players').textContent = players.length;
-      var totalH = players.reduce(function(s,p){ return s+(p.hundreds||0); },0);
-      var totalF = players.reduce(function(s,p){ return s+(p.fifties||0); },0);
-      var hEl = document.getElementById('td-hundreds');
-      var fEl = document.getElementById('td-fifties');
-      if(hEl) hEl.textContent = totalH || '—';
-      if(fEl) fEl.textContent = totalF || '—';
-      renderPlayers(players, team);
-    });
+    renderPlayers(players, team);
   }).catch(function(){
     document.getElementById('players-container').innerHTML =
       '<div class="loading-msg">Could not load players.</div>';
@@ -322,8 +317,8 @@ function renderPlayers(players, team){
       +'<td><span class="sv" style="color:var(--acc)">'+Math.round(p.runs).toLocaleString()+'</span></td>'
       +'<td><span class="sv" style="color:var(--acc3)">'+(p.average?parseFloat(p.average).toFixed(1):'—')+'</span></td>'
       +'<td><span class="sv" style="color:var(--acc4)">'+(p.strike_rate?parseFloat(p.strike_rate).toFixed(1):'—')+'</span></td>'
-      +'<td><span class="sv" style="color:var(--acc)">'  +(p.hundreds > 0 ? p.hundreds : (p.hundreds===0 && p.runs > 500 ? '—' : p.hundreds||0))+'</span></td>'
-      +'<td><span class="sv" style="color:var(--acc3)">'+(p.fifties  > 0 ? p.fifties  : (p.fifties===0  && p.runs > 200 ? '—' : p.fifties||0)) +'</span></td>'
+      +'<td><span class="sv" style="color:var(--acc2)">' +(p.hundreds > 0 ? p.hundreds : (p.runs > 300 ? '—' : '0'))+'</span></td>'
+      +'<td><span class="sv" style="color:var(--acc3)">' +(p.fifties  > 0 ? p.fifties  : (p.runs > 150 ? '—' : '0'))+'</span></td>'
       +'</tr>';
   });
   html += '</tbody></table>';
