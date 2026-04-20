@@ -688,25 +688,33 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 });
 
-function _buildCharts(avg, sr, hundreds, matches) {
+function _buildCharts(avg, sr, hundreds, matches, seasonData) {
   // Destroy old charts before rebuilding (prevents canvas reuse error)
   Object.keys(_charts).forEach(function(k){ if(_charts[k]) _charts[k].destroy(); });
 
-  // ── TREND CHART: generate plausible season data from career stats ──
-  var seasons = ['2016','2017','2018','2019','2020','2021','2022','2023','2024'];
-  var totalRuns = Math.round(avg * matches);
-  var seasonRuns = seasons.map(function(){
-    var base = totalRuns / seasons.length;
-    var variance = base * 0.5 * (Math.random() - 0.5);
-    return Math.max(50, Math.round(base + variance));
-  });
-  var seasonAvg = seasonRuns.map(function(r){
-    return parseFloat((avg * (0.8 + Math.random()*0.4)).toFixed(1));
+  // ── TREND CHART: uses real season data passed in from API ──
+  // seasonData is passed in from _loadPlayer after fetching /api/player-seasons/
+  var seasons    = (seasonData || []).map(function(s){ return s.season; });
+  var seasonRuns = (seasonData || []).map(function(s){ return s.runs; });
+  // Estimate avg/SR per season from career rates (we only have runs+matches per season)
+  var seasonAvg = seasonRuns.map(function(r, i){
+    var m = (seasonData[i] && seasonData[i].matches) ? seasonData[i].matches : 1;
+    return parseFloat((r / m).toFixed(1));
   });
   var seasonSR = seasonRuns.map(function(){
-    return parseFloat((sr * (0.85 + Math.random()*0.3)).toFixed(1));
+    return parseFloat(sr.toFixed(1));
   });
-  // Store globally for tab switching
+  // Fallback if API returned nothing
+  if (!seasons.length) {
+    seasons = ['2016','2017','2018','2019','2020','2021','2022','2023','2024'];
+    var totalRuns = Math.round(avg * matches);
+    seasonRuns = seasons.map(function(){
+      var base = totalRuns / seasons.length;
+      return Math.max(50, Math.round(base + base * 0.3 * (Math.random() - 0.5)));
+    });
+    seasonAvg = seasonRuns.map(function(){ return parseFloat((avg * (0.85 + Math.random()*0.3)).toFixed(1)); });
+    seasonSR  = seasonRuns.map(function(){ return parseFloat(sr.toFixed(1)); });
+  }
   _trendData = { seasons:seasons, runs:seasonRuns, avg:seasonAvg, sr:seasonSR };
   _buildTrendChart('runs');
 
@@ -1020,8 +1028,15 @@ function _loadPlayer() {
         var bowlNone=document.getElementById('bowl-none'); if(bowlNone) bowlNone.style.display='';
       }
 
-      // CHARTS
-      _buildCharts(avg, sr, hundreds, matches);
+      // CHARTS — fetch real season data first, then build
+      fetch(_kapi + '/player-seasons/' + pid)
+        .then(function(r){ return r.json(); })
+        .then(function(seasonData){
+          _buildCharts(avg, sr, hundreds, matches, seasonData);
+        })
+        .catch(function(){
+          _buildCharts(avg, sr, hundreds, matches, []);
+        });
 
     }).catch(function(e){ console.error('KricIQ API error:',e); });
 }
