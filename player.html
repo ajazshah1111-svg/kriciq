@@ -107,6 +107,11 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 /* CONSISTENCY */
 .cons-wrap{padding:16px 18px;}
 
+/* FORMAT BUTTONS */
+.fmt-btn{padding:5px 16px;border-radius:20px;font-size:12px;font-weight:500;font-family:var(--font-b);border:1px solid var(--border2);background:none;color:var(--muted2);cursor:pointer;transition:.15s;}
+.fmt-btn:hover{color:var(--text);border-color:rgba(255,255,255,0.2);}
+.fmt-btn.active{background:var(--acc);color:#000;border-color:var(--acc);font-weight:600;}
+
 /* RESPONSIVE */
 @media(max-width:800px){
   .wrap{grid-template-columns:1fr;padding:14px;}
@@ -219,10 +224,20 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
   </div>
 </div>
 
+<!-- FORMAT SELECTOR -->
+<div id="fmt-bar" style="background:var(--s1);border-bottom:1px solid var(--border);padding:0 28px;">
+  <div style="max-width:1160px;margin:0 auto;display:flex;gap:4px;padding:10px 0;">
+    <button class="fmt-btn active" data-fmt="ipl" onclick="_switchFormat('ipl',this)">IPL</button>
+    <button class="fmt-btn" data-fmt="odi" onclick="_switchFormat('odi',this)">ODI</button>
+    <button class="fmt-btn" data-fmt="t20i" onclick="_switchFormat('t20i',this)">T20I</button>
+    <button class="fmt-btn" data-fmt="test" onclick="_switchFormat('test',this)">Test</button>
+  </div>
+</div>
+
 <!-- STAT BAR -->
 <div class="sbar">
   <div class="sbar-inner">
-    <div class="si"><div class="sv" id="stat-runs" style="color:var(--acc)">—</div><div class="sk">IPL Runs</div></div>
+    <div class="si"><div class="sv" id="stat-runs" style="color:var(--acc)">—</div><div class="sk" id="stat-runs-lbl">Runs</div></div>
     <div class="si"><div class="sv" id="stat-matches">—</div><div class="sk">Matches</div></div>
     <div class="si"><div class="sv" id="stat-avg" style="color:var(--acc3)">—</div><div class="sk">Average</div></div>
     <div class="si"><div class="sv" id="stat-sr" style="color:var(--acc4)">—</div><div class="sk">Strike Rate</div></div>
@@ -352,6 +367,75 @@ function switchTab(name,btn){
 
 <script>
 var _kapi = 'https://kriciq-api.onrender.com/api';
+var _currentPid = 'Virat-Kohli';
+var _formatsData = {}; // stores all formats from API
+var _activeFormat = 'ipl';
+
+// ── FORMAT SWITCHER ──
+function _switchFormat(fmt, btn) {
+  _activeFormat = fmt;
+  document.querySelectorAll('.fmt-btn').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+
+  var d = _formatsData[fmt];
+  var fmtLabel = fmt.toUpperCase();
+
+  if(!d) {
+    // No data for this format
+    ['stat-runs','stat-matches','stat-avg','stat-sr','stat-hs','stat-6s','stat-4s','stat-100s','stat-50s','stat-dots'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.textContent = '—';
+    });
+    var lbl = document.getElementById('stat-runs-lbl');
+    if(lbl) lbl.textContent = fmtLabel + ' Runs';
+    // Update trend chart subtitle
+    var sub = document.querySelector('#tab-batting .card.span2 .ch .csub');
+    if(sub) sub.textContent = 'No ' + fmtLabel + ' data available for this player';
+    return;
+  }
+
+  var runs     = d.runs          ? Math.round(d.runs)          : 0;
+  var matches  = d.matches       ? Math.round(d.matches)       : 0;
+  var avg      = d.average       ? parseFloat(d.average)       : 0;
+  var sr       = d.strike_rate   ? parseFloat(d.strike_rate)   : 0;
+  var hundreds = d.hundreds      !== undefined ? Math.round(d.hundreds)      : 0;
+  var fifties  = d.fifties       ? Math.round(d.fifties)       : 0;
+  var fours    = d.fours         ? Math.round(d.fours)         : 0;
+  var sixes    = d.sixes         ? Math.round(d.sixes)         : 0;
+  var hs       = d.highest_score ? Math.round(d.highest_score) : 0;
+  var dotPct   = d.dot_pct       ? parseFloat(d.dot_pct)       : 0;
+
+  var el;
+  var lbl = document.getElementById('stat-runs-lbl');
+  if(lbl) lbl.textContent = fmtLabel + ' Runs';
+  el=document.getElementById('stat-runs');    if(el) el.textContent=runs.toLocaleString();
+  el=document.getElementById('stat-matches'); if(el) el.textContent=matches;
+  el=document.getElementById('stat-avg');     if(el) el.textContent=avg>0?avg.toFixed(2):'—';
+  el=document.getElementById('stat-sr');      if(el) el.textContent=sr>0?sr.toFixed(1):'—';
+  el=document.getElementById('stat-hs');      if(el) el.textContent=hs||'—';
+  el=document.getElementById('stat-6s');      if(el) el.textContent=sixes;
+  el=document.getElementById('stat-4s');      if(el) el.textContent=fours;
+  el=document.getElementById('stat-100s');    if(el) el.textContent=hundreds;
+  el=document.getElementById('stat-50s');     if(el) el.textContent=fifties;
+  el=document.getElementById('stat-dots');    if(el) el.textContent=dotPct>0?dotPct.toFixed(1)+'%':'—';
+
+  // Update stat bar "Runs" label badge
+  el=document.getElementById('badge-bat'); if(el) el.textContent=runs.toLocaleString()+' runs';
+
+  // Update trend chart subtitle
+  var sub = document.querySelector('#tab-batting .card.span2 .ch .csub');
+  if(sub) sub.textContent = fmtLabel + ' career — ' + runs.toLocaleString() + ' total runs across ' + matches + ' matches';
+
+  // Rebuild charts for this format
+  if(fmt === 'ipl') {
+    fetch(_kapi + '/player-seasons/' + _currentPid)
+      .then(function(r){ return r.json(); })
+      .then(function(seasonData){ _buildCharts(avg, sr, hundreds, matches, seasonData); })
+      .catch(function(){ _buildCharts(avg, sr, hundreds, matches, []); });
+  } else {
+    // Non-IPL: build charts from career stats (no ball-by-ball data)
+    _buildCharts(avg, sr, hundreds, matches, []);
+  }
+}
 
 // ── HELPERS ──
 function _initials(name) {
@@ -516,42 +600,42 @@ function _buildCharts(avg, sr, hundreds, matches, seasonData) {
     if(vals[i])  vals[i].textContent  = s;
   });
 
-  // ── CONSISTENCY chart: generate distribution based on avg ──
+  // ── CONSISTENCY chart: real innings distribution from API ──
   var consCtx = document.getElementById('consistencyChart').getContext('2d');
-  var sim = [];
-  for(var j=0;j<50;j++){
-    var rr=Math.random();
-    var sc = avg>40 ? (rr<0.1?0:rr<0.3?Math.round(3+Math.random()*18):rr<0.6?Math.round(20+Math.random()*30):rr<0.82?Math.round(50+Math.random()*30):Math.round(80+Math.random()*40))
-           : avg>25 ? (rr<0.18?0:rr<0.42?Math.round(3+Math.random()*18):rr<0.68?Math.round(20+Math.random()*25):rr<0.88?Math.round(45+Math.random()*25):Math.round(75+Math.random()*30))
-           : (rr<0.25?0:rr<0.5?Math.round(3+Math.random()*15):rr<0.75?Math.round(18+Math.random()*22):rr<0.9?Math.round(40+Math.random()*20):Math.round(60+Math.random()*30));
-    sim.push(sc);
+  var bucketLabels = ['0-9','10-24','25-49','50-74','75-99','100+'];
+  var bucketColors = [
+    'rgba(255,95,64,0.5)','rgba(247,201,72,0.4)','rgba(91,159,255,0.5)',
+    'rgba(0,245,170,0.5)','rgba(0,245,170,0.7)','rgba(0,245,170,0.9)'
+  ];
+  var bucketBorders = [
+    'rgba(255,95,64,0.8)','rgba(247,201,72,0.7)','rgba(91,159,255,0.8)',
+    'rgba(0,245,170,0.8)','rgba(0,245,170,0.9)','rgba(0,245,170,1)'
+  ];
+  function _buildConsistency(bucketData) {
+    var counts = bucketLabels.map(function(k){ return bucketData[k] || 0; });
+    _charts.cons = new Chart(consCtx, {
+      type:'bar',
+      data:{
+        labels: bucketLabels,
+        datasets:[{
+          label:'Innings', data: counts,
+          backgroundColor: bucketColors,
+          borderColor: bucketBorders,
+          borderWidth:1, borderRadius:5
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}, tooltip:{callbacks:{label:function(ctx){return ctx.parsed.y+' innings';}}}},
+        scales:{x:{grid:{color:gridColor},ticks:{color:muted}}, y:{grid:{color:gridColor},ticks:{color:muted,stepSize:1}}}
+      }
+    });
   }
-  var buckets=[{l:'0-9',c:0},{l:'10-24',c:0},{l:'25-49',c:0},{l:'50-74',c:0},{l:'75-99',c:0},{l:'100+',c:0}];
-  sim.forEach(function(s){
-    if(s<10)buckets[0].c++;
-    else if(s<25)buckets[1].c++;
-    else if(s<50)buckets[2].c++;
-    else if(s<75)buckets[3].c++;
-    else if(s<100)buckets[4].c++;
-    else buckets[5].c++;
-  });
-  _charts.cons = new Chart(consCtx, {
-    type:'bar',
-    data:{
-      labels:buckets.map(function(b){return b.l;}),
-      datasets:[{
-        label:'Innings',data:buckets.map(function(b){return b.c;}),
-        backgroundColor:['rgba(255,95,64,0.5)','rgba(247,201,72,0.4)','rgba(91,159,255,0.5)','rgba(0,245,170,0.5)','rgba(0,245,170,0.7)','rgba(0,245,170,0.9)'],
-        borderColor:['rgba(255,95,64,0.8)','rgba(247,201,72,0.7)','rgba(91,159,255,0.8)','rgba(0,245,170,0.8)','rgba(0,245,170,0.9)','rgba(0,245,170,1)'],
-        borderWidth:1,borderRadius:5
-      }]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.parsed.y+' innings';}}}},
-      scales:{x:{grid:{color:gridColor},ticks:{color:muted}},y:{grid:{color:gridColor},ticks:{color:muted,stepSize:2}}}
-    }
-  });
+  // pid is passed in via closure from _buildCharts call
+  fetch(_kapi + '/player-innings/' + _currentPid)
+    .then(function(r){ return r.json(); })
+    .then(function(data){ _buildConsistency(data); })
+    .catch(function(){ _buildConsistency({}); });
 }
 
 function _autoRole(avg, sr, sixes) {
@@ -570,23 +654,30 @@ function _autoRole(avg, sr, sixes) {
 function _loadPlayer() {
   var params = new URLSearchParams(window.location.search);
   var pid = params.get('id') || 'Virat-Kohli';
+  _currentPid = pid;
   fetch(_kapi + '/player/' + pid)
     .then(function(r){ return r.json(); })
     .then(function(d){
       var name       = d.player        || pid.replace(/-/g,' ');
-      var runs       = d.runs          ? Math.round(d.runs)          : 0;
-      var matches    = d.matches       ? Math.round(d.matches)       : 0;
-      var innings    = d.innings       ? Math.round(d.innings)       : matches;
-      var avg        = d.average       ? parseFloat(d.average)       : 0;
-      var sr         = d.strike_rate   ? parseFloat(d.strike_rate)   : 0;
-      var hundreds   = d.hundreds      !== undefined ? Math.round(d.hundreds) : 0;
-      var fifties    = d.fifties       ? Math.round(d.fifties)       : 0;
-      var fours      = d.fours         ? Math.round(d.fours)         : 0;
-      var sixes      = d.sixes         ? Math.round(d.sixes)         : 0;
-      var hs         = d.highest_score ? Math.round(d.highest_score) : 0;
-      var dotPct     = d.dot_pct       ? parseFloat(d.dot_pct)       : 0;
-      var balls      = d.balls         ? Math.round(d.balls)         : 0;
-      var dismissals = d.dismissals    ? Math.round(d.dismissals)    : 0;
+
+      // Store all formats globally
+      _formatsData = d.formats || { ipl: d };
+
+      // Use IPL data as default (or first available format)
+      var ipl = _formatsData['ipl'] || d;
+      var runs       = ipl.runs          ? Math.round(ipl.runs)          : 0;
+      var matches    = ipl.matches       ? Math.round(ipl.matches)       : 0;
+      var innings    = ipl.innings       ? Math.round(ipl.innings)       : matches;
+      var avg        = ipl.average       ? parseFloat(ipl.average)       : 0;
+      var sr         = ipl.strike_rate   ? parseFloat(ipl.strike_rate)   : 0;
+      var hundreds   = ipl.hundreds      !== undefined ? Math.round(ipl.hundreds) : 0;
+      var fifties    = ipl.fifties       ? Math.round(ipl.fifties)       : 0;
+      var fours      = ipl.fours         ? Math.round(ipl.fours)         : 0;
+      var sixes      = ipl.sixes         ? Math.round(ipl.sixes)         : 0;
+      var hs         = ipl.highest_score ? Math.round(ipl.highest_score) : 0;
+      var dotPct     = ipl.dot_pct       ? parseFloat(ipl.dot_pct)       : 0;
+      var balls      = ipl.balls         ? Math.round(ipl.balls)         : 0;
+      var dismissals = ipl.dismissals    ? Math.round(ipl.dismissals)    : 0;
 
       document.title = 'KricIQ — ' + name;
 
@@ -619,18 +710,6 @@ function _loadPlayer() {
       el=document.getElementById('badge-bat');   if(el) el.textContent=runs.toLocaleString()+' runs';
       el=document.getElementById('badge-field'); if(el) el.textContent=dismissals+' dis';
 
-      // STAT BAR — all real fields
-      el=document.getElementById('stat-runs');    if(el) el.textContent=runs.toLocaleString();
-      el=document.getElementById('stat-matches'); if(el) el.textContent=matches;
-      el=document.getElementById('stat-avg');     if(el) el.textContent=avg>0?avg.toFixed(2):'—';
-      el=document.getElementById('stat-sr');      if(el) el.textContent=sr>0?sr.toFixed(1):'—';
-      el=document.getElementById('stat-hs');      if(el) el.textContent=hs||'—';
-      el=document.getElementById('stat-6s');      if(el) el.textContent=sixes;
-      el=document.getElementById('stat-4s');      if(el) el.textContent=fours;
-      el=document.getElementById('stat-100s');    if(el) el.textContent=hundreds;
-      el=document.getElementById('stat-50s');     if(el) el.textContent=fifties;
-      el=document.getElementById('stat-dots');    if(el) el.textContent=dotPct.toFixed(1)+'%';
-
       // FORM RING
       var score=_formScore(avg,sr);
       var numEl=document.querySelector('.form-num');
@@ -651,61 +730,9 @@ function _loadPlayer() {
         dotsEl.innerHTML=dotHtml;
       }
 
-      // AI PREDICTION
-      var predLow=Math.round(avg*0.75),predHigh=Math.round(avg*1.35);
-      var pred50=Math.min(Math.round((avg/75)*100),68);
-      var duckRisk=Math.max(3,Math.round(13-avg/7));
-      var pred100=Math.round(hundreds/Math.max(matches,1)*100);
-      var confPct=Math.min(Math.round(44+avg/4),82);
-      var srBoost=sr>130?'+'+Math.round((sr-125)/2)+'%':'-'+Math.round((125-sr)/2)+'%';
-      el=document.querySelector('.ai-pred-runs'); if(el) el.textContent=predLow+'–'+predHigh;
-      el=document.querySelector('.ai-conf-val');  if(el) el.textContent=confPct+'%';
-      var gi=document.querySelectorAll('.ai-gitem');
-      if(gi.length>=5){
-        gi[0].querySelector('.ai-gv').textContent=pred50+'%';
-        gi[1].querySelector('.ai-gv').textContent=duckRisk+'%';
-        gi[2].querySelector('.ai-gv').textContent=pred100+'%';
-        gi[4].querySelector('.ai-gv').textContent=srBoost;
-      }
-
-      // AI REASONING FACTORS — calculated from real stats
-      // Each factor is a plain English sentence derived from the player's actual numbers
-      var formLevel = avg > 45 ? 'excellent' : avg > 35 ? 'strong' : avg > 25 ? 'moderate' : 'below average';
-      var srLevel   = sr > 150 ? 'explosive' : sr > 135 ? 'aggressive' : sr > 120 ? 'solid' : 'conservative';
-      var f1 = el=document.getElementById('ai-f1');
-      var f2 = el=document.getElementById('ai-f2');
-      var f3 = el=document.getElementById('ai-f3');
-      var f4 = el=document.getElementById('ai-f4');
-      if(f1) f1.innerHTML = 'Career average of <em>'+avg.toFixed(1)+'</em> indicates '+formLevel+' batting ability across '+matches+' IPL matches';
-      if(f2) f2.innerHTML = 'Strike rate of <em>'+sr.toFixed(1)+'</em> — '+srLevel+' scoring pace, predicted range '+predLow+'–'+predHigh+' runs';
-      if(f3) f3.innerHTML = '<strong>'+hundreds+'</strong> centuries and <strong>'+fifties+'</strong> half-centuries — big innings conversion rate: '+(hundreds>0?Math.round(hundreds/(hundreds+fifties)*100)+'%':'low');
-      if(f4) f4.innerHTML = 'Dot ball % of <em>'+dotPct.toFixed(1)+'%</em> — '+( dotPct < 35 ? 'finds gaps well, low dot pressure' : dotPct < 45 ? 'balanced approach under pressure' : 'tends to anchor under pressure');
-
-      // SCORE PROBABILITY DISTRIBUTION — calculated from avg
-      // Higher avg = more weight towards bigger scores
-      // These 6 buckets always add up to 100%
-      var p = [0,0,0,0,0,0];
-      if(avg > 45){      p = [5, 12, 22, 30, 20, 11]; }
-      else if(avg > 35){ p = [7, 15, 25, 28, 17,  8]; }
-      else if(avg > 28){ p = [9, 18, 28, 26, 13,  6]; }
-      else if(avg > 20){ p = [12, 22, 30, 22, 10,  4]; }
-      else {             p = [18, 28, 30, 16,  6,  2]; }
-      var pIds  = ['p0','p1','p2','p3','p4','p5'];
-      var pbIds = ['pb0','pb1','pb2','pb3','pb4','pb5'];
-      p.forEach(function(v,i){
-        var pEl = document.getElementById(pIds[i]);
-        var pbEl = document.getElementById(pbIds[i]);
-        if(pEl)  pEl.textContent = v+'%';
-        if(pbEl) pbEl.style.width = v+'%';
-      });
-
-      // SEASON header
-      var secSub=document.querySelector('#tab-batting .card.span2 .ch .csub');
-      if(!secSub) secSub=document.querySelector('.card.span2 .ch .csub');
-      if(secSub&&runs>0) secSub.textContent='IPL career — '+runs.toLocaleString()+' total runs across '+matches+' matches';
       // TEAM TAG
       el=document.getElementById('tag-team');
-      if(el && d.team) el.textContent=d.team;
+      if(el && ipl.team) el.textContent=ipl.team;
 
       // FIELDING TAB
       var disRate=(dismissals/Math.max(matches,1)).toFixed(2);
@@ -720,39 +747,29 @@ function _loadPlayer() {
       el=document.getElementById('fi-balls');         if(el) el.textContent=balls.toLocaleString();
       el=document.getElementById('fi-dot');           if(el) el.textContent=dotPct.toFixed(1)+'%';
 
-      // BOWLING TAB — uses d.bowling object from API
-      var bw = d.bowling || null;
+      // BOWLING TAB — uses ipl.bowling
+      var bw = ipl.bowling || null;
       var bowlBadge = document.getElementById('badge-bowl');
       if(bw && bw.wickets > 0){
-        // Has bowling stats — show them
         el=document.getElementById('bowl-wickets'); if(el) el.textContent=bw.wickets;
         el=document.getElementById('bowl-economy'); if(el) el.textContent=bw.economy ? bw.economy.toFixed(2) : '—';
         el=document.getElementById('bowl-avg');     if(el) el.textContent=bw.bowling_avg ? bw.bowling_avg.toFixed(1) : '—';
         el=document.getElementById('bowl-sr');      if(el) el.textContent=bw.bowling_sr ? bw.bowling_sr.toFixed(1) : '—';
         el=document.getElementById('bowl-overs');   if(el) el.textContent=bw.overs || '—';
         el=document.getElementById('bowl-matches'); if(el) el.textContent=bw.matches || '—';
-        el=document.getElementById('bowl-sub');     if(el) el.textContent=name+' — '+bw.wickets+' wickets in '+( bw.matches||'?')+' matches';
+        el=document.getElementById('bowl-sub');     if(el) el.textContent=name+' — '+bw.wickets+' wickets in '+(bw.matches||'?')+' matches';
         if(bowlBadge) bowlBadge.textContent=bw.wickets+' wkts';
-        // Show stats, hide "no data" card
         var bowlGrid=document.getElementById('bowl-stats-grid'); if(bowlGrid) bowlGrid.style.display='';
         var bowlNone=document.getElementById('bowl-none'); if(bowlNone) bowlNone.style.display='none';
         var bowlCard=document.getElementById('bowling-card'); if(bowlCard) bowlCard.style.display='';
       } else {
-        // No bowling stats — show "no data" message
         if(bowlBadge) bowlBadge.textContent='—';
-        var bowlCard=document.getElementById('bowling-card'); if(bowlCard) bowlCard.style.display='none';
-        var bowlNone=document.getElementById('bowl-none'); if(bowlNone) bowlNone.style.display='';
+        var bowlCard2=document.getElementById('bowling-card'); if(bowlCard2) bowlCard2.style.display='none';
+        var bowlNone2=document.getElementById('bowl-none'); if(bowlNone2) bowlNone2.style.display='';
       }
 
-      // CHARTS — fetch real season data first, then build
-      fetch(_kapi + '/player-seasons/' + pid)
-        .then(function(r){ return r.json(); })
-        .then(function(seasonData){
-          _buildCharts(avg, sr, hundreds, matches, seasonData);
-        })
-        .catch(function(){
-          _buildCharts(avg, sr, hundreds, matches, []);
-        });
+      // Trigger IPL format on load — fills stat bar + builds charts
+      _switchFormat('ipl', document.querySelector('.fmt-btn[data-fmt="ipl"]'));
 
     }).catch(function(e){ console.error('KricIQ API error:',e); });
 }
