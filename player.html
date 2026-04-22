@@ -806,42 +806,58 @@ function _loadAiInsight(name, runs, matches, avg, sr, hundreds, fifties, format)
   var el = document.getElementById('ai-insight-text');
   var sub = document.getElementById('ai-insight-sub');
   if(!el) return;
+  if(!runs || runs === 0) return;
 
   var fmt = (format || 'ipl').toUpperCase();
-  var prompt = 'You are a cricket analyst. Write a 3-4 sentence insight about ' + name + ' based on these real ' + fmt + ' career stats: '
-    + runs + ' runs in ' + matches + ' matches, average ' + avg.toFixed(2)
-    + ', strike rate ' + sr.toFixed(1) + ', ' + hundreds + ' hundreds, ' + fifties + ' fifties. '
-    + 'Be specific, analytical, and use the numbers. Highlight what makes this player distinctive. '
-    + 'Use <em> tags around key numbers. Keep it under 80 words. No preamble, just the insight.';
+  var firstName = name.split(' ')[0];
 
-  el.innerHTML = '<span style="color:var(--muted);font-size:12px;">⟳ Generating insight...</span>';
-  if(sub) sub.textContent = 'Based on ' + runs.toLocaleString() + ' ' + fmt + ' runs · ' + matches + ' matches';
+  // Classify player style
+  var avgTier   = avg > 50 ? 'elite' : avg > 40 ? 'excellent' : avg > 30 ? 'solid' : avg > 20 ? 'useful' : 'lower-order';
+  var srTier    = sr > 160 ? 'explosive' : sr > 145 ? 'aggressive' : sr > 130 ? 'fluent' : sr > 115 ? 'measured' : 'anchor';
+  var bigInnings = hundreds + Math.round(fifties * 0.4); // weighted milestone count
+  var convRate  = (hundreds + fifties) > 0 ? Math.round(hundreds / (hundreds + fifties) * 100) : 0;
+  var runsK     = (runs / 1000).toFixed(1);
 
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 200,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    if(data.content && data.content[0] && data.content[0].text){
-      el.innerHTML = data.content[0].text;
-      if(sub) sub.textContent = 'AI analysis · Based on real ' + fmt + ' career data';
-    } else {
-      el.innerHTML = '<span style="color:var(--muted)">Could not generate insight — check API key.</span>';
-    }
-  })
-  .catch(function(){
-    el.innerHTML = '<span style="color:var(--muted)">Insight unavailable right now.</span>';
-  });
+  // Build sentence 1 — career overview
+  var s1;
+  if(avg > 45 && sr > 140) {
+    s1 = '<strong>' + name + '</strong> is one of ' + fmt + '\'s most complete batters — <em>' + runs.toLocaleString() + ' runs</em> at an average of <em>' + avg.toFixed(2) + '</em> combined with a strike rate of <em>' + sr.toFixed(1) + '</em> across <em>' + matches + ' matches</em>.';
+  } else if(sr > 155) {
+    s1 = '<strong>' + name + '</strong> is a devastating <em>' + srTier + '</em> batter in ' + fmt + ', scoring <em>' + runs.toLocaleString() + ' runs</em> at a strike rate of <em>' + sr.toFixed(1) + '</em> across <em>' + matches + ' matches</em>.';
+  } else if(avg > 40) {
+    s1 = '<strong>' + name + '</strong> is a highly reliable ' + fmt + ' batter with <em>' + runs.toLocaleString() + ' runs</em> at an average of <em>' + avg.toFixed(2) + '</em> across <em>' + matches + ' matches</em>.';
+  } else {
+    s1 = '<strong>' + name + '</strong> has contributed <em>' + runs.toLocaleString() + ' runs</em> in ' + fmt + ' cricket across <em>' + matches + ' matches</em>, averaging <em>' + avg.toFixed(2) + '</em> at a strike rate of <em>' + sr.toFixed(1) + '</em>.';
+  }
+
+  // Build sentence 2 — milestones
+  var s2;
+  if(hundreds >= 5) {
+    s2 = firstName + '\'s <em>' + hundreds + ' centuries</em> and <em>' + fifties + ' half-centuries</em> demonstrate an exceptional ability to convert starts into match-winning innings' + (convRate > 0 ? ', with a century conversion rate of <em>' + convRate + '%</em>' : '') + '.';
+  } else if(hundreds >= 1) {
+    s2 = firstName + ' has <em>' + hundreds + (hundreds === 1 ? ' century' : ' centuries') + '</em> and <em>' + fifties + ' fifties</em> to their name in ' + fmt + ', showing the capacity to build significant innings when conditions allow.';
+  } else if(fifties >= 10) {
+    s2 = 'With <em>' + fifties + ' half-centuries</em>, ' + firstName + ' consistently delivers impactful innings, though converting those starts into hundreds remains an area for development.';
+  } else {
+    s2 = firstName + ' typically plays a role that prioritises impact over accumulation, with <em>' + fifties + ' fifties</em> reflecting a results-focused approach.';
+  }
+
+  // Build sentence 3 — style assessment
+  var s3;
+  if(sr > 155 && avg > 35) {
+    s3 = 'The combination of a <em>' + sr.toFixed(1) + '</em> strike rate and <em>' + avg.toFixed(2) + '</em> average places ' + firstName + ' among the most dangerous batters in the format — capable of both anchoring and accelerating.';
+  } else if(sr > 150) {
+    s3 = 'A strike rate of <em>' + sr.toFixed(1) + '</em> marks ' + firstName + ' as a genuine game-changer, someone who can shift the momentum of an innings in a matter of overs.';
+  } else if(avg > 45) {
+    s3 = 'An average of <em>' + avg.toFixed(2) + '</em> puts ' + firstName + ' in rare company — this level of consistency across <em>' + matches + ' matches</em> is a hallmark of a truly elite ' + fmt + ' batter.';
+  } else if(sr < 115 && avg > 30) {
+    s3 = 'With a strike rate of <em>' + sr.toFixed(1) + '</em>, ' + firstName + ' plays more of an anchor role, building innings patiently and providing the platform for others to attack.';
+  } else {
+    s3 = 'Across <em>' + runsK + 'K runs</em> in ' + fmt + ', ' + firstName + ' has proven to be a consistent and reliable contributor at this level of the game.';
+  }
+
+  el.innerHTML = s1 + ' ' + s2 + ' ' + s3;
+  if(sub) sub.textContent = 'Statistical analysis · Based on real ' + fmt + ' career data';
 }
 
 function _initSearch() {
