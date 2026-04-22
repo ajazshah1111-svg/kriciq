@@ -289,17 +289,33 @@ footer{background:var(--s1);border-top:1px solid var(--border);padding:48px 32px
 </nav>
 
 <!-- LIVE TICKER -->
-<div style="margin-top:60px;" class="ticker-wrap" id="ticker-wrap">
+<div style="margin-top:60px;" class="ticker-wrap">
   <div class="ticker-label">LIVE</div>
   <div style="overflow:hidden;flex:1;">
-    <div class="ticker-track" id="ticker-track">
-      <div class="ticker-item"><span class="team">Loading...</span></div>
+    <div class="ticker-track">
+      <div class="ticker-item"><span class="team">IND vs AUS</span> · <span class="score">287/4 (42.3)</span> · 3rd ODI · Wankhede</div>
+      <div class="ticker-dot"></div>
+      <div class="ticker-item"><span class="team">ENG vs SA</span> · <span class="score">143/6 (17.2)</span> · T20I · Lords</div>
+      <div class="ticker-dot"></div>
+      <div class="ticker-item"><span class="team">RCB vs MI</span> · <span class="score">198/3 (20)</span> · Kohli: <span class="score">91*</span></div>
+      <div class="ticker-dot"></div>
+      <div class="ticker-item"><span class="team">PAK vs NZ</span> · <span class="score">312/8 (85)</span> · 2nd Test · Day 2</div>
+      <div class="ticker-dot"></div>
+      <div class="ticker-item"><span class="team">WI vs SL</span> · <span class="score">156/2 (28)</span> · 2nd ODI</div>
+      <div class="ticker-dot"></div>
+      <div class="ticker-item"><span class="team">IND vs AUS</span> · <span class="score">287/4 (42.3)</span> · 3rd ODI · Wankhede</div>
+      <div class="ticker-dot"></div>
+      <div class="ticker-item"><span class="team">ENG vs SA</span> · <span class="score">143/6 (17.2)</span> · T20I · Lords</div>
+      <div class="ticker-dot"></div>
+      <div class="ticker-item"><span class="team">RCB vs MI</span> · <span class="score">198/3 (20)</span> · Kohli: <span class="score">91*</span></div>
+      <div class="ticker-dot"></div>
+      <div class="ticker-item"><span class="team">PAK vs NZ</span> · <span class="score">312/8 (85)</span> · 2nd Test · Day 2</div>
+      <div class="ticker-dot"></div>
+      <div class="ticker-item"><span class="team">WI vs SL</span> · <span class="score">156/2 (28)</span> · 2nd ODI</div>
+      <div class="ticker-dot"></div>
     </div>
   </div>
 </div>
-
-<!-- PLAYER OF THE DAY BAR -->
-<div id="potd-bar" style="display:none;background:#0d1520;border-bottom:1px solid rgba(0,245,170,0.1);height:32px;padding:0 32px;align-items:center;gap:16px;cursor:pointer;transition:background 0.2s;font-size:12px;"></div>
 
 <!-- HERO -->
 <section class="hero">
@@ -654,61 +670,39 @@ window.addEventListener('DOMContentLoaded', function(){
 </script>
 <script>
 fetch("https://kriciq-api.onrender.com/api/player_of_day")
-  .then(function(res){ return res.json(); })
-  .then(function(data){
-    var bar = document.getElementById('potd-bar');
-    if(!bar) return;
-    var pid = data.player.replace(/ /g,'-');
-    bar.style.display = 'flex';
-    bar.addEventListener('mouseover', function(){ bar.style.background='#0f1e2e'; });
-    bar.addEventListener('mouseout',  function(){ bar.style.background='#0d1520'; });
-    bar.addEventListener('click',     function(){ window.location.href='player.html?id='+pid; });
-    bar.innerHTML =
-      '<span style="color:#00f5aa;font-weight:700;letter-spacing:1px;font-size:10px;flex-shrink:0;">🔥 PLAYER OF THE DAY</span>'
-      +'<span style="color:#fff;font-weight:600;font-size:13px;">'+data.player+'</span>'
-      +'<span style="color:#5a6275;font-size:11px;margin-right:8px;">·</span>'
-      +'<span style="color:#8892a4;">Runs: <strong style="color:#eef0f5">'+data.runs+'</strong></span>'
-      +'<span style="color:#8892a4;">Avg: <strong style="color:#4d9fff">'+data.average+'</strong></span>'
-      +'<span style="color:#8892a4;">SR: <strong style="color:#f7c948">'+data.strike_rate+'</strong></span>'
-      +'<span style="color:#5a6275;font-size:11px;margin-left:4px;">→ view profile</span>';
+  .then(res => res.json())
+  .then(data => {
+    const section = document.createElement("div");
+
+    section.style.maxWidth = "1200px";
+    section.style.margin = "80px auto 20px";
+    section.style.padding = "16px 20px";
+    section.style.background = "#0f1720";
+    section.style.border = "1px solid rgba(0,255,170,0.15)";
+    section.style.borderRadius = "12px";
+    section.style.display = "flex";
+    section.style.justifyContent = "space-between";
+    section.style.alignItems = "center";
+
+    section.innerHTML = `
+      <div>
+        <div style="color:#00f5aa; font-size:12px; margin-bottom:4px;">
+          🔥 PLAYER OF THE DAY
+        </div>
+        <div style="font-size:18px; font-weight:600;">
+          ${data.player}
+        </div>
+      </div>
+
+      <div style="display:flex; gap:20px; font-size:14px; color:#9aa4b2;">
+        <div>Runs: <strong>${data.runs}</strong></div>
+        <div>Avg: <strong>${data.average}</strong></div>
+        <div>SR: <strong>${data.strike_rate}</strong></div>
+      </div>
+    `;
+
+    document.body.insertBefore(section, document.body.children[1]);
   });
 </script>  
-<script>
-// AI-POWERED LIVE TICKER
-(function loadLiveTicker(){
-  var track = document.getElementById('ticker-track');
-  if(!track) return;
-  fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:600,
-      tools:[{type:'web_search_20250305',name:'web_search'}],
-      system:'You are a cricket live ticker generator. Search for the latest cricket scores and news today. Return ONLY a JSON array of 8 short ticker items, no preamble, no markdown. Each item: {"teams":"IND vs AUS","score":"287/4 (42.3)","detail":"3rd ODI · Wankhede"}. Keep each item concise.',
-      messages:[{role:'user',content:"Get today's latest cricket scores for a live ticker. Return JSON array only."}]
-    })
-  })
-  .then(function(r){return r.json();})
-  .then(function(data){
-    var text='';
-    if(data.content) data.content.forEach(function(b){if(b.type==='text')text+=b.text;});
-    var items;
-    try{var m=text.replace(/```json|```/g,'').trim().match(/\[[\s\S]*\]/);items=m?JSON.parse(m[0]):null;}catch(e){items=null;}
-    if(!items||!items.length) return;
-    var html='';
-    function build(arr){arr.forEach(function(item){
-      html+='<div class="ticker-item"><span class="team">'+(item.teams||'')+'</span>'
-        +(item.score?' · <span class="score">'+item.score+'</span>':'')
-        +(item.detail?' · '+item.detail:'')
-        +'</div><div class="ticker-dot"></div>';
-    });}
-    build(items);build(items);
-    track.innerHTML=html;
-    track.style.animationDuration=Math.max(20,items.length*5)+'s';
-  })
-  .catch(function(){});
-})();
-</script>
 </body>
 </html>
