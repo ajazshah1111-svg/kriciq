@@ -107,6 +107,11 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 /* CONSISTENCY */
 .cons-wrap{padding:16px 18px;}
 
+/* AI INSIGHT */
+#ai-insight-text{font-size:14px;color:var(--muted2);line-height:1.8;}
+#ai-insight-text em{color:var(--acc);font-style:normal;}
+#ai-insight-text strong{color:var(--text);}
+
 /* FORMAT BUTTONS */
 .fmt-btn{padding:5px 16px;border-radius:20px;font-size:12px;font-weight:500;font-family:var(--font-b);border:1px solid var(--border2);background:none;color:var(--muted2);cursor:pointer;transition:.15s;}
 .fmt-btn:hover{color:var(--text);border-color:rgba(255,255,255,0.2);}
@@ -306,6 +311,24 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
   </div>
 
 </div>
+  <!-- AI INSIGHT BLOCK -->
+  <div class="card span2" id="ai-insight-card" style="background:linear-gradient(135deg,#090f0d,#091018);border:1px solid rgba(0,245,170,.15);">
+    <div class="ch" style="border-bottom:1px solid rgba(0,245,170,.1);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;background:rgba(0,245,170,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">✦</div>
+        <div>
+          <div style="font-family:var(--font-d);font-size:17px;letter-spacing:.5px;color:var(--acc);">AI <em style="color:var(--text);font-style:normal;">Player Insight</em></div>
+          <div id="ai-insight-sub" style="font-size:11px;color:var(--muted);">Generating analysis from real career data...</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:20px 22px;">
+      <div id="ai-insight-text" style="font-size:14px;color:var(--muted2);line-height:1.8;">
+        <span style="color:var(--muted);font-size:12px;">⟳ Analysing player data...</span>
+      </div>
+    </div>
+  </div>
+
 </div><!-- end batting -->
 
 <!-- FIELDING TAB -->
@@ -368,6 +391,7 @@ function switchTab(name,btn){
 <script>
 var _kapi = 'https://kriciq-api.onrender.com/api';
 var _currentPid = 'Virat-Kohli';
+var _currentPlayerName = 'Virat Kohli';
 var _formatsData = {}; // stores all formats from API
 var _activeFormat = 'ipl';
 
@@ -424,6 +448,9 @@ function _switchFormat(fmt, btn) {
   // Update trend chart subtitle
   var sub = document.querySelector('#tab-batting .card.span2 .ch .csub');
   if(sub) sub.textContent = fmtLabel + ' career — ' + runs.toLocaleString() + ' total runs across ' + matches + ' matches';
+
+  // Load AI insight for this format
+  _loadAiInsight(_currentPlayerName || _currentPid.replace(/-/g,' '), runs, matches, avg, sr, hundreds, fifties, fmt);
 
   // Rebuild charts for this format
   if(fmt === 'ipl') {
@@ -680,6 +707,7 @@ function _loadPlayer() {
       var dismissals = ipl.dismissals    ? Math.round(ipl.dismissals)    : 0;
 
       document.title = 'KricIQ — ' + name;
+      _currentPlayerName = name;
 
       // PLAYER NAME — always show full name, last word in green
       // e.g. "Virat Kohli" → "VIRAT <green>KOHLI</green>"
@@ -772,6 +800,48 @@ function _loadPlayer() {
       _switchFormat('ipl', document.querySelector('.fmt-btn[data-fmt="ipl"]'));
 
     }).catch(function(e){ console.error('KricIQ API error:',e); });
+}
+
+function _loadAiInsight(name, runs, matches, avg, sr, hundreds, fifties, format) {
+  var el = document.getElementById('ai-insight-text');
+  var sub = document.getElementById('ai-insight-sub');
+  if(!el) return;
+
+  var fmt = (format || 'ipl').toUpperCase();
+  var prompt = 'You are a cricket analyst. Write a 3-4 sentence insight about ' + name + ' based on these real ' + fmt + ' career stats: '
+    + runs + ' runs in ' + matches + ' matches, average ' + avg.toFixed(2)
+    + ', strike rate ' + sr.toFixed(1) + ', ' + hundreds + ' hundreds, ' + fifties + ' fifties. '
+    + 'Be specific, analytical, and use the numbers. Highlight what makes this player distinctive. '
+    + 'Use <em> tags around key numbers. Keep it under 80 words. No preamble, just the insight.';
+
+  el.innerHTML = '<span style="color:var(--muted);font-size:12px;">⟳ Generating insight...</span>';
+  if(sub) sub.textContent = 'Based on ' + runs.toLocaleString() + ' ' + fmt + ' runs · ' + matches + ' matches';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 200,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data.content && data.content[0] && data.content[0].text){
+      el.innerHTML = data.content[0].text;
+      if(sub) sub.textContent = 'AI analysis · Based on real ' + fmt + ' career data';
+    } else {
+      el.innerHTML = '<span style="color:var(--muted)">Could not generate insight — check API key.</span>';
+    }
+  })
+  .catch(function(){
+    el.innerHTML = '<span style="color:var(--muted)">Insight unavailable right now.</span>';
+  });
 }
 
 function _initSearch() {
