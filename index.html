@@ -677,9 +677,9 @@ fetch("https://kriciq-api.onrender.com/api/player_of_day")
  section.href = "player.html?id=" + data.player.replace(/ /g,'-');
  section.style.textDecoration="none";
  section.style.display="block";
- section.style.maxWidth="1200px";
- section.style.margin="85px auto 18px";
- section.style.padding="18px 24px";
+ section.style.maxWidth="860px";
+ section.style.margin="72px auto 14px";
+ section.style.padding="16px 22px";
  section.style.background="linear-gradient(135deg,#0f1720,#111b27)";
  section.style.border="1px solid rgba(0,255,170,.18)";
  section.style.borderRadius="14px";
@@ -704,18 +704,20 @@ fetch("https://kriciq-api.onrender.com/api/player_of_day")
       </div>
 
       <div style="
-      font-size:28px;
+      font-size:24px;
       font-weight:600;
       color:white;">
       ${data.player}
       </div>
    </div>
 
-   <div style="
-   display:flex;
-   gap:28px;
-   color:#9aa4b2;
-   font-size:14px;">
+  <div style="
+display:grid;
+grid-template-columns:repeat(3,72px);
+gap:18px;
+text-align:center;
+color:#9aa4b2;
+font-size:13px;">
 
       <div>
         Runs<br>
