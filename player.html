@@ -133,7 +133,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 .back-btn svg{stroke:currentColor;}
 .logo-svg{display:flex;align-items:center;text-decoration:none;}
 /* INSIGHT STRIP */
-.insight-strip{background:var(--bg);padding:20px 28px;border-bottom:1px solid var(--border);}
+.insight-strip{background:var(--bg);padding:20px 28px 4px;}
 .insight-inner{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .insight-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
 .insight-head{padding:14px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
@@ -294,6 +294,15 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
   </div>
 </div>
 
+<!-- TABS -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('batting',this)">Batting <span class="tab-badge" id="badge-bat">—</span></button>
+  <button class="tab-btn" onclick="switchTab('fielding',this)">Fielding <span class="tab-badge grey" id="badge-field">—</span></button>
+  <button class="tab-btn" onclick="switchTab('bowling',this)">Bowling <span class="tab-badge grey" id="badge-bowl">—</span></button>
+</div>
+<!-- MAIN GRID -->
+<div id="tab-batting" class="tab-panel active">
+
 <!-- INSIGHT STRIP: PHASES + MATCHUPS -->
 <div class="insight-strip" id="insight-strip" style="display:none;">
   <div class="insight-inner">
@@ -374,14 +383,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
   </div>
 </div>
 
-<!-- TABS -->
-<div class="tab-bar">
-  <button class="tab-btn active" onclick="switchTab('batting',this)">Batting <span class="tab-badge" id="badge-bat">—</span></button>
-  <button class="tab-btn" onclick="switchTab('fielding',this)">Fielding <span class="tab-badge grey" id="badge-field">—</span></button>
-  <button class="tab-btn" onclick="switchTab('bowling',this)">Bowling <span class="tab-badge grey" id="badge-bowl">—</span></button>
-</div>
-<!-- MAIN GRID -->
-<div id="tab-batting" class="tab-panel active">
 <div class="wrap">
 
   <!-- RUN TREND LINE CHART (full width) -->
