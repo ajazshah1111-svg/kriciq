@@ -247,26 +247,26 @@ footer{background:var(--s1);border-top:1px solid var(--border);padding:48px 32px
 /* POTD BAR */
 .potd-bar{
   display:flex;align-items:center;justify-content:space-between;
-  margin:62px auto 0;padding:10px 24px;
-  background:linear-gradient(90deg,rgba(0,245,170,.06),rgba(0,245,170,.02));
-  border-bottom:1px solid rgba(0,245,170,.12);
+  margin:60px auto 0;padding:9px 24px;
+  background:var(--s1);
+  border-bottom:1px solid var(--border);
   text-decoration:none;cursor:pointer;transition:.2s;
 }
-.potd-bar:hover{background:linear-gradient(90deg,rgba(0,245,170,.1),rgba(0,245,170,.04));}
-.potd-left{display:flex;align-items:center;gap:14px;}
+.potd-bar:hover{background:var(--s2);}
+.potd-left{display:flex;align-items:center;gap:12px;}
 .potd-badge{
-  background:rgba(0,245,170,.12);color:var(--acc);
-  font-size:10px;font-weight:700;letter-spacing:1.2px;
-  padding:4px 10px;border-radius:4px;white-space:nowrap;
+  background:rgba(255,255,255,.06);color:var(--muted2);
+  font-size:9px;font-weight:700;letter-spacing:1px;
+  padding:3px 8px;border-radius:3px;white-space:nowrap;
 }
-.potd-name{font-family:var(--font-d);font-size:22px;letter-spacing:1px;color:var(--text);}
-.potd-stats{display:flex;gap:24px;align-items:center;}
-.potd-stat{text-align:center;min-width:48px;}
-.potd-val{font-family:var(--font-d);font-size:26px;color:var(--text);line-height:1;display:block;}
+.potd-name{font-family:var(--font-d);font-size:20px;letter-spacing:1px;color:var(--text);}
+.potd-stats{display:flex;gap:20px;align-items:center;}
+.potd-stat{text-align:center;min-width:40px;}
+.potd-val{font-family:var(--font-d);font-size:24px;color:var(--text);line-height:1;display:block;}
 .potd-key{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
 @media(max-width:768px){
-  .potd-bar{flex-direction:column;gap:10px;padding:10px 16px;}
-  .potd-stats{gap:16px;}
+  .potd-bar{flex-direction:column;gap:8px;padding:10px 16px;}
+  .potd-stats{gap:14px;}
   .potd-val{font-size:20px;}
   .potd-name{font-size:18px;}
 }
