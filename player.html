@@ -132,6 +132,45 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 .back-btn:hover{color:var(--acc);border-color:rgba(0,245,170,.3);background:rgba(0,245,170,.05);}
 .back-btn svg{stroke:currentColor;}
 .logo-svg{display:flex;align-items:center;text-decoration:none;}
+/* INSIGHT STRIP */
+.insight-strip{background:var(--bg);padding:20px 28px;border-bottom:1px solid var(--border);}
+.insight-inner{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.insight-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.insight-head{padding:14px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.insight-title{font-family:var(--font-d);font-size:18px;letter-spacing:.5px;}
+.insight-title em{color:var(--acc);font-style:normal;}
+.insight-sub{font-size:11px;color:var(--muted);}
+.insight-body{padding:16px 18px;}
+.phase-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.phase-row:last-child{margin-bottom:0;}
+.phase-label{width:80px;flex-shrink:0;}
+.phase-name{font-size:12px;font-weight:600;color:var(--text);}
+.phase-overs{font-size:10px;color:var(--muted);}
+.phase-bar-wrap{flex:1;height:8px;background:var(--s3);border-radius:4px;overflow:hidden;}
+.phase-bar{height:100%;border-radius:4px;transition:width .8s ease;}
+.phase-stats{display:flex;gap:14px;flex-shrink:0;text-align:right;}
+.phase-stat{min-width:36px;}
+.phase-sv{font-family:var(--font-d);font-size:15px;line-height:1;}
+.phase-sk{font-size:9px;color:var(--muted);text-transform:uppercase;}
+.matchup-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.matchup-box{background:var(--s2);border-radius:10px;padding:14px 16px;text-align:center;position:relative;overflow:hidden;}
+.matchup-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.matchup-box.spin::before{background:var(--acc4);}
+.matchup-box.pace::before{background:var(--acc3);}
+.matchup-icon{font-size:22px;margin-bottom:4px;}
+.matchup-type{font-size:10px;color:var(--muted2);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;}
+.matchup-big{font-family:var(--font-d);font-size:36px;line-height:1;margin-bottom:2px;}
+.matchup-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.matchup-mini{display:flex;justify-content:center;gap:14px;}
+.matchup-mini-s{text-align:center;}
+.matchup-mini-v{font-family:var(--font-d);font-size:16px;line-height:1;}
+.matchup-mini-k{font-size:9px;color:var(--muted);text-transform:uppercase;}
+.matchup-verdict{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--muted2);text-align:center;}
+@media(max-width:768px){
+  .insight-inner{grid-template-columns:1fr;}
+  .insight-strip{padding:14px 16px;}
+  .matchup-big{font-size:28px;}
+}
 .tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--s1);padding:0 28px;}
 .tab-btn{padding:12px 20px;font-family:var(--font-b);font-size:13px;font-weight:500;color:var(--muted2);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s;}
 .tab-btn:hover{color:var(--text);}
@@ -252,6 +291,86 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
     <div class="si"><div class="sv" id="stat-100s">—</div><div class="sk">100s</div></div>
     <div class="si"><div class="sv" id="stat-50s">—</div><div class="sk">50s</div></div>
     <div class="si"><div class="sv" id="stat-dots" style="color:var(--muted2)">—</div><div class="sk">Dot Ball %</div></div>
+  </div>
+</div>
+
+<!-- INSIGHT STRIP: PHASES + MATCHUPS -->
+<div class="insight-strip" id="insight-strip" style="display:none;">
+  <div class="insight-inner">
+
+    <!-- PHASE ANALYSIS -->
+    <div class="insight-card">
+      <div class="insight-head">
+        <div>
+          <div class="insight-title">Phase <em>Analysis</em></div>
+          <div class="insight-sub">Runs & strike rate across match phases</div>
+        </div>
+      </div>
+      <div class="insight-body" id="phase-body">
+        <div class="phase-row">
+          <div class="phase-label"><div class="phase-name">Powerplay</div><div class="phase-overs">Overs 1–6</div></div>
+          <div class="phase-bar-wrap"><div class="phase-bar" id="pp-bar" style="width:0%;background:var(--acc)"></div></div>
+          <div class="phase-stats">
+            <div class="phase-stat"><div class="phase-sv" id="pp-runs" style="color:var(--acc)">—</div><div class="phase-sk">Runs</div></div>
+            <div class="phase-stat"><div class="phase-sv" id="pp-sr" style="color:var(--muted2)">—</div><div class="phase-sk">SR</div></div>
+          </div>
+        </div>
+        <div class="phase-row">
+          <div class="phase-label"><div class="phase-name">Middle</div><div class="phase-overs">Overs 7–15</div></div>
+          <div class="phase-bar-wrap"><div class="phase-bar" id="mid-bar" style="width:0%;background:var(--acc3)"></div></div>
+          <div class="phase-stats">
+            <div class="phase-stat"><div class="phase-sv" id="mid-runs" style="color:var(--acc3)">—</div><div class="phase-sk">Runs</div></div>
+            <div class="phase-stat"><div class="phase-sv" id="mid-sr" style="color:var(--muted2)">—</div><div class="phase-sk">SR</div></div>
+          </div>
+        </div>
+        <div class="phase-row">
+          <div class="phase-label"><div class="phase-name">Death</div><div class="phase-overs">Overs 16–20</div></div>
+          <div class="phase-bar-wrap"><div class="phase-bar" id="death-bar" style="width:0%;background:var(--acc2)"></div></div>
+          <div class="phase-stats">
+            <div class="phase-stat"><div class="phase-sv" id="death-runs" style="color:var(--acc2)">—</div><div class="phase-sk">Runs</div></div>
+            <div class="phase-stat"><div class="phase-sv" id="death-sr" style="color:var(--muted2)">—</div><div class="phase-sk">SR</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPIN VS PACE -->
+    <div class="insight-card">
+      <div class="insight-head">
+        <div>
+          <div class="insight-title">Spin vs <em>Pace</em></div>
+          <div class="insight-sub">Strike rate & average against each type</div>
+        </div>
+      </div>
+      <div class="insight-body">
+        <div class="matchup-grid">
+          <div class="matchup-box spin">
+            <div class="matchup-icon">🔄</div>
+            <div class="matchup-type">vs Spin</div>
+            <div class="matchup-big" id="spin-sr" style="color:var(--acc4)">—</div>
+            <div class="matchup-lbl">Strike Rate</div>
+            <div class="matchup-mini">
+              <div class="matchup-mini-s"><div class="matchup-mini-v" id="spin-runs" style="color:var(--text)">—</div><div class="matchup-mini-k">Runs</div></div>
+              <div class="matchup-mini-s"><div class="matchup-mini-v" id="spin-avg" style="color:var(--acc4)">—</div><div class="matchup-mini-k">Avg</div></div>
+              <div class="matchup-mini-s"><div class="matchup-mini-v" id="spin-wkts" style="color:var(--acc2)">—</div><div class="matchup-mini-k">Dis.</div></div>
+            </div>
+          </div>
+          <div class="matchup-box pace">
+            <div class="matchup-icon">⚡</div>
+            <div class="matchup-type">vs Pace</div>
+            <div class="matchup-big" id="pace-sr" style="color:var(--acc3)">—</div>
+            <div class="matchup-lbl">Strike Rate</div>
+            <div class="matchup-mini">
+              <div class="matchup-mini-s"><div class="matchup-mini-v" id="pace-runs" style="color:var(--text)">—</div><div class="matchup-mini-k">Runs</div></div>
+              <div class="matchup-mini-s"><div class="matchup-mini-v" id="pace-avg" style="color:var(--acc3)">—</div><div class="matchup-mini-k">Avg</div></div>
+              <div class="matchup-mini-s"><div class="matchup-mini-v" id="pace-wkts" style="color:var(--acc2)">—</div><div class="matchup-mini-k">Dis.</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="matchup-verdict" id="matchup-verdict"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -799,7 +918,71 @@ function _loadPlayer() {
       // Trigger IPL format on load — fills stat bar + builds charts
       _switchFormat('ipl', document.querySelector('.fmt-btn[data-fmt="ipl"]'));
 
+      // Load phase analysis + matchups (IPL only — ball by ball data)
+      _loadInsights(pid);
+
     }).catch(function(e){ console.error('KricIQ API error:',e); });
+}
+
+function _loadInsights(pid) {
+  var strip = document.getElementById('insight-strip');
+
+  // Fetch phases
+  fetch(_kapi + '/player-phases/' + pid)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var pp    = d.powerplay || {};
+      var mid   = d.middle    || {};
+      var death = d.death     || {};
+      var maxRuns = Math.max(pp.runs||0, mid.runs||0, death.runs||0, 1);
+
+      document.getElementById('pp-runs').textContent    = (pp.runs||0).toLocaleString();
+      document.getElementById('pp-sr').textContent      = (pp.sr||0).toFixed(1);
+      document.getElementById('mid-runs').textContent   = (mid.runs||0).toLocaleString();
+      document.getElementById('mid-sr').textContent     = (mid.sr||0).toFixed(1);
+      document.getElementById('death-runs').textContent = (death.runs||0).toLocaleString();
+      document.getElementById('death-sr').textContent   = (death.sr||0).toFixed(1);
+
+      // Animate bars as % of max runs
+      setTimeout(function(){
+        document.getElementById('pp-bar').style.width    = Math.round((pp.runs||0)/maxRuns*100) + '%';
+        document.getElementById('mid-bar').style.width   = Math.round((mid.runs||0)/maxRuns*100) + '%';
+        document.getElementById('death-bar').style.width = Math.round((death.runs||0)/maxRuns*100) + '%';
+      }, 200);
+
+      if(strip) strip.style.display = 'block';
+    }).catch(function(){});
+
+  // Fetch matchups
+  fetch(_kapi + '/player-matchups/' + pid)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var spin = d.spin || {};
+      var pace = d.pace || {};
+
+      document.getElementById('spin-sr').textContent    = (spin.sr||0).toFixed(1);
+      document.getElementById('spin-runs').textContent  = (spin.runs||0).toLocaleString();
+      document.getElementById('spin-avg').textContent   = (spin.avg||0).toFixed(1);
+      document.getElementById('spin-wkts').textContent  = spin.dismissals||0;
+      document.getElementById('pace-sr').textContent    = (pace.sr||0).toFixed(1);
+      document.getElementById('pace-runs').textContent  = (pace.runs||0).toLocaleString();
+      document.getElementById('pace-avg').textContent   = (pace.avg||0).toFixed(1);
+      document.getElementById('pace-wkts').textContent  = pace.dismissals||0;
+
+      // Verdict
+      var verdict = '';
+      if(spin.sr && pace.sr) {
+        if(spin.sr > pace.sr + 10) {
+          verdict = '🔄 Dominant against spin — SR ' + spin.sr.toFixed(1) + ' vs ' + pace.sr.toFixed(1) + ' against pace';
+        } else if(pace.sr > spin.sr + 10) {
+          verdict = '⚡ Stronger against pace — SR ' + pace.sr.toFixed(1) + ' vs ' + spin.sr.toFixed(1) + ' against spin';
+        } else {
+          verdict = '⚖️ Handles both spin and pace equally well';
+        }
+      }
+      var vEl = document.getElementById('matchup-verdict');
+      if(vEl) vEl.textContent = verdict;
+    }).catch(function(){});
 }
 
 function _loadAiInsight(name, runs, matches, avg, sr, hundreds, fifties, format) {
