@@ -244,6 +244,33 @@ footer{background:var(--s1);border-top:1px solid var(--border);padding:48px 32px
   footer{padding:40px 20px 24px;}
 }
 
+/* POTD BAR */
+.potd-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:62px auto 0;padding:10px 24px;
+  background:linear-gradient(90deg,rgba(0,245,170,.06),rgba(0,245,170,.02));
+  border-bottom:1px solid rgba(0,245,170,.12);
+  text-decoration:none;cursor:pointer;transition:.2s;
+}
+.potd-bar:hover{background:linear-gradient(90deg,rgba(0,245,170,.1),rgba(0,245,170,.04));}
+.potd-left{display:flex;align-items:center;gap:14px;}
+.potd-badge{
+  background:rgba(0,245,170,.12);color:var(--acc);
+  font-size:10px;font-weight:700;letter-spacing:1.2px;
+  padding:4px 10px;border-radius:4px;white-space:nowrap;
+}
+.potd-name{font-family:var(--font-d);font-size:22px;letter-spacing:1px;color:var(--text);}
+.potd-stats{display:flex;gap:24px;align-items:center;}
+.potd-stat{text-align:center;min-width:48px;}
+.potd-val{font-family:var(--font-d);font-size:26px;color:var(--text);line-height:1;display:block;}
+.potd-key{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+@media(max-width:768px){
+  .potd-bar{flex-direction:column;gap:10px;padding:10px 16px;}
+  .potd-stats{gap:16px;}
+  .potd-val{font-size:20px;}
+  .potd-name{font-size:18px;}
+}
+
 /* MOBILE BOTTOM NAV */
 .mobile-nav{
   display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;
@@ -289,7 +316,10 @@ footer{background:var(--s1);border-top:1px solid var(--border);padding:48px 32px
 
 <!-- LIVE TICKER -->
 <div style="
+<<<<<<< HEAD
 margin-top:60px;
+=======
+>>>>>>> 9960181 (Add working H2H widget on homepage)
 background:rgba(77,159,255,.06);
 border-bottom:1px solid rgba(77,159,255,.14);
 padding:12px 22px;
@@ -672,6 +702,7 @@ window.addEventListener('DOMContentLoaded', function(){
 fetch("https://kriciq-api.onrender.com/api/player_of_day")
 .then(res => res.json())
 .then(data => {
+<<<<<<< HEAD
 
  const section = document.createElement("a");
  section.href = "player.html?id=" + data.player.replace(/ /g,'-');
@@ -741,5 +772,22 @@ font-size:13px;">
 
  document.body.insertBefore(section, document.body.children[1]);
 
+=======
+ const el = document.createElement("a");
+ el.href = "player.html?id=" + data.player.replace(/ /g,'-');
+ el.className = "potd-bar";
+ el.innerHTML = '<div class="potd-left">'
+   + '<span class="potd-badge">🔥 POTD</span>'
+   + '<span class="potd-name">' + data.player + '</span>'
+   + '</div>'
+   + '<div class="potd-stats">'
+   + '<div class="potd-stat"><span class="potd-val">' + data.runs + '</span><span class="potd-key">RUNS</span></div>'
+   + '<div class="potd-stat"><span class="potd-val">' + data.average + '</span><span class="potd-key">AVG</span></div>'
+   + '<div class="potd-stat"><span class="potd-val">' + data.strike_rate + '</span><span class="potd-key">SR</span></div>'
+   + '<div class="potd-stat"><span class="potd-val">' + (data.hundreds || 0) + '</span><span class="potd-key">100s</span></div>'
+   + '<div class="potd-stat"><span class="potd-val">' + (data.fifties || 0) + '</span><span class="potd-key">50s</span></div>'
+   + '</div>';
+ document.body.insertBefore(el, document.body.children[1]);
+>>>>>>> 9960181 (Add working H2H widget on homepage)
 });
 </script>
