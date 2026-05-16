@@ -332,27 +332,32 @@ function loadBestXI(team){
       document.getElementById('td-players').textContent = xi.length;
 
       var roleClass = {
-        'Opener':'opener','Top Order':'toporder','Batsman':'toporder',
-        'Middle Order':'middle','Finisher':'finisher',
-        'All-rounder':'allrounder','Bowler':'bowler'
+        'Opener':'opener','No.3':'toporder','No.4':'toporder',
+        'No.5':'middle','All-rounder':'allrounder',
+        'Finisher':'finisher','Spinner':'bowler','Fast Bowler':'bowler','Batsman':'toporder'
       };
       var roleColor = {
-        'Opener':'var(--acc)','Top Order':'var(--acc3)','Batsman':'var(--acc3)',
-        'Middle Order':'var(--acc4)','Finisher':'var(--acc2)',
-        'All-rounder':'#a855f7','Bowler':'var(--acc2)'
+        'Opener':'var(--acc)','No.3':'var(--acc3)','No.4':'var(--acc3)',
+        'No.5':'var(--acc4)','All-rounder':'#a855f7',
+        'Finisher':'var(--acc2)','Spinner':'var(--acc4)','Fast Bowler':'var(--acc2)','Batsman':'var(--acc3)'
       };
 
       var html = '<div class="xi-grid">';
       xi.forEach(function(p, i){
         var id = p.player.replace(/ /g,'-');
-        var cls = roleClass[p.role]||'toporder';
-        var col = roleColor[p.role]||'var(--acc3)';
-        var mainStat = p.role==='Bowler'
-          ? '<div class="xi-stat" style="color:var(--acc2);">'+p.wickets+'<span style="font-size:11px;color:var(--muted);"> wkts</span></div>'
-          : '<div class="xi-stat" style="color:var(--acc);">'+p.runs+'<span style="font-size:11px;color:var(--muted);"> runs</span></div>';
+        var pos = p.position || p.role || 'Batsman';
+        var cls = roleClass[pos]||'toporder';
+        var col = roleColor[pos]||'var(--acc3)';
+        var isBowler = pos==='Fast Bowler'||pos==='Spinner';
+        var isAR = pos==='All-rounder';
+        var mainStat = isBowler
+          ? '<div class="xi-stat" style="color:var(--acc2);">'+(p.wickets||0)+'<span style="font-size:11px;color:var(--muted);"> wkts</span></div>'
+          : isAR
+          ? '<div style="display:flex;gap:12px;"><div class="xi-stat" style="color:var(--acc);">'+(p.runs||0)+'<span style="font-size:11px;color:var(--muted);"> runs</span></div><div class="xi-stat" style="color:var(--acc2);">'+(p.wickets||0)+'<span style="font-size:11px;color:var(--muted);"> wkts</span></div></div>'
+          : '<div class="xi-stat" style="color:var(--acc);">'+(p.runs||0)+'<span style="font-size:11px;color:var(--muted);"> runs</span></div>';
         html += '<a href="player.html?id='+id+'" style="text-decoration:none;">'
           +'<div class="xi-card '+cls+'">'
-          +'<div class="xi-pos" style="color:'+col+';">'+(i+1)+'. '+p.role+'</div>'
+          +'<div class="xi-pos" style="color:'+col+';">'+(i+1)+'. '+pos+'</div>'
           +'<div class="xi-name">'+p.player+'</div>'
           +mainStat
           +'<div class="xi-detail">'+p.detail+'</div>'
