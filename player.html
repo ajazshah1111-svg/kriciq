@@ -772,38 +772,6 @@ function _buildCharts(avg, sr, hundreds, matches, seasonData) {
     }
   });
 
-  // ── RADAR: derive skill scores from real stats ──
-  var radarCtx = document.getElementById('radarChart').getContext('2d');
-  var technique   = Math.min(Math.round(avg * 1.8), 99);
-  var consistency = Math.min(Math.round(avg * 1.6), 99);
-  var power       = Math.min(Math.round(sr * 0.6), 99);
-  var chasing     = Math.min(Math.round(avg * 1.7), 99);
-  var deathSR     = Math.min(Math.round(sr * 0.55), 99);
-  var vsSpin      = Math.min(Math.round(avg * 1.3), 99);
-  _charts.radar = new Chart(radarCtx, {
-    type:'radar',
-    data:{
-      labels:['Technique','Consistency','Power','Chasing','Death SR','vs Spin'],
-      datasets:[
-        {label:'Player',data:[technique,consistency,power,chasing,deathSR,vsSpin],borderColor:acc,backgroundColor:'rgba(0,245,170,0.15)',borderWidth:2,pointBackgroundColor:acc,pointRadius:4},
-        {label:'Top-10 avg',data:[72,70,74,68,72,70],borderColor:muted2,backgroundColor:'rgba(136,146,164,0.08)',borderWidth:1,pointBackgroundColor:muted2,pointRadius:3,borderDash:[4,4]}
-      ]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:true,
-      plugins:{legend:{display:false}},
-      scales:{r:{angleLines:{color:gridColor},grid:{color:gridColor},ticks:{display:false,stepSize:20},pointLabels:{color:muted2,font:{size:10}}}}
-    }
-  });
-  // Update radar legend bars
-  var fills = document.querySelectorAll('.rl-fill');
-  var vals  = document.querySelectorAll('.rl-val');
-  var scores = [technique,consistency,power,chasing,deathSR,vsSpin];
-  scores.forEach(function(s,i){
-    if(fills[i]) fills[i].style.width = s+'%';
-    if(vals[i])  vals[i].textContent  = s;
-  });
-
   // ── CONSISTENCY chart: real innings distribution from API ──
   var consCtx = document.getElementById('consistencyChart').getContext('2d');
   var bucketLabels = ['0-9','10-24','25-49','50-74','75-99','100+'];
