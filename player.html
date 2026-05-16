@@ -1036,7 +1036,6 @@ function _loadPlayer() {
         el=document.getElementById('bowl-avg');     if(el) el.textContent=bw.bowling_avg ? bw.bowling_avg.toFixed(1) : '—';
         el=document.getElementById('bowl-sr');      if(el) el.textContent=bw.bowling_sr ? bw.bowling_sr.toFixed(1) : '—';
         el=document.getElementById('bowl-overs');   if(el) el.textContent=bw.overs || '—';
-        el=document.getElementById('bowl-matches'); if(el) el.textContent=bw.matches || '—';
         el=document.getElementById('bowl-sub');     if(el) el.textContent=name+' — '+bw.wickets+' wickets in '+(bw.matches||'?')+' matches';
         if(bowlBadge) bowlBadge.textContent=bw.wickets+' wkts';
         var bowlGrid=document.getElementById('bowl-stats-grid'); if(bowlGrid) bowlGrid.style.display='';

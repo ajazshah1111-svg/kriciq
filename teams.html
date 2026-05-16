@@ -61,6 +61,24 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 .player-table tbody tr:hover td{background:var(--s2);}
 .player-link{color:var(--text);text-decoration:none;font-weight:500;display:flex;align-items:center;gap:8px;}
 .player-link:hover{color:var(--acc);}
+/* BEST XI */
+.xi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.xi-card{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px;position:relative;overflow:hidden;transition:.15s;}
+.xi-card:hover{border-color:var(--border2);}
+.xi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.xi-card.opener::before{background:var(--acc);}
+.xi-card.toporder::before{background:var(--acc3);}
+.xi-card.middle::before{background:var(--acc4);}
+.xi-card.finisher::before{background:var(--acc2);}
+.xi-card.allrounder::before{background:#a855f7;}
+.xi-card.bowler::before{background:var(--acc2);}
+.xi-card.impact::before{background:var(--acc4);height:3px;}
+.xi-pos{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;}
+.xi-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.2;}
+.xi-stat{font-family:var(--font-d);font-size:20px;line-height:1;}
+.xi-detail{font-size:10px;color:var(--muted2);margin-top:3px;}
+.xi-impact-card{background:linear-gradient(135deg,rgba(247,201,72,.08),rgba(247,201,72,.03));border:1px solid rgba(247,201,72,.2);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;margin-top:4px;}
+@media(max-width:600px){.xi-grid{grid-template-columns:repeat(2,1fr);}}
 .p-init{width:28px;height:28px;border-radius:6px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:11px;color:var(--acc);flex-shrink:0;}
 .sv{font-family:var(--font-d);font-size:15px;}
 .loading-msg{text-align:center;padding:40px;color:var(--muted2);}
@@ -126,21 +144,19 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
     <div class="td-stats">
       <div class="td-stat"><div class="td-sv" id="td-matches">—</div><div class="td-sk">Matches</div></div>
       <div class="td-stat"><div class="td-sv" id="td-runs" style="color:var(--acc)">—</div><div class="td-sk">Total Runs</div></div>
-      <div class="td-stat"><div class="td-sv" id="td-avgscore" style="color:var(--acc4)">—</div><div class="td-sk">Avg Score/Inn</div></div>
+      <div class="td-stat"><div class="td-sv" id="td-avgscore" style="color:var(--acc4)">—</div><div class="td-sk">Avg Score</div></div>
       <div class="td-stat"><div class="td-sv" id="td-winpct" style="color:var(--acc)">—</div><div class="td-sk">Win %</div></div>
       <div class="td-stat"><div class="td-sv" id="td-wins" style="color:var(--acc3)">—</div><div class="td-sk">Wins</div></div>
       <div class="td-stat"><div class="td-sv" id="td-players">—</div><div class="td-sk">Players Used</div></div>
     </div>
 
-    <!-- PHASE STATS + TOP PERFORMERS -->
+    <!-- ANALYTICS: phase stats + top performers -->
     <div id="team-analytics-section" style="display:none;padding:20px 28px;border-bottom:1px solid var(--border);">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
-        <!-- Phase batting -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
         <div>
-          <div style="font-family:var(--font-d);font-size:16px;letter-spacing:.5px;margin-bottom:12px;color:var(--muted2);">Phase <span style="color:var(--acc);">Batting</span></div>
+          <div style="font-family:var(--font-d);font-size:16px;letter-spacing:.5px;margin-bottom:12px;color:var(--muted2);">Phase <span style="color:var(--acc);">Batting RPO</span></div>
           <div id="team-phase-rows"></div>
         </div>
-        <!-- Top batters -->
         <div>
           <div style="font-family:var(--font-d);font-size:16px;letter-spacing:.5px;margin-bottom:12px;color:var(--muted2);">Top <span style="color:var(--acc);">Run Scorers</span></div>
           <div id="team-top-bat"></div>
@@ -151,9 +167,11 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;" id="team-top-bowl"></div>
       </div>
     </div>
+
+    <!-- BEST XI -->
     <div class="players-section">
-      <div class="ps-title">Squad <em>Stats</em></div>
-      <div id="players-container"><div class="loading-msg"><div class="spinner"></div>Loading players...</div></div>
+      <div class="ps-title">Best <em>XI</em> <span style="font-size:12px;color:var(--muted);font-family:var(--font-b);font-weight:400;margin-left:8px;">Position-aware · All-time IPL</span></div>
+      <div id="players-container"><div class="loading-msg"><div class="spinner"></div>Building Best XI...</div></div>
     </div>
   </div>
 </div>
@@ -167,6 +185,232 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 
 <script>
 var _kapi = 'https://kriciq-api.onrender.com/api';
+
+var TEAMS = [
+  {id:'mi',   name:'Mumbai Indians',        abbr:'MI',   color:'#4d9fff', bg:'rgba(77,159,255,.15)',  aliases:['Mumbai Indians']},
+  {id:'csk',  name:'Chennai Super Kings',   abbr:'CSK',  color:'#f7c948', bg:'rgba(247,201,72,.15)',  aliases:['Chennai Super Kings']},
+  {id:'rcb',  name:'Royal Challengers',     abbr:'RCB',  color:'#ff5f40', bg:'rgba(255,95,64,.15)',   aliases:['Royal Challengers Bangalore','Royal Challengers Bengaluru']},
+  {id:'kkr',  name:'Kolkata Knight Riders', abbr:'KKR',  color:'#c084fc', bg:'rgba(192,132,252,.15)', aliases:['Kolkata Knight Riders']},
+  {id:'srh',  name:'Sunrisers Hyderabad',   abbr:'SRH',  color:'#ff8c40', bg:'rgba(255,140,64,.15)',  aliases:['Sunrisers Hyderabad']},
+  {id:'dc',   name:'Delhi Capitals',        abbr:'DC',   color:'#3b82f6', bg:'rgba(59,130,246,.15)',  aliases:['Delhi Capitals','Delhi Daredevils']},
+  {id:'pbks', name:'Punjab Kings',          abbr:'PBKS', color:'#ff5f40', bg:'rgba(255,95,64,.12)',   aliases:['Punjab Kings','Kings XI Punjab']},
+  {id:'rr',   name:'Rajasthan Royals',      abbr:'RR',   color:'#e879f9', bg:'rgba(232,121,249,.15)', aliases:['Rajasthan Royals']},
+  {id:'lsg',  name:'Lucknow Super Giants',  abbr:'LSG',  color:'#00f5aa', bg:'rgba(0,245,170,.12)',   aliases:['Lucknow Super Giants']},
+  {id:'gt',   name:'Gujarat Titans',        abbr:'GT',   color:'#5b9fff', bg:'rgba(91,159,255,.15)',  aliases:['Gujarat Titans']},
+];
+
+var _teamStats = {};
+var _activeTeam = null;
+
+function renderTeamCards(){
+  var grid = document.getElementById('teams-grid');
+  grid.innerHTML = TEAMS.map(function(t){
+    return '<div class="team-card" id="card-'+t.id+'" style="--tc:'+t.color+'" onclick="selectTeam(\''+t.id+'\')">'
+      +'<div class="team-badge" style="background:'+t.bg+';color:'+t.color+'">'+t.abbr+'</div>'
+      +'<div class="team-name">'+t.name+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function loadTeamStats(){
+  fetch(_kapi+'/team-stats')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      data.forEach(function(row){
+        TEAMS.forEach(function(t){
+          if(t.aliases.some(function(a){return a===row.team;})){
+            if(!_teamStats[t.id]) _teamStats[t.id]={matches:0,total_runs:0,count:0};
+            _teamStats[t.id].matches    += row.matches;
+            _teamStats[t.id].total_runs += row.total_runs;
+            _teamStats[t.id].count      += 1;
+          }
+        });
+      });
+      Object.keys(_teamStats).forEach(function(id){
+        var ts = _teamStats[id];
+        ts.avg_score_per_match = ts.matches > 0 ? Math.round(ts.total_runs/ts.matches) : 0;
+      });
+    }).catch(function(){});
+}
+
+function selectTeam(teamId){
+  document.querySelectorAll('.team-card').forEach(function(c){c.classList.remove('active');});
+  document.getElementById('card-'+teamId).classList.add('active');
+  _activeTeam = teamId;
+  var team = TEAMS.find(function(t){return t.id===teamId;});
+  var detail = document.getElementById('team-detail');
+  detail.classList.add('show');
+  setTimeout(function(){detail.scrollIntoView({behavior:'smooth',block:'nearest'});},100);
+
+  document.getElementById('td-badge').textContent = team.abbr;
+  document.getElementById('td-badge').style.background = team.bg;
+  document.getElementById('td-badge').style.color = team.color;
+  document.getElementById('td-name').textContent = team.name;
+  document.getElementById('td-sub').textContent = 'IPL franchise · '+team.aliases[0];
+
+  var ts = _teamStats[teamId];
+  if(ts){
+    document.getElementById('td-matches').textContent  = ts.matches;
+    document.getElementById('td-runs').textContent     = ts.total_runs.toLocaleString();
+    document.getElementById('td-avgscore').textContent = ts.avg_score_per_match;
+  }
+  document.getElementById('td-winpct').textContent = '—';
+  document.getElementById('td-wins').textContent   = '—';
+  document.getElementById('td-players').textContent = '—';
+  document.getElementById('team-analytics-section').style.display = 'none';
+  document.getElementById('players-container').innerHTML = '<div class="loading-msg"><div class="spinner"></div>Building Best XI...</div>';
+
+  loadTeamAnalytics(team);
+  loadBestXI(team);
+}
+
+function loadTeamAnalytics(team){
+  var alias = team.aliases[0].replace(/ /g,'-');
+  fetch(_kapi+'/team-analytics/'+encodeURIComponent(alias))
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error) return;
+      document.getElementById('td-winpct').textContent = (d.win_pct||0)+'%';
+      document.getElementById('td-wins').textContent   = d.wins||0;
+
+      var phases = d.phases||{};
+      var pd = [
+        {key:'powerplay',label:'Powerplay',overs:'1–6', color:'var(--acc)'},
+        {key:'middle',   label:'Middle',   overs:'7–15',color:'var(--acc3)'},
+        {key:'death',    label:'Death',    overs:'16–20',color:'var(--acc2)'},
+      ];
+      var maxRpo = Math.max.apply(null, pd.map(function(p){return (phases[p.key]||{}).rpo||0;})) || 1;
+      document.getElementById('team-phase-rows').innerHTML = pd.map(function(p){
+        var ph = phases[p.key]||{};
+        var w = Math.round((ph.rpo||0)/maxRpo*100);
+        return '<div style="margin-bottom:12px;">'
+          +'<div style="display:flex;justify-content:space-between;margin-bottom:4px;">'
+          +'<span style="font-size:12px;font-weight:600;">'+p.label+'</span>'
+          +'<span style="font-size:10px;color:var(--muted);">Overs '+p.overs+'</span>'
+          +'</div>'
+          +'<div style="display:flex;align-items:center;gap:10px;">'
+          +'<div style="flex:1;height:6px;background:var(--s3);border-radius:3px;">'
+          +'<div style="height:100%;background:'+p.color+';border-radius:3px;width:'+w+'%;"></div>'
+          +'</div>'
+          +'<span style="font-family:var(--font-d);font-size:15px;color:'+p.color+';min-width:36px;text-align:right;">'+(ph.rpo||0)+'</span>'
+          +'<span style="font-size:9px;color:var(--muted);text-transform:uppercase;">RPO</span>'
+          +'</div></div>';
+      }).join('');
+
+      document.getElementById('team-top-bat').innerHTML = (d.top_batters||[]).map(function(p){
+        var id = p.player.replace(/ /g,'-');
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">'
+          +'<a href="player.html?id='+id+'" style="color:var(--text);text-decoration:none;font-size:13px;font-weight:500;">'+p.player+'</a>'
+          +'<div style="display:flex;gap:14px;">'
+          +'<span style="font-family:var(--font-d);font-size:15px;color:var(--acc);">'+p.runs+'</span>'
+          +'<span style="font-size:11px;color:var(--muted2);min-width:56px;text-align:right;">SR '+p.sr+'</span>'
+          +'</div></div>';
+      }).join('');
+
+      document.getElementById('team-top-bowl').innerHTML = (d.top_bowlers||[]).map(function(p){
+        var id = p.player.replace(/ /g,'-');
+        return '<a href="player.html?id='+id+'" style="background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;text-decoration:none;display:block;">'
+          +'<div style="font-size:11px;color:var(--text);font-weight:500;margin-bottom:6px;line-height:1.3;">'+p.player+'</div>'
+          +'<div style="font-family:var(--font-d);font-size:22px;color:var(--acc2);">'+p.wickets+'</div>'
+          +'<div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Wickets</div>'
+          +'<div style="font-size:11px;color:var(--muted2);margin-top:4px;">Econ '+p.economy+'</div>'
+          +'</a>';
+      }).join('');
+
+      document.getElementById('team-analytics-section').style.display = '';
+    }).catch(function(){});
+}
+
+function loadBestXI(team){
+  // Fetch all aliases and use first
+  var alias = team.aliases[0].replace(/ /g,'-');
+  fetch(_kapi+'/team-best-xi/'+encodeURIComponent(alias))
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var xi = d.xi||[];
+      var impact = d.impact_player;
+      document.getElementById('td-players').textContent = xi.length;
+
+      var roleClass = {
+        'Opener':'opener','Top Order':'toporder','Batsman':'toporder',
+        'Middle Order':'middle','Finisher':'finisher',
+        'All-rounder':'allrounder','Bowler':'bowler'
+      };
+      var roleColor = {
+        'Opener':'var(--acc)','Top Order':'var(--acc3)','Batsman':'var(--acc3)',
+        'Middle Order':'var(--acc4)','Finisher':'var(--acc2)',
+        'All-rounder':'#a855f7','Bowler':'var(--acc2)'
+      };
+
+      var html = '<div class="xi-grid">';
+      xi.forEach(function(p, i){
+        var id = p.player.replace(/ /g,'-');
+        var cls = roleClass[p.role]||'toporder';
+        var col = roleColor[p.role]||'var(--acc3)';
+        var mainStat = p.role==='Bowler'
+          ? '<div class="xi-stat" style="color:var(--acc2);">'+p.wickets+'<span style="font-size:11px;color:var(--muted);"> wkts</span></div>'
+          : '<div class="xi-stat" style="color:var(--acc);">'+p.runs+'<span style="font-size:11px;color:var(--muted);"> runs</span></div>';
+        html += '<a href="player.html?id='+id+'" style="text-decoration:none;">'
+          +'<div class="xi-card '+cls+'">'
+          +'<div class="xi-pos" style="color:'+col+';">'+(i+1)+'. '+p.role+'</div>'
+          +'<div class="xi-name">'+p.player+'</div>'
+          +mainStat
+          +'<div class="xi-detail">'+p.detail+'</div>'
+          +'</div></a>';
+      });
+      html += '</div>';
+
+      // Impact player
+      if(impact){
+        var impId = impact.player.replace(/ /g,'-');
+        html += '<a href="player.html?id='+impId+'" style="text-decoration:none;">'
+          +'<div class="xi-impact-card">'
+          +'<div style="font-size:28px;">⚡</div>'
+          +'<div>'
+          +'<div style="font-size:9px;color:var(--acc4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">Impact Player</div>'
+          +'<div style="font-size:15px;font-weight:600;color:var(--text);">'+impact.player+'</div>'
+          +'<div style="font-size:11px;color:var(--muted2);">Impact Score: '+impact.impact+' · '+impact.runs+' runs @ SR '+impact.sr+'</div>'
+          +'</div></div></a>';
+      }
+
+      document.getElementById('players-container').innerHTML = html;
+    }).catch(function(){
+      document.getElementById('players-container').innerHTML = '<div class="loading-msg">Could not build Best XI.</div>';
+    });
+}
+
+function initSearch(){
+  var inp = document.getElementById('nav-search');
+  if(!inp) return;
+  var drop = document.createElement('div');
+  drop.style.cssText='display:none;position:absolute;top:calc(100% + 8px);right:0;min-width:280px;background:#0f131c;border:1px solid rgba(255,255,255,0.1);border-radius:8px;z-index:999;max-height:280px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4);';
+  inp.parentNode.appendChild(drop);
+  var t;
+  inp.addEventListener('input',function(){
+    clearTimeout(t);
+    var q=this.value.trim();
+    if(q.length<2){drop.style.display='none';return;}
+    t=setTimeout(function(){
+      fetch(_kapi+'/search/'+encodeURIComponent(q))
+        .then(function(r){return r.json();})
+        .then(function(players){
+          drop.innerHTML=players.length
+            ?players.map(function(p){var id=p.player.replace(/ /g,'-');return '<a href="player.html?id='+id+'" style="display:flex;justify-content:space-between;padding:9px 14px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);color:#eef0f4;font-size:13px;">'+p.player+'<span style="color:#5a6275;font-size:11px;">'+Math.round(p.runs)+' runs</span></a>';}).join('')
+            :'<div style="padding:10px 14px;color:#5a6275;font-size:13px;">No players found</div>';
+          drop.style.display='block';
+        }).catch(function(){drop.style.display='none';});
+    },300);
+  });
+  document.addEventListener('click',function(e){if(!inp.parentNode.contains(e.target))drop.style.display='none';});
+}
+
+window.addEventListener('DOMContentLoaded',function(){
+  renderTeamCards();
+  loadTeamStats();
+  initSearch();
+  setTimeout(function(){selectTeam('mi');},300);
+});
+</script>
 
 // ── TEAM DEFINITIONS — merged duplicates, current 10 teams ──
 var TEAMS = [
@@ -256,77 +500,11 @@ function selectTeam(teamId){
     document.getElementById('td-runs').textContent = ts.total_runs.toLocaleString();
     document.getElementById('td-avgscore').textContent = ts.avg_score_per_match || Math.round(ts.total_runs / ts.matches);
   }
-  document.getElementById('td-winpct').textContent = '—';
-  document.getElementById('td-wins').textContent   = '—';
-  document.getElementById('team-analytics-section').style.display = 'none';
+  document.getElementById('td-hundreds').textContent = '—';
+  document.getElementById('td-fifties').textContent  = '—';
 
-  // Load analytics
-  loadTeamAnalytics(team);
+  // Load players
   loadTeamPlayers(team);
-}
-
-// ── LOAD TEAM ANALYTICS ──
-function loadTeamAnalytics(team) {
-  var alias = team.aliases[0].replace(/ /g,'-');
-  fetch(_kapi+'/team-analytics/'+encodeURIComponent(alias))
-    .then(function(r){return r.json();})
-    .then(function(d){
-      if(d.error) return;
-      document.getElementById('td-winpct').textContent = (d.win_pct||0) + '%';
-      document.getElementById('td-wins').textContent   = d.wins||0;
-
-      // Phase batting rows
-      var phases = d.phases || {};
-      var phaseData = [
-        {key:'powerplay', label:'Powerplay', overs:'1–6',  color:'var(--acc)'},
-        {key:'middle',    label:'Middle',    overs:'7–15', color:'var(--acc3)'},
-        {key:'death',     label:'Death',     overs:'16–20',color:'var(--acc2)'},
-      ];
-      var maxRpo = Math.max.apply(null, phaseData.map(function(p){ return (phases[p.key]||{}).rpo||0; })) || 1;
-      var phaseHtml = phaseData.map(function(p){
-        var ph = phases[p.key] || {};
-        var barW = Math.round((ph.rpo||0)/maxRpo*100);
-        return '<div style="margin-bottom:12px;">'
-          +'<div style="display:flex;justify-content:space-between;margin-bottom:4px;">'
-          +'<span style="font-size:12px;font-weight:600;">'+p.label+'</span>'
-          +'<span style="font-size:10px;color:var(--muted);">Overs '+p.overs+'</span>'
-          +'</div>'
-          +'<div style="display:flex;align-items:center;gap:10px;">'
-          +'<div style="flex:1;height:6px;background:var(--s3);border-radius:3px;">'
-          +'<div style="height:100%;background:'+p.color+';border-radius:3px;width:'+barW+'%;"></div>'
-          +'</div>'
-          +'<span style="font-family:var(--font-d);font-size:15px;color:'+p.color+';min-width:36px;text-align:right;">'+(ph.rpo||0)+'</span>'
-          +'<span style="font-size:9px;color:var(--muted);text-transform:uppercase;">RPO</span>'
-          +'</div></div>';
-      }).join('');
-      document.getElementById('team-phase-rows').innerHTML = phaseHtml;
-
-      // Top batters
-      var batHtml = (d.top_batters||[]).map(function(p,i){
-        var id = p.player.replace(/ /g,'-');
-        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">'
-          +'<a href="player.html?id='+id+'" style="color:var(--text);text-decoration:none;font-size:13px;font-weight:500;">'+p.player+'</a>'
-          +'<div style="display:flex;gap:16px;">'
-          +'<span style="font-family:var(--font-d);font-size:15px;color:var(--acc);">'+p.runs+'</span>'
-          +'<span style="font-size:11px;color:var(--muted2);">SR '+p.sr+'</span>'
-          +'</div></div>';
-      }).join('');
-      document.getElementById('team-top-bat').innerHTML = batHtml;
-
-      // Top bowlers
-      var bowlHtml = (d.top_bowlers||[]).map(function(p){
-        var id = p.player.replace(/ /g,'-');
-        return '<a href="player.html?id='+id+'" style="background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;text-decoration:none;display:block;">'
-          +'<div style="font-size:11px;color:var(--text);font-weight:500;margin-bottom:6px;line-height:1.3;">'+p.player+'</div>'
-          +'<div style="font-family:var(--font-d);font-size:22px;color:var(--acc2);">'+p.wickets+'</div>'
-          +'<div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Wickets</div>'
-          +'<div style="font-size:11px;color:var(--muted2);margin-top:4px;">Econ '+p.economy+'</div>'
-          +'</a>';
-      }).join('');
-      document.getElementById('team-top-bowl').innerHTML = bowlHtml;
-
-      document.getElementById('team-analytics-section').style.display = '';
-    }).catch(function(){});
 }
 
 // ── LOAD TEAM PLAYERS ──
@@ -363,6 +541,12 @@ function loadTeamPlayers(team){
     });
     players.sort(function(a,b){return b.runs-a.runs;});
     document.getElementById('td-players').textContent = players.length;
+    var totalH = players.reduce(function(s,p){return s+(p.hundreds||0);},0);
+    var totalF = players.reduce(function(s,p){return s+(p.fifties||0);},0);
+    var hasRealH = players.some(function(p){return (p.hundreds||0)>0;});
+    var hasRealF = players.some(function(p){return (p.fifties||0)>0;});
+    document.getElementById('td-hundreds').textContent = hasRealH ? totalH : '—';
+    document.getElementById('td-fifties').textContent  = hasRealF ? totalF : '—';
     renderPlayers(players, team);
   }).catch(function(){
     document.getElementById('players-container').innerHTML =
