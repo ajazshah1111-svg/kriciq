@@ -768,20 +768,22 @@ var _nameAliases = {
 function _fuzzyMatch(player, q) {
   var pl = player.toLowerCase();
   var ql = q.toLowerCase().trim();
+  // 1. Direct substring
   if (pl.indexOf(ql) !== -1) return true;
+  // 2. Alias map
   if (_nameAliases[ql] && player === _nameAliases[ql]) return true;
   var plParts = pl.split(' ');
-  var plLast = plParts[plParts.length - 1];
   var qlParts = ql.split(' ');
+  var plLast = plParts[plParts.length - 1];
   var qlLast = qlParts[qlParts.length - 1];
+  // 3. Last name match — "kohli" finds "v kohli"
   if (qlLast.length >= 3 && plLast.indexOf(qlLast) !== -1) return true;
-  if (qlParts.length > 1) {
-    var allMatch = qlParts.every(function(w) {
-      if (w.length < 2) return true;
-      return pl.indexOf(w) !== -1 || plParts.some(function(pp){ return pp[0] === w[0] && w.length <= 2; });
-    });
-    if (allMatch) return true;
+  // 4. First name match — "virat" matches alias "virat kohli" -> "V Kohli"
+  for (var key in _nameAliases) {
+    if (_nameAliases[key] === player && key.indexOf(ql) !== -1) return true;
   }
+  // 5. Multi-word: "virat kohli" — check last word against DB last name
+  if (qlParts.length > 1 && plLast.indexOf(qlLast) !== -1) return true;
   return false;
 }
 function _runSearch(q) {
