@@ -166,6 +166,19 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 .matchup-mini-v{font-family:var(--font-d);font-size:16px;line-height:1;}
 .matchup-mini-k{font-size:9px;color:var(--muted);text-transform:uppercase;}
 .matchup-verdict{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--muted2);text-align:center;}
+.adv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.adv-box{background:var(--s2);border-radius:10px;padding:14px 12px;text-align:center;}
+.adv-val{font-family:var(--font-d);font-size:28px;line-height:1;margin-bottom:3px;}
+.adv-key{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.adv-sub{font-size:10px;color:var(--muted2);margin-top:2px;}
+.chase-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+.chase-box{background:var(--s2);border-radius:10px;padding:12px;text-align:center;}
+.chase-label{font-size:10px;color:var(--muted2);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;}
+.chase-big{font-family:var(--font-d);font-size:30px;line-height:1;}
+.chase-mini{display:flex;justify-content:center;gap:14px;margin-top:6px;}
+.chase-ms{text-align:center;}
+.chase-mv{font-family:var(--font-d);font-size:15px;line-height:1;}
+.chase-mk{font-size:9px;color:var(--muted);text-transform:uppercase;}
 @media(max-width:768px){
   .insight-inner{grid-template-columns:1fr;}
   .insight-strip{padding:14px 16px;}
@@ -445,6 +458,54 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
     <div style="padding:20px 22px;">
       <div id="ai-insight-text" style="font-size:14px;color:var(--muted2);line-height:1.8;">
         <span style="color:var(--muted);font-size:12px;">⟳ Analysing player data...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADVANCED BATTING METRICS -->
+  <div class="card span2" id="adv-batting-card" style="display:none;">
+    <div class="ch"><div><div class="ct">Advanced <em>Batting</em></div><div class="csub">Deeper metrics from ball-by-ball IPL data</div></div></div>
+    <div class="adv-grid">
+      <div class="adv-box">
+        <div class="adv-val" id="adv-boundary-pct" style="color:var(--acc)">—</div>
+        <div class="adv-key">Boundary %</div>
+        <div class="adv-sub">Runs from 4s &amp; 6s</div>
+      </div>
+      <div class="adv-box">
+        <div class="adv-val" id="adv-dot-pct" style="color:var(--acc2)">—</div>
+        <div class="adv-key">Dot Ball %</div>
+        <div class="adv-sub">Balls scored 0</div>
+      </div>
+      <div class="adv-box">
+        <div class="adv-val" id="adv-impact" style="color:var(--acc4)">—</div>
+        <div class="adv-key">Impact Score</div>
+        <div class="adv-sub">Runs × SR / Matches</div>
+      </div>
+    </div>
+    <div class="chase-grid">
+      <div class="chase-box">
+        <div class="chase-label">🏹 Batting First</div>
+        <div class="chase-big" id="adv-defend-sr" style="color:var(--acc3)">—</div>
+        <div class="adv-key">Strike Rate</div>
+        <div class="chase-mini">
+          <div class="chase-ms"><div class="chase-mv" id="adv-defend-avg">—</div><div class="chase-mk">Avg</div></div>
+        </div>
+      </div>
+      <div class="chase-box">
+        <div class="chase-label">🎯 Chasing</div>
+        <div class="chase-big" id="adv-chase-sr" style="color:var(--acc)">—</div>
+        <div class="adv-key">Strike Rate</div>
+        <div class="chase-mini">
+          <div class="chase-ms"><div class="chase-mv" id="adv-chase-avg">—</div><div class="chase-mk">Avg</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:10px;background:var(--s2);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;">
+      <div style="font-size:28px;">🎯</div>
+      <div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Favourite Over</div>
+        <div style="font-family:var(--font-d);font-size:22px;color:var(--acc4);">Over <span id="adv-fav-over">—</span></div>
+        <div style="font-size:11px;color:var(--muted2);" id="adv-fav-runs">Most runs scored in this over across career</div>
       </div>
     </div>
   </div>
@@ -954,7 +1015,25 @@ function _loadInsights(pid) {
       if(strip) strip.style.display = 'block';
     }).catch(function(){});
 
-  // Fetch matchups
+  // Fetch advanced batting metrics
+  fetch(_kapi + '/player-advanced/' + pid)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.error) return;
+      var el;
+      el = document.getElementById('adv-boundary-pct'); if(el) el.textContent = (d.boundary_pct||0) + '%';
+      el = document.getElementById('adv-dot-pct');      if(el) el.textContent = (d.dot_pct||0) + '%';
+      el = document.getElementById('adv-impact');       if(el) el.textContent = (d.impact_score||0);
+      el = document.getElementById('adv-defend-sr');    if(el) el.textContent = (d.defend_sr||0);
+      el = document.getElementById('adv-defend-avg');   if(el) el.textContent = (d.defend_avg||0);
+      el = document.getElementById('adv-chase-sr');     if(el) el.textContent = (d.chase_sr||0);
+      el = document.getElementById('adv-chase-avg');    if(el) el.textContent = (d.chase_avg||0);
+      el = document.getElementById('adv-fav-over');     if(el) el.textContent = (d.fav_over||'—');
+      el = document.getElementById('adv-fav-runs');     if(el) el.textContent = (d.fav_over_runs||0) + ' runs scored in over ' + (d.fav_over||'—') + ' across career';
+      var card = document.getElementById('adv-batting-card');
+      if(card) card.style.display = '';
+    }).catch(function(){});
+
   fetch(_kapi + '/player-matchups/' + pid)
     .then(function(r){ return r.json(); })
     .then(function(d){
