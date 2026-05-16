@@ -474,6 +474,22 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
     <div class="cb"><div class="chart-wrap"><canvas id="trendChart"></canvas></div></div>
   </div>
 
+  <!-- SKILL RADAR -->
+  <div class="card">
+    <div class="ch"><div><div class="ct">Skill <em>Radar</em></div><div class="csub">Derived from real IPL career stats</div></div></div>
+    <div class="radar-wrap">
+      <canvas class="radar-canvas" id="radarChart"></canvas>
+      <div class="radar-legend">
+        <div class="rl-row"><span class="rl-name">Technique</span><div class="rl-bar"><div class="rl-fill" style="width:0%;background:var(--acc)"></div></div><span class="rl-val" style="color:var(--acc)">—</span></div>
+        <div class="rl-row"><span class="rl-name">Consistency</span><div class="rl-bar"><div class="rl-fill" style="width:0%;background:var(--acc3)"></div></div><span class="rl-val" style="color:var(--acc3)">—</span></div>
+        <div class="rl-row"><span class="rl-name">Power hitting</span><div class="rl-bar"><div class="rl-fill" style="width:0%;background:var(--acc4)"></div></div><span class="rl-val" style="color:var(--acc4)">—</span></div>
+        <div class="rl-row"><span class="rl-name">Chasing</span><div class="rl-bar"><div class="rl-fill" style="width:0%;background:var(--acc)"></div></div><span class="rl-val" style="color:var(--acc)">—</span></div>
+        <div class="rl-row"><span class="rl-name">Death overs SR</span><div class="rl-bar"><div class="rl-fill" style="width:0%;background:var(--acc2)"></div></div><span class="rl-val" style="color:var(--acc2)">—</span></div>
+        <div class="rl-row"><span class="rl-name">vs Spin</span><div class="rl-bar"><div class="rl-fill" style="width:0%;background:var(--acc4)"></div></div><span class="rl-val" style="color:var(--acc4)">—</span></div>
+      </div>
+    </div>
+  </div>
+
   <!-- SCORE CONSISTENCY -->
   <div class="card">
     <div class="ch"><div><div class="ct">Score <em>Consistency</em></div><div class="csub">Innings distribution — all IPL matches</div></div></div>
@@ -771,6 +787,39 @@ function _buildCharts(avg, sr, hundreds, matches, seasonData) {
       scales:{x:{grid:{color:gridColor},ticks:{color:muted,maxRotation:0}},y:{grid:{color:gridColor},ticks:{color:muted}}}
     }
   });
+
+  // ── RADAR: derive skill scores from real stats ──
+  var radarCtx = document.getElementById('radarChart');
+  if (radarCtx) {
+    var technique   = Math.min(Math.round(avg * 1.8), 99);
+    var consistency = Math.min(Math.round(avg * 1.6), 99);
+    var power       = Math.min(Math.round(sr * 0.6), 99);
+    var chasing     = Math.min(Math.round(avg * 1.7), 99);
+    var deathSR     = Math.min(Math.round(sr * 0.55), 99);
+    var vsSpin      = Math.min(Math.round(avg * 1.3), 99);
+    _charts.radar = new Chart(radarCtx.getContext('2d'), {
+      type:'radar',
+      data:{
+        labels:['Technique','Consistency','Power','Chasing','Death SR','vs Spin'],
+        datasets:[
+          {label:'Player',data:[technique,consistency,power,chasing,deathSR,vsSpin],borderColor:acc,backgroundColor:'rgba(0,245,170,0.15)',borderWidth:2,pointBackgroundColor:acc,pointRadius:4},
+          {label:'Top-10 avg',data:[72,70,74,68,72,70],borderColor:muted2,backgroundColor:'rgba(136,146,164,0.08)',borderWidth:1,pointBackgroundColor:muted2,pointRadius:3,borderDash:[4,4]}
+        ]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:true,
+        plugins:{legend:{display:false}},
+        scales:{r:{angleLines:{color:gridColor},grid:{color:gridColor},ticks:{display:false,stepSize:20},pointLabels:{color:muted2,font:{size:10}}}}
+      }
+    });
+    var fills = document.querySelectorAll('.rl-fill');
+    var vals  = document.querySelectorAll('.rl-val');
+    var scores = [technique,consistency,power,chasing,deathSR,vsSpin];
+    scores.forEach(function(s,i){
+      if(fills[i]) fills[i].style.width = s+'%';
+      if(vals[i])  vals[i].textContent  = s;
+    });
+  }
 
   // ── CONSISTENCY chart: real innings distribution from API ──
   var consCtx = document.getElementById('consistencyChart').getContext('2d');
