@@ -474,6 +474,27 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
     <div class="cb"><div class="chart-wrap"><canvas id="trendChart"></canvas></div></div>
   </div>
 
+  <!-- SEASON TABLE -->
+  <div class="card span2" id="season-table-card" style="display:none;">
+    <div class="ch"><div><div class="ct">Season <em>Breakdown</em></div><div class="csub">Per-season stats — matches, runs, avg, SR, 50s, 100s</div></div></div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;" id="season-table">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border);">
+            <th style="padding:10px 18px;text-align:left;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;">Season</th>
+            <th style="padding:10px 12px;text-align:right;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;">M</th>
+            <th style="padding:10px 12px;text-align:right;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;">Runs</th>
+            <th style="padding:10px 12px;text-align:right;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;">Avg</th>
+            <th style="padding:10px 12px;text-align:right;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;">SR</th>
+            <th style="padding:10px 12px;text-align:right;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;">50s</th>
+            <th style="padding:10px 18px;text-align:right;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;">100s</th>
+          </tr>
+        </thead>
+        <tbody id="season-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- SKILL RADAR -->
   <div class="card">
     <div class="ch"><div><div class="ct">Skill <em>Radar</em></div><div class="csub">Derived from real IPL career stats</div></div></div>
@@ -559,8 +580,45 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
       <div class="fstat"><div class="fstat-v" id="bowl-avg" style="color:var(--acc3)">—</div><div class="fstat-k">Bowling Avg</div></div>
       <div class="fstat"><div class="fstat-v" id="bowl-sr" style="color:var(--acc)">—</div><div class="fstat-k">Bowling SR</div></div>
       <div class="fstat"><div class="fstat-v" id="bowl-overs" style="color:var(--muted2)">—</div><div class="fstat-k">Overs</div></div>
-      <div class="fstat"><div class="fstat-v" id="bowl-matches" style="color:var(--muted2)">—</div><div class="fstat-k">Matches</div></div>
+      <div class="fstat"><div class="fstat-v" id="bowl-dot-pct" style="color:var(--acc2)">—</div><div class="fstat-k">Dot Ball %</div></div>
     </div>
+  </div>
+
+  <!-- BOWLING PHASE ANALYSIS -->
+  <div class="card span2" id="bowl-phase-card" style="display:none;">
+    <div class="ch"><div><div class="ct">Bowling <em>Phase Analysis</em></div><div class="csub">Economy & wickets across match phases</div></div></div>
+    <div class="insight-body">
+      <div class="phase-row">
+        <div class="phase-label"><div class="phase-name">Powerplay</div><div class="phase-overs">Overs 1–6</div></div>
+        <div class="phase-bar-wrap"><div class="phase-bar" id="bpp-bar" style="width:0%;background:var(--acc)"></div></div>
+        <div class="phase-stats">
+          <div class="phase-stat"><div class="phase-sv" id="bpp-econ" style="color:var(--acc)">—</div><div class="phase-sk">Econ</div></div>
+          <div class="phase-stat"><div class="phase-sv" id="bpp-wkts" style="color:var(--acc2)">—</div><div class="phase-sk">Wkts</div></div>
+        </div>
+      </div>
+      <div class="phase-row">
+        <div class="phase-label"><div class="phase-name">Middle</div><div class="phase-overs">Overs 7–15</div></div>
+        <div class="phase-bar-wrap"><div class="phase-bar" id="bmid-bar" style="width:0%;background:var(--acc3)"></div></div>
+        <div class="phase-stats">
+          <div class="phase-stat"><div class="phase-sv" id="bmid-econ" style="color:var(--acc3)">—</div><div class="phase-sk">Econ</div></div>
+          <div class="phase-stat"><div class="phase-sv" id="bmid-wkts" style="color:var(--acc2)">—</div><div class="phase-sk">Wkts</div></div>
+        </div>
+      </div>
+      <div class="phase-row">
+        <div class="phase-label"><div class="phase-name">Death</div><div class="phase-overs">Overs 16–20</div></div>
+        <div class="phase-bar-wrap"><div class="phase-bar" id="bdeath-bar" style="width:0%;background:var(--acc2)"></div></div>
+        <div class="phase-stats">
+          <div class="phase-stat"><div class="phase-sv" id="bdeath-econ" style="color:var(--acc2)">—</div><div class="phase-sk">Econ</div></div>
+          <div class="phase-stat"><div class="phase-sv" id="bdeath-wkts" style="color:var(--acc2)">—</div><div class="phase-sk">Wkts</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOST DISMISSED BATTERS -->
+  <div class="card span2" id="bowl-dismissed-card" style="display:none;">
+    <div class="ch"><div><div class="ct">Favourite <em>Victims</em></div><div class="csub">Batters dismissed most times in IPL career</div></div></div>
+    <div style="padding:16px 18px;" id="dismissed-list"></div>
   </div>
   <div class="card span2" id="bowl-none" style="display:none;">
     <div class="coming-soon">
@@ -1044,6 +1102,84 @@ function _loadInsights(pid) {
       el = document.getElementById('adv-fav-runs');     if(el) el.textContent = (d.fav_over_runs||0) + ' runs in over ' + (d.fav_over||'—') + ' across career';
       var sec = document.getElementById('adv-batting-section');
       if(sec) sec.style.display = '';
+    }).catch(function(){});
+
+  // Fetch season table
+  fetch(_kapi + '/player-season-table/' + pid)
+    .then(function(r){ return r.json(); })
+    .then(function(rows){
+      if(!rows.length) return;
+      var tbody = document.getElementById('season-table-body');
+      if(!tbody) return;
+      var maxRuns = Math.max.apply(null, rows.map(function(r){ return r.runs; }));
+      tbody.innerHTML = rows.map(function(r){
+        var barW = Math.round(r.runs / maxRuns * 100);
+        return '<tr style="border-bottom:1px solid var(--border);">'
+          + '<td style="padding:10px 18px;font-family:var(--font-d);font-size:16px;letter-spacing:.5px;">'
+            + r.season
+            + '<div style="height:3px;background:var(--s3);border-radius:2px;margin-top:4px;width:80px;">'
+            + '<div style="height:100%;background:var(--acc);border-radius:2px;width:'+barW+'%;transition:width .6s;"></div></div>'
+          + '</td>'
+          + '<td style="padding:10px 12px;text-align:right;font-size:13px;color:var(--muted2);">'+r.matches+'</td>'
+          + '<td style="padding:10px 12px;text-align:right;font-family:var(--font-d);font-size:16px;color:var(--acc);">'+r.runs+'</td>'
+          + '<td style="padding:10px 12px;text-align:right;font-family:var(--font-d);font-size:16px;color:var(--acc3);">'+r.avg+'</td>'
+          + '<td style="padding:10px 12px;text-align:right;font-family:var(--font-d);font-size:16px;color:var(--acc4);">'+r.sr+'</td>'
+          + '<td style="padding:10px 12px;text-align:right;font-size:13px;color:var(--muted2);">'+(r.fifties||0)+'</td>'
+          + '<td style="padding:10px 18px;text-align:right;font-size:13px;color:var(--acc2);">'+(r.hundreds||0)+'</td>'
+          + '</tr>';
+      }).join('');
+      var card = document.getElementById('season-table-card');
+      if(card) card.style.display = '';
+    }).catch(function(){});
+
+  // Fetch bowling advanced (phases + victims)
+  fetch(_kapi + '/player-bowling-advanced/' + pid)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.error) return;
+      var el;
+      // Dot ball %
+      el = document.getElementById('bowl-dot-pct'); if(el) el.textContent = (d.dot_pct||0) + '%';
+      // Phase bars
+      var phases = d.phases || {};
+      var pp = phases.powerplay || {}, mid = phases.middle || {}, death = phases.death || {};
+      var maxEcon = Math.max(pp.economy||0, mid.economy||0, death.economy||0, 1);
+      el = document.getElementById('bpp-econ');   if(el) el.textContent = pp.economy||'—';
+      el = document.getElementById('bpp-wkts');   if(el) el.textContent = pp.wickets||0;
+      el = document.getElementById('bmid-econ');  if(el) el.textContent = mid.economy||'—';
+      el = document.getElementById('bmid-wkts');  if(el) el.textContent = mid.wickets||0;
+      el = document.getElementById('bdeath-econ');if(el) el.textContent = death.economy||'—';
+      el = document.getElementById('bdeath-wkts');if(el) el.textContent = death.wickets||0;
+      setTimeout(function(){
+        el = document.getElementById('bpp-bar');    if(el) el.style.width = Math.round((pp.economy||0)/maxEcon*100)+'%';
+        el = document.getElementById('bmid-bar');   if(el) el.style.width = Math.round((mid.economy||0)/maxEcon*100)+'%';
+        el = document.getElementById('bdeath-bar'); if(el) el.style.width = Math.round((death.economy||0)/maxEcon*100)+'%';
+      }, 200);
+      var phaseCard = document.getElementById('bowl-phase-card');
+      if(phaseCard && d.total_wickets > 0) phaseCard.style.display = '';
+      // Favourite victims
+      var victims = d.top_dismissed || [];
+      if(victims.length) {
+        var maxT = victims[0].times;
+        var html = victims.map(function(v, i){
+          var barW = Math.round(v.times / maxT * 100);
+          var colors = ['var(--acc2)','var(--acc4)','var(--acc3)','var(--muted2)','var(--muted2)'];
+          return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">'
+            + '<div style="width:24px;font-family:var(--font-d);font-size:18px;color:var(--muted);text-align:center;">'+(i+1)+'</div>'
+            + '<div style="flex:1;">'
+            + '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">'
+            + '<span style="font-size:13px;font-weight:500;">'+v.batter+'</span>'
+            + '<span style="font-family:var(--font-d);font-size:16px;color:'+colors[i]+';">'+v.times+'×</span>'
+            + '</div>'
+            + '<div style="height:5px;background:var(--s3);border-radius:3px;">'
+            + '<div style="height:100%;background:'+colors[i]+';border-radius:3px;width:'+barW+'%;transition:width .6s;"></div>'
+            + '</div></div></div>';
+        }).join('');
+        var dl = document.getElementById('dismissed-list');
+        if(dl) dl.innerHTML = html;
+        var dc = document.getElementById('bowl-dismissed-card');
+        if(dc) dc.style.display = '';
+      }
     }).catch(function(){});
 
   // Fetch matchups

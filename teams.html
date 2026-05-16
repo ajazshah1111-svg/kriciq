@@ -127,9 +127,29 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
       <div class="td-stat"><div class="td-sv" id="td-matches">—</div><div class="td-sk">Matches</div></div>
       <div class="td-stat"><div class="td-sv" id="td-runs" style="color:var(--acc)">—</div><div class="td-sk">Total Runs</div></div>
       <div class="td-stat"><div class="td-sv" id="td-avgscore" style="color:var(--acc4)">—</div><div class="td-sk">Avg Score/Inn</div></div>
-      <div class="td-stat"><div class="td-sv" id="td-hundreds" style="color:var(--acc2)">—</div><div class="td-sk">Team 100s</div></div>
-      <div class="td-stat"><div class="td-sv" id="td-fifties" style="color:var(--acc3)">—</div><div class="td-sk">Team 50s</div></div>
+      <div class="td-stat"><div class="td-sv" id="td-winpct" style="color:var(--acc)">—</div><div class="td-sk">Win %</div></div>
+      <div class="td-stat"><div class="td-sv" id="td-wins" style="color:var(--acc3)">—</div><div class="td-sk">Wins</div></div>
       <div class="td-stat"><div class="td-sv" id="td-players">—</div><div class="td-sk">Players Used</div></div>
+    </div>
+
+    <!-- PHASE STATS + TOP PERFORMERS -->
+    <div id="team-analytics-section" style="display:none;padding:20px 28px;border-bottom:1px solid var(--border);">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+        <!-- Phase batting -->
+        <div>
+          <div style="font-family:var(--font-d);font-size:16px;letter-spacing:.5px;margin-bottom:12px;color:var(--muted2);">Phase <span style="color:var(--acc);">Batting</span></div>
+          <div id="team-phase-rows"></div>
+        </div>
+        <!-- Top batters -->
+        <div>
+          <div style="font-family:var(--font-d);font-size:16px;letter-spacing:.5px;margin-bottom:12px;color:var(--muted2);">Top <span style="color:var(--acc);">Run Scorers</span></div>
+          <div id="team-top-bat"></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-d);font-size:16px;letter-spacing:.5px;margin-bottom:12px;color:var(--muted2);">Top <span style="color:var(--acc2);">Wicket Takers</span></div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;" id="team-top-bowl"></div>
+      </div>
     </div>
     <div class="players-section">
       <div class="ps-title">Squad <em>Stats</em></div>
@@ -236,11 +256,77 @@ function selectTeam(teamId){
     document.getElementById('td-runs').textContent = ts.total_runs.toLocaleString();
     document.getElementById('td-avgscore').textContent = ts.avg_score_per_match || Math.round(ts.total_runs / ts.matches);
   }
-  document.getElementById('td-hundreds').textContent = '—';
-  document.getElementById('td-fifties').textContent  = '—';
+  document.getElementById('td-winpct').textContent = '—';
+  document.getElementById('td-wins').textContent   = '—';
+  document.getElementById('team-analytics-section').style.display = 'none';
 
-  // Load players
+  // Load analytics
+  loadTeamAnalytics(team);
   loadTeamPlayers(team);
+}
+
+// ── LOAD TEAM ANALYTICS ──
+function loadTeamAnalytics(team) {
+  var alias = team.aliases[0].replace(/ /g,'-');
+  fetch(_kapi+'/team-analytics/'+encodeURIComponent(alias))
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error) return;
+      document.getElementById('td-winpct').textContent = (d.win_pct||0) + '%';
+      document.getElementById('td-wins').textContent   = d.wins||0;
+
+      // Phase batting rows
+      var phases = d.phases || {};
+      var phaseData = [
+        {key:'powerplay', label:'Powerplay', overs:'1–6',  color:'var(--acc)'},
+        {key:'middle',    label:'Middle',    overs:'7–15', color:'var(--acc3)'},
+        {key:'death',     label:'Death',     overs:'16–20',color:'var(--acc2)'},
+      ];
+      var maxRpo = Math.max.apply(null, phaseData.map(function(p){ return (phases[p.key]||{}).rpo||0; })) || 1;
+      var phaseHtml = phaseData.map(function(p){
+        var ph = phases[p.key] || {};
+        var barW = Math.round((ph.rpo||0)/maxRpo*100);
+        return '<div style="margin-bottom:12px;">'
+          +'<div style="display:flex;justify-content:space-between;margin-bottom:4px;">'
+          +'<span style="font-size:12px;font-weight:600;">'+p.label+'</span>'
+          +'<span style="font-size:10px;color:var(--muted);">Overs '+p.overs+'</span>'
+          +'</div>'
+          +'<div style="display:flex;align-items:center;gap:10px;">'
+          +'<div style="flex:1;height:6px;background:var(--s3);border-radius:3px;">'
+          +'<div style="height:100%;background:'+p.color+';border-radius:3px;width:'+barW+'%;"></div>'
+          +'</div>'
+          +'<span style="font-family:var(--font-d);font-size:15px;color:'+p.color+';min-width:36px;text-align:right;">'+(ph.rpo||0)+'</span>'
+          +'<span style="font-size:9px;color:var(--muted);text-transform:uppercase;">RPO</span>'
+          +'</div></div>';
+      }).join('');
+      document.getElementById('team-phase-rows').innerHTML = phaseHtml;
+
+      // Top batters
+      var batHtml = (d.top_batters||[]).map(function(p,i){
+        var id = p.player.replace(/ /g,'-');
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">'
+          +'<a href="player.html?id='+id+'" style="color:var(--text);text-decoration:none;font-size:13px;font-weight:500;">'+p.player+'</a>'
+          +'<div style="display:flex;gap:16px;">'
+          +'<span style="font-family:var(--font-d);font-size:15px;color:var(--acc);">'+p.runs+'</span>'
+          +'<span style="font-size:11px;color:var(--muted2);">SR '+p.sr+'</span>'
+          +'</div></div>';
+      }).join('');
+      document.getElementById('team-top-bat').innerHTML = batHtml;
+
+      // Top bowlers
+      var bowlHtml = (d.top_bowlers||[]).map(function(p){
+        var id = p.player.replace(/ /g,'-');
+        return '<a href="player.html?id='+id+'" style="background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;text-decoration:none;display:block;">'
+          +'<div style="font-size:11px;color:var(--text);font-weight:500;margin-bottom:6px;line-height:1.3;">'+p.player+'</div>'
+          +'<div style="font-family:var(--font-d);font-size:22px;color:var(--acc2);">'+p.wickets+'</div>'
+          +'<div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Wickets</div>'
+          +'<div style="font-size:11px;color:var(--muted2);margin-top:4px;">Econ '+p.economy+'</div>'
+          +'</a>';
+      }).join('');
+      document.getElementById('team-top-bowl').innerHTML = bowlHtml;
+
+      document.getElementById('team-analytics-section').style.display = '';
+    }).catch(function(){});
 }
 
 // ── LOAD TEAM PLAYERS ──
@@ -277,12 +363,6 @@ function loadTeamPlayers(team){
     });
     players.sort(function(a,b){return b.runs-a.runs;});
     document.getElementById('td-players').textContent = players.length;
-    var totalH = players.reduce(function(s,p){return s+(p.hundreds||0);},0);
-    var totalF = players.reduce(function(s,p){return s+(p.fifties||0);},0);
-    var hasRealH = players.some(function(p){return (p.hundreds||0)>0;});
-    var hasRealF = players.some(function(p){return (p.fifties||0)>0;});
-    document.getElementById('td-hundreds').textContent = hasRealH ? totalH : '—';
-    document.getElementById('td-fifties').textContent  = hasRealF ? totalF : '—';
     renderPlayers(players, team);
   }).catch(function(){
     document.getElementById('players-container').innerHTML =
