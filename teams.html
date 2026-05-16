@@ -350,34 +350,36 @@ function loadBestXI(team){
         var col = roleColor[pos]||'var(--acc3)';
         var isBowler = pos==='Fast Bowler'||pos==='Spinner';
         var isAR = pos==='All-rounder';
+        var isWK = pos==='Wicket-keeper';
         var mainStat = isBowler
           ? '<div class="xi-stat" style="color:var(--acc2);">'+(p.wickets||0)+'<span style="font-size:11px;color:var(--muted);"> wkts</span></div>'
           : isAR
           ? '<div style="display:flex;gap:12px;"><div class="xi-stat" style="color:var(--acc);">'+(p.runs||0)+'<span style="font-size:11px;color:var(--muted);"> runs</span></div><div class="xi-stat" style="color:var(--acc2);">'+(p.wickets||0)+'<span style="font-size:11px;color:var(--muted);"> wkts</span></div></div>'
           : '<div class="xi-stat" style="color:var(--acc);">'+(p.runs||0)+'<span style="font-size:11px;color:var(--muted);"> runs</span></div>';
+        // Clean detail — remove redundant wickets text for AR/bowlers since shown above
+        var detail = p.detail || '';
+        if (isAR) detail = (p.avg||0)+' avg · '+(p.sr||0)+' SR';
         html += '<a href="player.html?id='+id+'" style="text-decoration:none;">'
           +'<div class="xi-card '+cls+'">'
-          +'<div class="xi-pos" style="color:'+col+';">'+(i+1)+'. '+pos+'</div>'
+          +'<div class="xi-pos" style="color:'+col+';">'+(i+1)+'. '+pos+(isWK?' 🧤':'')+'</div>'
           +'<div class="xi-name">'+p.player+'</div>'
           +mainStat
-          +'<div class="xi-detail">'+p.detail+'</div>'
+          +'<div class="xi-detail">'+detail+'</div>'
           +'</div></a>';
       });
-      html += '</div>';
 
-      // Impact player
+      // Impact player as card 12 in same grid
       if(impact){
         var impId = impact.player.replace(/ /g,'-');
         html += '<a href="player.html?id='+impId+'" style="text-decoration:none;">'
-          +'<div class="xi-impact-card">'
-          +'<div style="font-size:28px;">⚡</div>'
-          +'<div>'
-          +'<div style="font-size:9px;color:var(--acc4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">Impact Player</div>'
-          +'<div style="font-size:15px;font-weight:600;color:var(--text);">'+impact.player+'</div>'
-          +'<div style="font-size:11px;color:var(--muted2);">Impact Score: '+impact.impact+' · '+impact.runs+' runs @ SR '+impact.sr+'</div>'
-          +'</div></div></a>';
+          +'<div class="xi-card impact" style="border-color:rgba(247,201,72,.25);">'
+          +'<div class="xi-pos" style="color:var(--acc4);">⚡ Impact Player</div>'
+          +'<div class="xi-name">'+impact.player+'</div>'
+          +'<div class="xi-stat" style="color:var(--acc4);">'+impact.impact+'<span style="font-size:11px;color:var(--muted);"> score</span></div>'
+          +'<div class="xi-detail">'+impact.runs+' runs @ SR '+impact.sr+'</div>'
+          +'</div></a>';
       }
-
+      html += '</div>';
       document.getElementById('players-container').innerHTML = html;
     }).catch(function(){
       document.getElementById('players-container').innerHTML = '<div class="loading-msg">Could not build Best XI.</div>';
