@@ -749,17 +749,48 @@ function _hideResults() {
   if(heroStats) heroStats.style.display = 'flex';
 }
 
+var _nameAliases = {
+  'virat kohli':'V Kohli','rohit sharma':'RG Sharma','ms dhoni':'MS Dhoni',
+  'mahendra singh dhoni':'MS Dhoni','jasprit bumrah':'JJ Bumrah',
+  'hardik pandya':'HH Pandya','kl rahul':'KL Rahul','suresh raina':'SK Raina',
+  'ravindra jadeja':'RA Jadeja','shikhar dhawan':'S Dhawan',
+  'david warner':'DA Warner','ab de villiers':'AB de Villiers',
+  'chris gayle':'CH Gayle','shane watson':'SR Watson',
+  'rishabh pant':'RR Pant','sanju samson':'SV Samson',
+  'jos buttler':'JC Buttler','kane williamson':'KS Williamson',
+  'faf du plessis':'F du Plessis','dinesh karthik':'KD Karthik',
+  'ambati rayudu':'AT Rayudu','yuzvendra chahal':'YS Chahal',
+  'kuldeep yadav':'Kuldeep Yadav','bhuvneshwar kumar':'B Kumar',
+  'suryakumar yadav':'SA Yadav','washington sundar':'Washington Sundar',
+  'shubman gill':'Shubman Gill','ishan kishan':'IS Kishan',
+  'ruturaj gaikwad':'RD Gaikwad','yashasvi jaiswal':'YBK Jaiswal'
+};
+function _fuzzyMatch(player, q) {
+  var pl = player.toLowerCase();
+  var ql = q.toLowerCase().trim();
+  if (pl.indexOf(ql) !== -1) return true;
+  if (_nameAliases[ql] && player === _nameAliases[ql]) return true;
+  var plParts = pl.split(' ');
+  var plLast = plParts[plParts.length - 1];
+  var qlParts = ql.split(' ');
+  var qlLast = qlParts[qlParts.length - 1];
+  if (qlLast.length >= 3 && plLast.indexOf(qlLast) !== -1) return true;
+  if (qlParts.length > 1) {
+    var allMatch = qlParts.every(function(w) {
+      if (w.length < 2) return true;
+      return pl.indexOf(w) !== -1 || plParts.some(function(pp){ return pp[0] === w[0] && w.length <= 2; });
+    });
+    if (allMatch) return true;
+  }
+  return false;
+}
 function _runSearch(q) {
   if (!q || q.length < 2) { _hideResults(); return; }
-
-  // Use preloaded data if available
   if (_allPlayers.length) {
-    var filtered = _allPlayers.filter(function(p){ return p.player.toLowerCase().indexOf(q.toLowerCase()) !== -1; });
+    var filtered = _allPlayers.filter(function(p){ return _fuzzyMatch(p.player, q); });
     _renderResults(filtered);
     return;
   }
-
-  // Fallback to API
   clearTimeout(_t);
   _t = setTimeout(function(){
     fetch(_kapi + '/search/' + encodeURIComponent(q))
