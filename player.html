@@ -414,6 +414,23 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
           </div>
         </div>
         <div class="matchup-verdict" id="matchup-verdict"></div>
+        <!-- Chase vs Defend — added here to avoid duplicate SR display -->
+        <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="background:var(--bg);border-radius:8px;padding:12px;text-align:center;">
+            <div style="font-size:10px;color:var(--muted2);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;">🏹 Batting First</div>
+            <div style="font-family:var(--font-d);font-size:26px;color:var(--acc3);" id="adv-defend-sr">—</div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;">SR</div>
+            <div style="font-family:var(--font-d);font-size:16px;color:var(--text);margin-top:4px;" id="adv-defend-avg">—</div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;">Avg</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:12px;text-align:center;">
+            <div style="font-size:10px;color:var(--muted2);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;">🎯 Chasing</div>
+            <div style="font-family:var(--font-d);font-size:26px;color:var(--acc);" id="adv-chase-sr">—</div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;">SR</div>
+            <div style="font-family:var(--font-d);font-size:16px;color:var(--text);margin-top:4px;" id="adv-chase-avg">—</div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;">Avg</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -424,7 +441,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
 <div class="adv-strip" id="adv-batting-section" style="display:none;">
   <div class="adv-inner">
     <div class="adv-section-title">Advanced <em>Batting</em></div>
-    <!-- Row 1: 3 key metrics -->
     <div class="adv-row1">
       <div class="adv-box green">
         <div class="adv-icon">🎯</div>
@@ -438,43 +454,11 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px
         <div class="adv-key">Boundary %</div>
         <div class="adv-sub">Runs from 4s &amp; 6s</div>
       </div>
-      <div class="adv-box red">
-        <div class="adv-icon">⏸</div>
-        <div class="adv-val" id="adv-dot-pct" style="color:var(--acc2)">—</div>
-        <div class="adv-key">Dot Ball %</div>
-        <div class="adv-sub">Balls scored 0</div>
-      </div>
-    </div>
-    <!-- Row 2: Chase vs Defend + Fav Over -->
-    <div class="chase-row">
-      <div class="chase-box">
-        <div class="chase-head">🏹 Batting First</div>
-        <div class="chase-stats">
-          <div class="chase-big" id="adv-defend-sr" style="color:var(--acc3)">—</div>
-          <div class="chase-mini-wrap">
-            <div><div class="chase-mv" id="adv-defend-avg" style="color:var(--text)">—</div><div class="chase-mk">Avg</div></div>
-            <div style="font-size:9px;color:var(--muted);margin-top:2px;">Strike Rate</div>
-          </div>
-        </div>
-      </div>
-      <div class="chase-box">
-        <div class="chase-head">🎯 Chasing</div>
-        <div class="chase-stats">
-          <div class="chase-big" id="adv-chase-sr" style="color:var(--acc)">—</div>
-          <div class="chase-mini-wrap">
-            <div><div class="chase-mv" id="adv-chase-avg" style="color:var(--text)">—</div><div class="chase-mk">Avg</div></div>
-            <div style="font-size:9px;color:var(--muted);margin-top:2px;">Strike Rate</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Favourite Over -->
-    <div class="fav-over-box">
-      <div class="fav-over-num" id="adv-fav-over">—</div>
-      <div>
-        <div class="fav-over-label">Favourite Over</div>
-        <div style="font-size:13px;color:var(--text);font-weight:600;margin-bottom:3px;">Most productive over in career</div>
-        <div class="fav-over-runs" id="adv-fav-runs">Loading...</div>
+      <div class="adv-box blue">
+        <div class="adv-icon">⭐</div>
+        <div class="adv-val" id="adv-fav-over" style="color:var(--acc3)">—</div>
+        <div class="adv-key">Favourite Over</div>
+        <div class="adv-sub" id="adv-fav-runs">Most runs in career</div>
       </div>
     </div>
   </div>
@@ -1034,14 +1018,13 @@ function _loadInsights(pid) {
       if(d.error) return;
       var el;
       el = document.getElementById('adv-boundary-pct'); if(el) el.textContent = (d.boundary_pct||0) + '%';
-      el = document.getElementById('adv-dot-pct');      if(el) el.textContent = (d.dot_pct||0) + '%';
       el = document.getElementById('adv-impact');       if(el) el.textContent = (d.impact_score||0);
       el = document.getElementById('adv-defend-sr');    if(el) el.textContent = (d.defend_sr||0);
       el = document.getElementById('adv-defend-avg');   if(el) el.textContent = (d.defend_avg||0);
       el = document.getElementById('adv-chase-sr');     if(el) el.textContent = (d.chase_sr||0);
       el = document.getElementById('adv-chase-avg');    if(el) el.textContent = (d.chase_avg||0);
       el = document.getElementById('adv-fav-over');     if(el) el.textContent = 'Over ' + (d.fav_over||'—');
-      el = document.getElementById('adv-fav-runs');     if(el) el.textContent = (d.fav_over_runs||0) + ' runs scored in over ' + (d.fav_over||'—') + ' across career';
+      el = document.getElementById('adv-fav-runs');     if(el) el.textContent = (d.fav_over_runs||0) + ' runs in over ' + (d.fav_over||'—') + ' across career';
       var sec = document.getElementById('adv-batting-section');
       if(sec) sec.style.display = '';
     }).catch(function(){});
