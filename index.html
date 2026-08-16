@@ -39,8 +39,8 @@ nav{
   background:rgba(7,9,15,.95);border-bottom:1px solid var(--border);
   backdrop-filter:blur(20px);
 }
-.logo{font-family:var(--font-d);font-size:24px;letter-spacing:3px;color:var(--acc);text-decoration:none;}
-.logo em{color:var(--text);font-style:normal;}
+.logo{font-family:var(--font-b);font-size:20px;font-weight:700;letter-spacing:1px;color:var(--text);text-decoration:none;}
+.logo span{color:var(--acc);}
 .nav-links{display:flex;gap:2px;}
 .nl{padding:6px 12px;border-radius:6px;font-size:13px;color:var(--muted2);cursor:pointer;transition:.15s;text-decoration:none;display:block;}
 .nl:hover{color:var(--text);background:var(--s2);}
@@ -66,8 +66,36 @@ nav{
   position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(0,245,170,.04) 0%,transparent 70%);
 }
-.hero h1{font-family:var(--font-d);font-size:clamp(42px,7vw,80px);line-height:.95;letter-spacing:2px;margin-bottom:10px;}
+.hero h1{font-family:var(--font-b);font-size:clamp(48px,8vw,88px);font-weight:700;line-height:1;letter-spacing:-2px;margin-bottom:10px;}
 .hero h1 span{color:var(--acc);}
+
+/* GAME */
+.game-section{padding:40px 24px 0;max-width:600px;margin:0 auto;}
+.game-wrap{background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.game-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.game-title{font-family:var(--font-b);font-size:14px;font-weight:600;color:var(--text);}
+.game-title span{color:var(--acc);}
+.game-score{font-family:var(--font-d);font-size:22px;color:var(--acc4);letter-spacing:1px;}
+.game-body{padding:20px;}
+.game-player{display:flex;align-items:center;gap:14px;padding:14px 0;}
+.game-avatar{width:44px;height:44px;border-radius:10px;background:var(--s2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:16px;flex-shrink:0;}
+.game-pname{font-size:14px;font-weight:500;}
+.game-pstat{font-family:var(--font-d);font-size:22px;margin-top:2px;}
+.game-vs{text-align:center;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:4px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:4px 0;}
+.game-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+.game-btn{padding:12px;border:1px solid var(--border2);border-radius:8px;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;background:var(--s2);color:var(--text);transition:.15s;letter-spacing:.3px;}
+.game-btn:hover{background:var(--s3);}
+.game-btn.higher{border-color:rgba(0,245,170,.3);color:var(--acc);}
+.game-btn.lower{border-color:rgba(255,85,51,.3);color:var(--acc2);}
+.game-btn.correct{background:rgba(0,245,170,.15);border-color:var(--acc);}
+.game-btn.wrong{background:rgba(255,85,51,.15);border-color:var(--acc2);}
+.game-result{text-align:center;padding:10px;font-size:13px;font-weight:500;border-radius:6px;margin-top:8px;display:none;}
+.game-result.show{display:block;}
+.game-result.correct{background:rgba(0,245,170,.1);color:var(--acc);}
+.game-result.wrong{background:rgba(255,85,51,.1);color:var(--acc2);}
+.game-over{text-align:center;padding:20px;display:none;}
+.game-over.show{display:block;}
+.game-restart{margin-top:12px;padding:10px 24px;background:var(--acc);border:none;border-radius:8px;font-family:var(--font-b);font-size:13px;font-weight:600;color:#000;cursor:pointer;}
 .hero-sub{font-size:14px;color:var(--muted2);margin-bottom:28px;}
 
 /* SEARCH */
@@ -200,7 +228,7 @@ nav{
 
 <!-- NAV -->
 <nav>
-  <a href="index.html" class="logo">Kric<em>IQ</em></a>
+  <a href="index.html" class="logo">Kric<span>IQ</span></a>
   <div class="nav-links">
     <a href="index.html" class="nl active">Home</a>
     <a href="teams.html" class="nl">Teams</a>
@@ -301,6 +329,24 @@ nav{
       <tr><td colspan="8" style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">Loading…</td></tr>
     </tbody>
   </table>
+</div>
+
+<!-- HIGHER OR LOWER GAME -->
+<div class="game-section fade-up d4">
+  <div class="game-wrap">
+    <div class="game-head">
+      <div><div class="game-title">Higher or <span>Lower?</span></div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Does Player B have more or fewer IPL runs?</div></div>
+      <div><div class="game-score" id="game-score">0</div><div style="font-size:9px;color:var(--muted);text-align:center;letter-spacing:.5px;">SCORE</div></div>
+    </div>
+    <div class="game-body" id="game-body">
+      <div class="game-player"><div class="game-avatar" id="g-av-a" style="color:var(--acc)">VK</div><div><div class="game-pname" id="g-name-a">Loading2026</div><div class="game-pstat" style="color:var(--acc)" id="g-runs-a">2014</div></div></div>
+      <div class="game-vs">vs</div>
+      <div class="game-player"><div class="game-avatar" id="g-av-b" style="color:var(--acc3)">??</div><div><div class="game-pname" id="g-name-b">2014</div><div class="game-pstat" style="color:var(--muted)" id="g-runs-b">??? IPL runs</div></div></div>
+      <div class="game-btns" id="game-btns"><button class="game-btn higher" onclick="_gameGuess('higher')"><!-- QUICK H2H -->#8593; HIGHER</button><button class="game-btn lower" onclick="_gameGuess('lower')"><!-- QUICK H2H -->#8595; LOWER</button></div>
+      <div class="game-result" id="game-result"></div>
+    </div>
+    <div class="game-over" id="game-over"><div style="font-size:28px;margin-bottom:8px;"><!-- QUICK H2H -->#127955;</div><div style="font-size:16px;font-weight:600;" id="go-msg">Game Over!</div><div style="font-size:13px;color:var(--muted2);margin-top:4px;" id="go-score"></div><button class="game-restart" onclick="_gameStart()">Play Again</button></div>
+  </div>
 </div>
 
 <!-- QUICK H2H -->
@@ -473,9 +519,10 @@ window.addEventListener('DOMContentLoaded',function(){
 });
 
 // ── TOP BATTERS ──
-fetch(_kapi+'/top-batters')
+fetch(_kapi+'/top-batters?limit=5')
   .then(function(r){return r.json();})
   .then(function(data){
+    data = data.slice(0,5);
     var maxRuns = data.length ? data[0].runs : 1;
     var tbody = document.getElementById('batters-body');
     tbody.innerHTML = data.map(function(p,i){
@@ -502,6 +549,7 @@ fetch(_kapi+'/top-batters')
 fetch(_kapi+'/top-bowlers')
   .then(function(r){return r.json();})
   .then(function(data){
+    data = data.slice(0,5);
     var maxWkts = data.length ? data[0].wickets : 1;
     var tbody = document.getElementById('bowlers-body');
     tbody.innerHTML = data.map(function(p,i){
@@ -546,28 +594,103 @@ var _tickerItems = [
   wrap.style.display = 'flex';
 })();
 
-// ── POTD ──
-fetch(_kapi+'/player_of_day')
-  .then(function(r){return r.json();})
-  .then(function(data){
-    var el = document.createElement('a');
-    el.href = 'player.html?id='+data.player.replace(/ /g,'-');
-    el.className = 'potd-bar';
-    el.innerHTML = '<div class="potd-left">'
-      +'<span class="potd-badge">🔥 POTD</span>'
-      +'<span class="potd-name">'+data.player+'</span>'
-      +'</div>'
-      +'<div class="potd-stats">'
-      +'<div class="potd-stat"><span class="potd-val">'+Math.round(data.runs).toLocaleString()+'</span><span class="potd-key">RUNS</span></div>'
-      +'<div class="potd-stat"><span class="potd-val">'+data.average+'</span><span class="potd-key">AVG</span></div>'
-      +'<div class="potd-stat"><span class="potd-val">'+data.strike_rate+'</span><span class="potd-key">SR</span></div>'
-      +'<div class="potd-stat"><span class="potd-val">'+(data.hundreds||0)+'</span><span class="potd-key">100s</span></div>'
-      +'<div class="potd-stat"><span class="potd-val">'+(data.fifties||0)+'</span><span class="potd-key">50s</span></div>'
-      +'</div>';
-    var ticker = document.getElementById('ticker-wrap');
-    if(ticker && ticker.nextSibling) ticker.parentNode.insertBefore(el, ticker.nextSibling);
-    else document.body.insertBefore(el, document.body.children[1]);
-  }).catch(function(){});
+// ── HIGHER OR LOWER GAME ──
+var _gamePlayers = [];
+var _gameScore   = 0;
+var _gameBest    = parseInt(localStorage.getItem('kriciq_best')||'0');
+var _gameA, _gameB, _gameLocked;
+var _gColors = ['var(--acc)','var(--acc3)','var(--acc4)','var(--acc2)','rgba(180,120,255,.9)'];
+
+function _gInit(n){ return n.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase(); }
+
+function _gameStart(){
+  _gameScore  = 0;
+  _gameLocked = false;
+  document.getElementById('game-score').textContent = '0';
+  document.getElementById('game-over').style.display  = 'none';
+  document.getElementById('game-body').style.display  = '';
+  document.getElementById('game-result').className = 'game-result';
+  document.querySelectorAll('.game-btn').forEach(function(b){ b.className = b.dataset.base; });
+  _gameNext();
+}
+
+function _gameNext(){
+  if(_gamePlayers.length < 10) return;
+  _gameLocked = false;
+  document.getElementById('game-result').className = 'game-result';
+  document.querySelectorAll('.game-btn').forEach(function(b){ b.className = b.dataset.base || b.className.replace(' correct','').replace(' wrong',''); });
+
+  // Pick two different random players with decent runs (min 500)
+  var pool = _gamePlayers.filter(function(p){ return p.runs >= 500; });
+  var idxA = Math.floor(Math.random()*pool.length);
+  var idxB;
+  do { idxB = Math.floor(Math.random()*pool.length); } while(idxB===idxA);
+  _gameA = pool[idxA];
+  _gameB = pool[idxB];
+
+  var cA = _gColors[idxA % _gColors.length];
+  var cB = _gColors[idxB % _gColors.length];
+
+  document.getElementById('g-av-a').textContent  = _gInit(_gameA.player);
+  document.getElementById('g-av-a').style.color  = cA;
+  document.getElementById('g-name-a').textContent = _gameA.player;
+  document.getElementById('g-runs-a').textContent = Math.round(_gameA.runs).toLocaleString() + ' IPL runs';
+  document.getElementById('g-runs-a').style.color = cA;
+
+  document.getElementById('g-av-b').textContent  = _gInit(_gameB.player);
+  document.getElementById('g-av-b').style.color  = cB;
+  document.getElementById('g-name-b').textContent = _gameB.player;
+  document.getElementById('g-runs-b').textContent = '??? IPL runs';
+  document.getElementById('g-runs-b').style.color = 'var(--muted)';
+}
+
+function _gameGuess(guess){
+  if(_gameLocked || !_gameA || !_gameB) return;
+  _gameLocked = true;
+  var correct = (guess==='higher' && _gameB.runs >= _gameA.runs) ||
+                (guess==='lower'  && _gameB.runs <= _gameA.runs);
+
+  // Reveal B's runs
+  document.getElementById('g-runs-b').textContent = Math.round(_gameB.runs).toLocaleString() + ' IPL runs';
+  document.getElementById('g-runs-b').style.color = correct ? 'var(--acc)' : 'var(--acc2)';
+
+  // Show result message
+  var res = document.getElementById('game-result');
+  if(correct){
+    _gameScore++;
+    document.getElementById('game-score').textContent = _gameScore;
+    if(_gameScore > _gameBest){ _gameBest = _gameScore; localStorage.setItem('kriciq_best',_gameBest); }
+    res.textContent = '✓ Correct! +1';
+    res.className   = 'game-result show correct';
+    setTimeout(_gameNext, 1600);
+  } else {
+    res.textContent = '✗ Wrong — ' + _gameB.player + ' scored ' + Math.round(_gameB.runs).toLocaleString();
+    res.className   = 'game-result show wrong';
+    setTimeout(function(){
+      document.getElementById('game-body').style.display = 'none';
+      var go = document.getElementById('game-over');
+      go.style.display = 'block';
+      document.getElementById('go-msg').textContent = 'Game Over — Score: ' + _gameScore;
+      document.getElementById('go-score').textContent = 'Best: ' + _gameBest + ' correct in a row';
+    }, 1800);
+  }
+}
+
+// Load players for game when ready
+(function(){
+  if(_allPlayers.length) { _gamePlayers = _allPlayers; _gameNext(); return; }
+  // Wait for player list to load
+  var check = setInterval(function(){
+    if(_allPlayers.length){
+      clearInterval(check);
+      _gamePlayers = _allPlayers;
+      _gameStart();
+    }
+  }, 300);
+})();
+
+// Store base classes for buttons
+document.querySelectorAll('.game-btn').forEach(function(b){ b.dataset.base = b.className; });
 </script>
 </body>
 </html>
