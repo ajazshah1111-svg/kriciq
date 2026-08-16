@@ -715,6 +715,17 @@ function _switchFormat(fmt, btn) {
   el=document.getElementById('stat-dots');    if(el) el.textContent=dotPct>0?dotPct.toFixed(1)+'%':'—';
   el=document.getElementById('badge-bat');    if(el) el.textContent=runs.toLocaleString()+' runs';
 
+  // ── HERO TAGS + FORM SCORE ──
+  var role = _autoRole(avg, sr, sixes);
+  el=document.getElementById('tag-role');  if(el) el.textContent = role;
+  el=document.getElementById('tag-hs');    if(el) el.textContent = 'Best: ' + (hs || '—');
+  el=document.getElementById('tag-dots');  if(el) el.textContent = dotPct > 0 ? 'Dot%: ' + dotPct.toFixed(1) + '%' : '';
+  var score = _formScore(avg, sr);
+  var numEl = document.querySelector('.form-num');
+  var ringCircle = document.querySelectorAll('.form-ring circle')[1];
+  if(numEl) numEl.textContent = score;
+  if(ringCircle) ringCircle.setAttribute('stroke-dashoffset', _ringOffset(score));
+
   // ── BOWLING STATS ──
   var bw = d.bowling;
   var bsub = document.getElementById('bowl-sub');
