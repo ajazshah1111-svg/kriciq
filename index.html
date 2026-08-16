@@ -55,13 +55,10 @@ nav{
   text-align:center;position:relative;
 }
 .hero-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(0,245,170,.04) 0%,transparent 70%);}
-.hero-logo{display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
-.hero-logo img{height:72px;display:block;}
-.hero-wordmark{font-family:var(--font-b);font-weight:700;font-size:clamp(52px,9vw,96px);letter-spacing:-2px;line-height:1;margin-left:16px;}
+.hero-wordmark{font-family:var(--font-b);font-weight:700;font-size:clamp(56px,10vw,104px);letter-spacing:-3px;line-height:1;margin-bottom:10px;}
 .hero-wordmark span{color:var(--acc);}
-.hero-tagline{font-family:var(--font-d);font-size:clamp(16px,2.5vw,22px);letter-spacing:2px;color:var(--muted2);margin-bottom:6px;}
+.hero-tagline{font-family:var(--font-d);font-size:clamp(14px,2vw,18px);letter-spacing:3px;color:var(--muted2);margin-bottom:6px;}
 .hero-sub{font-size:13px;color:var(--muted);margin-bottom:28px;}
-@media(max-width:500px){.hero-logo img{height:52px;}.hero-wordmark{font-size:48px;margin-left:10px;}}
 
 /* SEARCH */
 .search-wrap{width:100%;max-width:600px;position:relative;margin-bottom:16px;}
@@ -199,17 +196,14 @@ nav{
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
-  <div class="hero-logo fade-up">
-    <img src="logo.png" alt="KricIQ logo"/>
-    <div class="hero-wordmark">Kric<span>IQ</span></div>
-  </div>
-  <div class="hero-tagline fade-up d2">CRICKET INTELLIGENCE PLATFORM</div>
+  <div class="hero-wordmark fade-up">Kric<span>IQ</span></div>
+  <div class="hero-tagline fade-up d2">THE CRICKET ANALYTICS PLATFORM</div>
   <div class="hero-sub fade-up d2">Search any player across IPL · ODI · T20I · Test</div>
 
   <div class="search-wrap fade-up d3">
     <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <input id="hero-search" class="search-box" type="text" placeholder="Search player — Kohli, Bumrah, Rohit…" autocomplete="off"/>
-    <button id="hero-btn" class="search-btn">SEARCH</button>
+    <button class="search-btn" onclick="clearTimeout(_t);_doSearch(document.getElementById('hero-search').value.trim())">SEARCH</button>
   </div>
   <div class="search-tags" id="search-tags">
     <span class="search-tag" onclick="fillSearch('Kohli')">V Kohli</span>
@@ -465,11 +459,9 @@ document.querySelectorAll('.srp-pill').forEach(function(btn){
 
 window.addEventListener('DOMContentLoaded',function(){
   var inp=document.getElementById('hero-search');
-  var btn=document.getElementById('hero-btn');
   if(!inp) return;
   inp.addEventListener('input',function(){clearTimeout(_t);var q=this.value.trim();_t=setTimeout(function(){_doSearch(q);},180);});
   inp.addEventListener('keydown',function(e){if(e.key==='Enter'){clearTimeout(_t);_doSearch(this.value.trim());}if(e.key==='Escape'){this.value='';_hideResults();}});
-  if(btn) btn.addEventListener('click',function(){clearTimeout(_t);_doSearch(document.getElementById('hero-search').value.trim());});
 });
 
 // ── TOP 5 BATTERS ──

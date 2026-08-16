@@ -746,6 +746,19 @@ function _switchFormat(fmt, btn) {
     el=document.getElementById('badge-bowl'); if(el) el.textContent = '—';
   }
 
+  // ── FIELDING STATS ──
+  var dismissals_f = d.dismissals ? Math.round(d.dismissals) : 0;
+  var innings_f    = d.innings    ? Math.round(d.innings)    : matches;
+  var disRate_f    = innings_f > 0 ? (dismissals_f / innings_f).toFixed(2) : '—';
+  var impact_f     = matches  > 0 ? (dismissals_f / matches).toFixed(2)   : '—';
+  el=document.getElementById('field-dismissals'); if(el) el.textContent = dismissals_f;
+  el=document.getElementById('field-innings');    if(el) el.textContent = innings_f;
+  el=document.getElementById('field-dis-rate');   if(el) el.textContent = disRate_f;
+  el=document.getElementById('field-impact');     if(el) el.textContent = impact_f;
+  el=document.getElementById('badge-field');      if(el) el.textContent = dismissals_f + ' dis';
+  var fsub = document.getElementById('field-sub');
+  if(fsub) fsub.textContent = fmtLabel + ' career — ' + dismissals_f + ' dismissals in ' + matches + ' matches';
+
   // ── AI INSIGHT ──
   _loadAiInsight(_currentPlayerName || _currentPid.replace(/-/g,' '), runs, matches, avg, sr, hundreds, fifties, fmt);
 
