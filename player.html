@@ -652,8 +652,26 @@ function _switchFormat(fmt, btn) {
   document.querySelectorAll('.fmt-btn').forEach(function(b){ b.classList.remove('active'); });
   if(btn) btn.classList.add('active');
 
-  var d = _formatsData[fmt];
   var fmtLabel = fmt.toUpperCase();
+
+  // Update format pill in hero
+  var tagTeam = document.getElementById('tag-team');
+  if(tagTeam) tagTeam.textContent = fmtLabel;
+
+  // Show / hide IPL-only sections
+  var iplOnlyIds = ['insight-strip','adv-batting-section','season-table-card','bowl-phase-card','bowl-dismissed-card'];
+  iplOnlyIds.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.style.display = (fmt === 'ipl') ? '' : 'none';
+  });
+  // Season trend chart card (target via canvas parent)
+  var trendCanvas = document.getElementById('trendChart');
+  if(trendCanvas && trendCanvas.closest) {
+    var trendCard = trendCanvas.closest('.card');
+    if(trendCard) trendCard.style.display = (fmt === 'ipl') ? '' : 'none';
+  }
+
+  var d = _formatsData[fmt];
 
   if(!d) {
     // No data for this format
@@ -662,17 +680,20 @@ function _switchFormat(fmt, btn) {
     });
     var lbl = document.getElementById('stat-runs-lbl');
     if(lbl) lbl.textContent = fmtLabel + ' Runs';
-    // Update trend chart subtitle
-    var sub = document.querySelector('#tab-batting .card.span2 .ch .csub');
-    if(sub) sub.textContent = 'No ' + fmtLabel + ' data available for this player';
+    var bsub = document.getElementById('bowl-sub');
+    if(bsub) bsub.textContent = 'No ' + fmtLabel + ' data available';
+    ['bowl-wickets','bowl-economy','bowl-avg','bowl-sr','bowl-overs','bowl-dot-pct'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.textContent = '—';
+    });
     return;
   }
 
+  // ── BATTING STATS ──
   var runs     = d.runs          ? Math.round(d.runs)          : 0;
   var matches  = d.matches       ? Math.round(d.matches)       : 0;
   var avg      = d.average       ? parseFloat(d.average)       : 0;
   var sr       = d.strike_rate   ? parseFloat(d.strike_rate)   : 0;
-  var hundreds = d.hundreds      !== undefined ? Math.round(d.hundreds)      : 0;
+  var hundreds = d.hundreds      !== undefined ? Math.round(d.hundreds) : 0;
   var fifties  = d.fifties       ? Math.round(d.fifties)       : 0;
   var fours    = d.fours         ? Math.round(d.fours)         : 0;
   var sixes    = d.sixes         ? Math.round(d.sixes)         : 0;
@@ -692,25 +713,41 @@ function _switchFormat(fmt, btn) {
   el=document.getElementById('stat-100s');    if(el) el.textContent=hundreds;
   el=document.getElementById('stat-50s');     if(el) el.textContent=fifties;
   el=document.getElementById('stat-dots');    if(el) el.textContent=dotPct>0?dotPct.toFixed(1)+'%':'—';
+  el=document.getElementById('badge-bat');    if(el) el.textContent=runs.toLocaleString()+' runs';
 
-  // Update stat bar "Runs" label badge
-  el=document.getElementById('badge-bat'); if(el) el.textContent=runs.toLocaleString()+' runs';
+  // ── BOWLING STATS ──
+  var bw = d.bowling;
+  var bsub = document.getElementById('bowl-sub');
+  if(bw && bw.wickets) {
+    if(bsub) bsub.textContent = fmtLabel + ' career bowling statistics';
+    var dots = (bw.dots && bw.balls) ? Math.round(bw.dots * 100 / bw.balls) : 0;
+    el=document.getElementById('bowl-wickets');  if(el) el.textContent = bw.wickets;
+    el=document.getElementById('bowl-economy');  if(el) el.textContent = bw.economy ? parseFloat(bw.economy).toFixed(2) : '—';
+    el=document.getElementById('bowl-avg');      if(el) el.textContent = bw.bowling_avg ? parseFloat(bw.bowling_avg).toFixed(2) : '—';
+    el=document.getElementById('bowl-sr');       if(el) el.textContent = bw.bowling_sr ? parseFloat(bw.bowling_sr).toFixed(1) : '—';
+    el=document.getElementById('bowl-overs');    if(el) el.textContent = bw.overs || '—';
+    el=document.getElementById('bowl-dot-pct');  if(el) el.textContent = dots ? dots + '%' : '—';
+    el=document.getElementById('badge-bowl');    if(el) el.textContent = bw.wickets + ' wkts';
+    el=document.getElementById('bowl-none');     if(el) el.style.display = 'none';
+    el=document.getElementById('bowling-card');  if(el) el.style.display = '';
+  } else {
+    if(bsub) bsub.textContent = 'No ' + fmtLabel + ' bowling data';
+    ['bowl-wickets','bowl-economy','bowl-avg','bowl-sr','bowl-overs','bowl-dot-pct'].forEach(function(id){
+      var bel = document.getElementById(id); if(bel) bel.textContent = '—';
+    });
+    el=document.getElementById('badge-bowl'); if(el) el.textContent = '—';
+  }
 
-  // Update trend chart subtitle
-  var sub = document.querySelector('#tab-batting .card.span2 .ch .csub');
-  if(sub) sub.textContent = fmtLabel + ' career — ' + runs.toLocaleString() + ' total runs across ' + matches + ' matches';
-
-  // Load AI insight for this format
+  // ── AI INSIGHT ──
   _loadAiInsight(_currentPlayerName || _currentPid.replace(/-/g,' '), runs, matches, avg, sr, hundreds, fifties, fmt);
 
-  // Rebuild charts for this format
+  // ── CHARTS ──
   if(fmt === 'ipl') {
     fetch(_kapi + '/player-seasons/' + _currentPid)
       .then(function(r){ return r.json(); })
       .then(function(seasonData){ _buildCharts(avg, sr, hundreds, matches, seasonData); })
       .catch(function(){ _buildCharts(avg, sr, hundreds, matches, []); });
   } else {
-    // Non-IPL: build charts from career stats (no ball-by-ball data)
     _buildCharts(avg, sr, hundreds, matches, []);
   }
 }
