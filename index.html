@@ -3,23 +3,17 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>KricIQ — Cricket Intelligence Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<!-- Google tag (gtag.js) -->
+<title>KricIQ — Cricket Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BBV9PK60VK"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-BBV9PK60VK');
-</script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-BBV9PK60VK');</script>
 <style>
-:root {
-  --bg:#07090f; --s1:#0d1018; --s2:#141820; --s3:#1c2230;
-  --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.12);
-  --acc:#00f5aa; --acc2:#ff5533; --acc3:#4d9fff; --acc4:#f7c948;
-  --text:#eef0f5; --muted:#5a6275; --muted2:#8892a4;
-  --font-d:'Bebas Neue',sans-serif; --font-b:'Outfit',sans-serif;
+:root{
+  --bg:#07090f;--s1:#0d1018;--s2:#141820;--s3:#1c2230;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
+  --acc:#00f5aa;--acc2:#ff5533;--acc3:#4d9fff;--acc4:#f7c948;
+  --text:#eef0f5;--muted:#5a6275;--muted2:#8892a4;
+  --font-d:'Bebas Neue',sans-serif;--font-b:'Outfit',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
@@ -36,13 +30,13 @@ nav{
   position:fixed;top:0;left:0;right:0;z-index:200;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 24px;height:56px;
-  background:rgba(7,9,15,.95);border-bottom:1px solid var(--border);
+  background:rgba(7,9,15,.96);border-bottom:1px solid var(--border);
   backdrop-filter:blur(20px);
 }
-.logo{font-family:var(--font-b);font-size:20px;font-weight:700;letter-spacing:1px;color:var(--text);text-decoration:none;}
-.logo span{color:var(--acc);}
+.nav-logo{display:flex;align-items:center;text-decoration:none;}
+.nav-logo img{height:40px;display:block;}
 .nav-links{display:flex;gap:2px;}
-.nl{padding:6px 12px;border-radius:6px;font-size:13px;color:var(--muted2);cursor:pointer;transition:.15s;text-decoration:none;display:block;}
+.nl{padding:6px 12px;border-radius:6px;font-size:13px;color:var(--muted2);text-decoration:none;transition:.15s;}
 .nl:hover{color:var(--text);background:var(--s2);}
 .nl.active{color:var(--acc);}
 @media(max-width:768px){.nav-links{display:none;}}
@@ -50,69 +44,32 @@ nav{
 /* TICKER */
 .ticker-wrap{background:rgba(0,245,170,.05);border-bottom:1px solid rgba(0,245,170,.1);height:34px;overflow:hidden;display:flex;align-items:center;}
 .ticker-label{background:var(--acc);color:#000;font-size:10px;font-weight:700;padding:4px 12px;letter-spacing:1px;white-space:nowrap;flex-shrink:0;height:100%;display:flex;align-items:center;}
-.ticker-track{display:flex;animation:ticker 35s linear infinite;width:max-content;}
+.ticker-track{display:flex;animation:ticker 40s linear infinite;width:max-content;}
 .ticker-item{font-size:12px;color:var(--muted2);padding:0 24px;white-space:nowrap;display:flex;align-items:center;gap:8px;}
-.ticker-item .hi{color:var(--acc);font-weight:600;}
-.ticker-item .nm{color:var(--text);}
 .ticker-dot{width:3px;height:3px;border-radius:50%;background:var(--muted);flex-shrink:0;}
 
-/* HERO — compact */
+/* HERO */
 .hero{
-  padding:90px 24px 48px;
+  padding:96px 24px 44px;
   display:flex;flex-direction:column;align-items:center;
   text-align:center;position:relative;
 }
-.hero-bg{
-  position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(0,245,170,.04) 0%,transparent 70%);
-}
-.hero h1{font-family:var(--font-b);font-size:clamp(48px,8vw,88px);font-weight:700;line-height:1;letter-spacing:-2px;margin-bottom:10px;}
-.hero h1 span{color:var(--acc);}
-
-/* GAME */
-.game-section{padding:40px 24px 0;max-width:600px;margin:0 auto;}
-.game-wrap{background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
-.game-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.game-title{font-family:var(--font-b);font-size:14px;font-weight:600;color:var(--text);}
-.game-title span{color:var(--acc);}
-.game-score{font-family:var(--font-d);font-size:22px;color:var(--acc4);letter-spacing:1px;}
-.game-body{padding:20px;}
-.game-player{display:flex;align-items:center;gap:14px;padding:14px 0;}
-.game-avatar{width:44px;height:44px;border-radius:10px;background:var(--s2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:16px;flex-shrink:0;}
-.game-pname{font-size:14px;font-weight:500;}
-.game-pstat{font-family:var(--font-d);font-size:22px;margin-top:2px;}
-.game-vs{text-align:center;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:4px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:4px 0;}
-.game-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
-.game-btn{padding:12px;border:1px solid var(--border2);border-radius:8px;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;background:var(--s2);color:var(--text);transition:.15s;letter-spacing:.3px;}
-.game-btn:hover{background:var(--s3);}
-.game-btn.higher{border-color:rgba(0,245,170,.3);color:var(--acc);}
-.game-btn.lower{border-color:rgba(255,85,51,.3);color:var(--acc2);}
-.game-btn.correct{background:rgba(0,245,170,.15);border-color:var(--acc);}
-.game-btn.wrong{background:rgba(255,85,51,.15);border-color:var(--acc2);}
-.game-result{text-align:center;padding:10px;font-size:13px;font-weight:500;border-radius:6px;margin-top:8px;display:none;}
-.game-result.show{display:block;}
-.game-result.correct{background:rgba(0,245,170,.1);color:var(--acc);}
-.game-result.wrong{background:rgba(255,85,51,.1);color:var(--acc2);}
-.game-over{text-align:center;padding:20px;display:none;}
-.game-over.show{display:block;}
-.game-restart{margin-top:12px;padding:10px 24px;background:var(--acc);border:none;border-radius:8px;font-family:var(--font-b);font-size:13px;font-weight:600;color:#000;cursor:pointer;}
-.hero-sub{font-size:14px;color:var(--muted2);margin-bottom:28px;}
+.hero-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(0,245,170,.04) 0%,transparent 70%);}
+.hero-logo{display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.hero-logo img{height:72px;display:block;}
+.hero-wordmark{font-family:var(--font-b);font-weight:700;font-size:clamp(52px,9vw,96px);letter-spacing:-2px;line-height:1;margin-left:16px;}
+.hero-wordmark span{color:var(--acc);}
+.hero-tagline{font-family:var(--font-d);font-size:clamp(16px,2.5vw,22px);letter-spacing:2px;color:var(--muted2);margin-bottom:6px;}
+.hero-sub{font-size:13px;color:var(--muted);margin-bottom:28px;}
+@media(max-width:500px){.hero-logo img{height:52px;}.hero-wordmark{font-size:48px;margin-left:10px;}}
 
 /* SEARCH */
 .search-wrap{width:100%;max-width:600px;position:relative;margin-bottom:16px;}
-.search-box{
-  width:100%;padding:16px 56px 16px 52px;
-  background:var(--s2);border:1px solid var(--border2);border-radius:12px;
-  font-family:var(--font-b);font-size:15px;color:var(--text);outline:none;transition:.2s;
-}
+.search-box{width:100%;padding:16px 60px 16px 50px;background:var(--s2);border:1px solid var(--border2);border-radius:12px;font-family:var(--font-b);font-size:15px;color:var(--text);outline:none;transition:.2s;}
 .search-box::placeholder{color:var(--muted);}
 .search-box:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(0,245,170,.1);}
 .search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted);}
-.search-btn{
-  position:absolute;right:7px;top:50%;transform:translateY(-50%);
-  background:var(--acc);border:none;border-radius:8px;padding:8px 18px;
-  font-family:var(--font-d);font-size:14px;letter-spacing:1px;color:#000;cursor:pointer;transition:.15s;
-}
+.search-btn{position:absolute;right:7px;top:50%;transform:translateY(-50%);background:var(--acc);border:none;border-radius:8px;padding:8px 18px;font-family:var(--font-d);font-size:14px;letter-spacing:1px;color:#000;cursor:pointer;transition:.15s;}
 .search-btn:hover{background:#00d494;}
 .search-tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
 .search-tag{padding:4px 14px;background:var(--s2);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--muted2);cursor:pointer;transition:.15s;}
@@ -140,21 +97,19 @@ nav{
 
 /* STATS SECTION */
 .stats-section{padding:40px 24px 0;max-width:1100px;margin:0 auto;}
-.stats-section+.stats-section{padding-top:32px;}
-.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.sec-title{font-family:var(--font-d);font-size:26px;letter-spacing:1px;color:var(--text);}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sec-title{font-family:var(--font-d);font-size:28px;letter-spacing:1px;}
 .sec-title span{color:var(--acc);}
+.sec-title.red span{color:var(--acc2);}
 .sec-sub{font-size:12px;color:var(--muted);margin-top:2px;}
-.sec-link{font-size:12px;color:var(--acc3);text-decoration:none;border:1px solid rgba(77,159,255,.2);padding:4px 12px;border-radius:20px;transition:.15s;}
-.sec-link:hover{background:rgba(77,159,255,.1);}
 
-/* PLAYER TABLE */
+/* TABLE */
 .player-table{width:100%;border-collapse:collapse;}
 .pt-head th{padding:8px 12px;text-align:left;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--border);font-weight:400;}
 .pt-head th.r{text-align:right;}
-.pt-row{border-bottom:1px solid var(--border);transition:.15s;text-decoration:none;display:table-row;}
+.pt-row{border-bottom:1px solid var(--border);cursor:pointer;transition:.15s;}
 .pt-row:hover{background:var(--s2);}
-.pt-row td{padding:11px 12px;font-size:13px;vertical-align:middle;}
+.pt-row td{padding:12px;font-size:13px;vertical-align:middle;}
 .pt-row td.r{text-align:right;color:var(--muted2);}
 .pt-rank{color:var(--muted);font-size:12px;width:28px;}
 .pt-avatar{width:30px;height:30px;border-radius:6px;background:var(--s2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:11px;}
@@ -165,92 +120,93 @@ nav{
 .pt-num{font-family:var(--font-d);font-size:15px;}
 .bar-cell{width:90px;}
 .mini-bar{height:3px;background:var(--s3);border-radius:2px;margin-top:4px;}
-.mini-bar-fill{height:100%;border-radius:2px;transition:.6s;}
-@media(max-width:600px){
-  .hide-mob{display:none;}
-  .bar-cell{display:none;}
-}
+.mini-bar-fill{height:100%;border-radius:2px;}
+@media(max-width:600px){.hide-mob{display:none;}.bar-cell{display:none;}}
 
-/* H2H STRIP */
-.h2h-strip{
-  margin:40px 24px 0;max-width:1100px;
-  background:var(--s1);border:1px solid var(--border);border-radius:14px;
-  padding:20px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;
-}
-.h2h-label{font-family:var(--font-d);font-size:20px;letter-spacing:1px;color:var(--acc);flex-shrink:0;}
-.h2h-label em{color:var(--muted2);font-style:normal;font-size:14px;font-family:var(--font-b);display:block;margin-top:2px;}
-.h2h-sel{flex:1;min-width:140px;padding:10px 14px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font-b);font-size:13px;outline:none;cursor:pointer;}
-.h2h-sel:focus{border-color:var(--acc);}
-.h2h-vs{font-family:var(--font-d);font-size:18px;color:var(--muted);flex-shrink:0;}
-.h2h-btn{padding:10px 22px;background:var(--acc);border:none;border-radius:8px;font-family:var(--font-d);font-size:16px;letter-spacing:1px;color:#000;cursor:pointer;transition:.15s;flex-shrink:0;}
-.h2h-btn:hover{background:#00d494;}
-@media(max-width:600px){.h2h-strip{gap:10px;}.h2h-sel{min-width:100px;}}
+/* GAME */
+.game-section{padding:40px 24px 0;max-width:520px;margin:0 auto;}
+.game-wrap{background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.game-head{padding:14px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.game-title{font-weight:600;font-size:14px;}
+.game-title span{color:var(--acc);}
+.game-score-box{text-align:right;}
+.game-score{font-family:var(--font-d);font-size:24px;color:var(--acc4);line-height:1;}
+.game-score-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.game-body{padding:18px;}
+.game-player{display:flex;align-items:center;gap:12px;padding:10px 0;}
+.game-av{width:40px;height:40px;border-radius:9px;background:var(--s2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:15px;flex-shrink:0;}
+.game-pname{font-size:14px;font-weight:500;}
+.game-pstat{font-family:var(--font-d);font-size:20px;margin-top:2px;}
+.game-divider{text-align:center;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:6px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:4px 0;}
+.game-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.game-btn{padding:12px;border:1px solid var(--border2);border-radius:8px;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;background:var(--s2);color:var(--text);transition:.15s;}
+.game-btn:hover:not(:disabled){background:var(--s3);}
+.game-btn:disabled{opacity:.6;cursor:default;}
+.game-btn.g-hi{border-color:rgba(0,245,170,.3);color:var(--acc);}
+.game-btn.g-lo{border-color:rgba(255,85,51,.3);color:var(--acc2);}
+.game-btn.correct{background:rgba(0,245,170,.12);border-color:var(--acc);}
+.game-btn.wrong{background:rgba(255,85,51,.12);border-color:var(--acc2);}
+.game-msg{text-align:center;padding:8px;font-size:12px;font-weight:500;border-radius:6px;margin-top:10px;min-height:32px;}
+.game-msg.correct{background:rgba(0,245,170,.08);color:var(--acc);}
+.game-msg.wrong{background:rgba(255,85,51,.08);color:var(--acc2);}
+.game-over-screen{padding:24px;text-align:center;display:none;}
+.game-over-screen.show{display:block;}
+.game-restart{margin-top:12px;padding:9px 22px;background:var(--acc);border:none;border-radius:8px;font-family:var(--font-b);font-size:13px;font-weight:600;color:#000;cursor:pointer;}
+
+/* FACTS */
+.facts-section{padding:40px 24px 0;max-width:1100px;margin:0 auto;}
+.facts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+@media(max-width:700px){.facts-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:440px){.facts-grid{grid-template-columns:1fr;}}
+.fact-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.fact-stat{font-family:var(--font-d);font-size:28px;line-height:1;margin-bottom:4px;}
+.fact-desc{font-size:12px;color:var(--muted2);line-height:1.5;}
+.fact-player{font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;}
 
 /* FOOTER */
-.site-footer{margin-top:60px;border-top:1px solid var(--border);padding:24px;text-align:center;font-size:12px;color:var(--muted);padding-bottom:80px;}
+.site-footer{margin-top:48px;border-top:1px solid var(--border);padding:20px 24px 80px;text-align:center;font-size:12px;color:var(--muted);}
 .site-footer a{color:var(--muted2);text-decoration:none;margin:0 10px;}
 .site-footer a:hover{color:var(--acc);}
 
 /* MOBILE NAV */
-.mobile-nav{
-  display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
-  background:rgba(13,16,24,.97);border-top:1px solid var(--border);
-  backdrop-filter:blur(20px);
-}
-.mobile-nav-inner{display:flex;padding:0;}
-.mnav-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:10px 4px 14px;text-decoration:none;color:var(--muted2);
-  font-size:10px;letter-spacing:.3px;transition:.15s;gap:4px;
-}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(7,9,15,.97);border-top:1px solid var(--border);backdrop-filter:blur(20px);}
+.mobile-nav-inner{display:flex;}
+.mnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 14px;text-decoration:none;color:var(--muted2);font-size:10px;gap:4px;transition:.15s;}
 .mnav-item svg{width:20px;height:20px;stroke:currentColor;}
 .mnav-item.active,.mnav-item:hover{color:var(--acc);}
 @media(max-width:768px){.mobile-nav{display:block;}}
-
-/* POTD */
-.potd-bar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:9px 20px;background:rgba(0,245,170,.04);border-bottom:1px solid rgba(0,245,170,.1);
-  text-decoration:none;transition:.15s;flex-wrap:wrap;gap:8px;
-}
-.potd-bar:hover{background:rgba(0,245,170,.07);}
-.potd-left{display:flex;align-items:center;gap:10px;}
-.potd-badge{background:rgba(0,245,170,.15);color:var(--acc);font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:.5px;white-space:nowrap;}
-.potd-name{font-family:var(--font-d);font-size:16px;letter-spacing:.5px;color:var(--text);}
-.potd-stats{display:flex;gap:16px;}
-.potd-stat{text-align:center;}
-.potd-val{font-family:var(--font-d);font-size:16px;color:var(--acc);display:block;line-height:1;}
-.potd-key{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
-@media(max-width:480px){.potd-stats{gap:10px;}.potd-stat:last-child,.potd-stat:nth-last-child(2){display:none;}}
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <a href="index.html" class="logo">Kric<span>IQ</span></a>
+  <a href="index.html" class="nav-logo">
+    <img src="logo.png" alt="KricIQ"/>
+  </a>
   <div class="nav-links">
     <a href="index.html" class="nl active">Home</a>
-    <a href="teams.html" class="nl">Teams</a>
     <a href="headtohead.html" class="nl">Head to Head</a>
   </div>
 </nav>
 
-<!-- TICKER — populated by JS below -->
+<!-- TICKER -->
 <div class="ticker-wrap" id="ticker-wrap" style="display:none;">
-  <div class="ticker-label">CRICKET</div>
+  <div class="ticker-label">LIVE</div>
   <div class="ticker-track" id="ticker-track"></div>
 </div>
-
-<!-- POTD — injected by JS -->
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
-  <h1 class="fade-up">KRIC<span>IQ</span></h1>
-  <p class="hero-sub fade-up d2">Search any player across IPL · ODI · T20I · Test</p>
+  <div class="hero-logo fade-up">
+    <img src="logo.png" alt="KricIQ logo"/>
+    <div class="hero-wordmark">Kric<span>IQ</span></div>
+  </div>
+  <div class="hero-tagline fade-up d2">CRICKET INTELLIGENCE PLATFORM</div>
+  <div class="hero-sub fade-up d2">Search any player across IPL · ODI · T20I · Test</div>
 
-  <div class="search-wrap fade-up d2">
+  <div class="search-wrap fade-up d3">
     <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <input id="hero-search" class="search-box" type="text" placeholder="Search player — Kohli, Bumrah, Rohit…" autocomplete="off"/>
     <button id="hero-btn" class="search-btn">SEARCH</button>
@@ -288,14 +244,10 @@ nav{
   <table class="player-table">
     <thead class="pt-head">
       <tr>
-        <th style="width:28px;">#</th>
-        <th>Player</th>
-        <th class="r">Runs</th>
-        <th class="r hide-mob">Avg</th>
-        <th class="r hide-mob">SR</th>
-        <th class="r hide-mob">100s</th>
-        <th class="r">M</th>
-        <th class="bar-cell hide-mob"></th>
+        <th style="width:28px;">#</th><th>Player</th>
+        <th class="r">Runs</th><th class="r hide-mob">Avg</th>
+        <th class="r hide-mob">SR</th><th class="r hide-mob">100s</th>
+        <th class="r">M</th><th class="bar-cell hide-mob"></th>
       </tr>
     </thead>
     <tbody id="batters-body">
@@ -308,21 +260,17 @@ nav{
 <div class="stats-section fade-up d4" id="bowlers-section">
   <div class="sec-head">
     <div>
-      <div class="sec-title">TOP <span style="color:var(--acc2);">BOWLERS</span></div>
+      <div class="sec-title red">TOP <span>BOWLERS</span></div>
       <div class="sec-sub">All-time IPL · ranked by wickets</div>
     </div>
   </div>
   <table class="player-table">
     <thead class="pt-head">
       <tr>
-        <th style="width:28px;">#</th>
-        <th>Player</th>
-        <th class="r">Wkts</th>
-        <th class="r hide-mob">Econ</th>
-        <th class="r hide-mob">Avg</th>
-        <th class="r hide-mob">SR</th>
-        <th class="r">M</th>
-        <th class="bar-cell hide-mob"></th>
+        <th style="width:28px;">#</th><th>Player</th>
+        <th class="r">Wkts</th><th class="r hide-mob">Econ</th>
+        <th class="r hide-mob">Avg</th><th class="r hide-mob">SR</th>
+        <th class="r">M</th><th class="bar-cell hide-mob"></th>
       </tr>
     </thead>
     <tbody id="bowlers-body">
@@ -333,37 +281,79 @@ nav{
 
 <!-- HIGHER OR LOWER GAME -->
 <div class="game-section fade-up d4">
+  <div style="font-family:var(--font-d);font-size:22px;letter-spacing:1px;margin-bottom:10px;">HIGHER OR <span style="color:var(--acc);">LOWER?</span> <span style="font-family:var(--font-b);font-size:13px;color:var(--muted);font-weight:400;">Test your cricket IQ</span></div>
   <div class="game-wrap">
     <div class="game-head">
-      <div><div class="game-title">Higher or <span>Lower?</span></div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Does Player B have more or fewer IPL runs?</div></div>
-      <div><div class="game-score" id="game-score">0</div><div style="font-size:9px;color:var(--muted);text-align:center;letter-spacing:.5px;">SCORE</div></div>
+      <div><div class="game-title">Does Player B have more or fewer <span>IPL runs</span>?</div></div>
+      <div class="game-score-box"><div class="game-score" id="game-score">0</div><div class="game-score-lbl">Score</div></div>
     </div>
     <div class="game-body" id="game-body">
-      <div class="game-player"><div class="game-avatar" id="g-av-a" style="color:var(--acc)">VK</div><div><div class="game-pname" id="g-name-a">Loading2026</div><div class="game-pstat" style="color:var(--acc)" id="g-runs-a">2014</div></div></div>
-      <div class="game-vs">vs</div>
-      <div class="game-player"><div class="game-avatar" id="g-av-b" style="color:var(--acc3)">??</div><div><div class="game-pname" id="g-name-b">2014</div><div class="game-pstat" style="color:var(--muted)" id="g-runs-b">??? IPL runs</div></div></div>
-      <div class="game-btns" id="game-btns"><button class="game-btn higher" onclick="_gameGuess('higher')"><!-- QUICK H2H -->#8593; HIGHER</button><button class="game-btn lower" onclick="_gameGuess('lower')"><!-- QUICK H2H -->#8595; LOWER</button></div>
-      <div class="game-result" id="game-result"></div>
+      <div class="game-player">
+        <div class="game-av" id="g-av-a" style="color:var(--acc)">VK</div>
+        <div><div class="game-pname" id="g-name-a">Loading…</div><div class="game-pstat" style="color:var(--acc)" id="g-stat-a">—</div></div>
+      </div>
+      <div class="game-divider">vs</div>
+      <div class="game-player">
+        <div class="game-av" id="g-av-b" style="color:var(--acc3)">??</div>
+        <div><div class="game-pname" id="g-name-b">—</div><div class="game-pstat" style="color:var(--muted)" id="g-stat-b">??? runs</div></div>
+      </div>
+      <div class="game-btns">
+        <button class="game-btn g-hi" id="g-btn-hi" onclick="_guess('higher')">&#8593; Higher</button>
+        <button class="game-btn g-lo" id="g-btn-lo" onclick="_guess('lower')">&#8595; Lower</button>
+      </div>
+      <div class="game-msg" id="game-msg"></div>
     </div>
-    <div class="game-over" id="game-over"><div style="font-size:28px;margin-bottom:8px;"><!-- QUICK H2H -->#127955;</div><div style="font-size:16px;font-weight:600;" id="go-msg">Game Over!</div><div style="font-size:13px;color:var(--muted2);margin-top:4px;" id="go-score"></div><button class="game-restart" onclick="_gameStart()">Play Again</button></div>
+    <div class="game-over-screen" id="game-over">
+      <div style="font-size:32px;">&#127955;</div>
+      <div style="font-size:15px;font-weight:600;margin-top:8px;" id="go-title">Game Over</div>
+      <div style="font-size:12px;color:var(--muted2);margin-top:4px;" id="go-sub"></div>
+      <button class="game-restart" onclick="_gameStart()">Play Again</button>
+    </div>
   </div>
 </div>
 
-<!-- QUICK H2H -->
-<div class="h2h-strip fade-up d4" style="margin-bottom:0;">
-  <div class="h2h-label">HEAD <em>to HEAD</em></div>
-  <select id="h2h-t1" class="h2h-sel"></select>
-  <div class="h2h-vs">VS</div>
-  <select id="h2h-t2" class="h2h-sel"></select>
-  <button class="h2h-btn" onclick="_goH2H()">GO</button>
+<!-- CRICKET FACTS -->
+<div class="facts-section fade-up d4">
+  <div style="font-family:var(--font-d);font-size:22px;letter-spacing:1px;margin-bottom:14px;">CRICKET <span style="color:var(--acc4);">FACTS</span></div>
+  <div class="facts-grid">
+    <div class="fact-card">
+      <div class="fact-stat" style="color:var(--acc)">8,899</div>
+      <div class="fact-desc">Most IPL runs all time — and still playing</div>
+      <div class="fact-player">V Kohli · RCB</div>
+    </div>
+    <div class="fact-card">
+      <div class="fact-stat" style="color:var(--acc2)">183</div>
+      <div class="fact-desc">Kohli's highest IPL score — his personal best</div>
+      <div class="fact-player">V Kohli vs PBKS · 2016</div>
+    </div>
+    <div class="fact-card">
+      <div class="fact-stat" style="color:var(--acc3)">275</div>
+      <div class="fact-desc">Matches played — both Kohli and Rohit</div>
+      <div class="fact-player">Most experienced IPL players</div>
+    </div>
+    <div class="fact-card">
+      <div class="fact-stat" style="color:var(--acc4)">9</div>
+      <div class="fact-desc">IPL centuries by Kohli — the most in IPL history</div>
+      <div class="fact-player">V Kohli</div>
+    </div>
+    <div class="fact-card">
+      <div class="fact-stat" style="color:var(--acc2)">175*</div>
+      <div class="fact-desc">Highest ever IPL individual score</div>
+      <div class="fact-player">CH Gayle vs PWI · 2013</div>
+    </div>
+    <div class="fact-card">
+      <div class="fact-stat" style="color:var(--acc)">151.7</div>
+      <div class="fact-desc">Career IPL strike rate — one of the best ever</div>
+      <div class="fact-player">AB de Villiers · RCB</div>
+    </div>
+  </div>
 </div>
 
 <!-- FOOTER -->
 <footer class="site-footer">
-  <span>© 2026 KricIQ · kriciq.com · Data: cricsheet.org</span>
+  <span>© 2026 KricIQ · kriciq.com · Data from cricsheet.org</span>
   <div style="margin-top:8px;">
     <a href="index.html">Home</a>
-    <a href="teams.html">Teams</a>
     <a href="headtohead.html">Head to Head</a>
   </div>
 </footer>
@@ -374,10 +364,6 @@ nav{
     <a href="index.html" class="mnav-item active">
       <svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955a1.5 1.5 0 0 1 2.092 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
       <span>Home</span>
-    </a>
-    <a href="teams.html" class="mnav-item">
-      <svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg>
-      <span>Teams</span>
     </a>
     <a href="headtohead.html" class="mnav-item">
       <svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
@@ -391,61 +377,53 @@ var _kapi = 'https://kriciq-api.onrender.com/api';
 var _allPlayers = [];
 var _currentSort = 'runs';
 var _t;
-var _colors = ['rgba(0,245,170,.8)','rgba(91,159,255,.8)','rgba(247,201,72,.8)','rgba(255,85,51,.8)','rgba(180,120,255,.8)'];
-function _initials(n){ return n.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase(); }
-function _colorFor(i){ return _colors[i % _colors.length]; }
-
-// IPL teams for H2H dropdown
-var _iplTeams = [
-  'Mumbai Indians','Chennai Super Kings','Royal Challengers Bangalore',
-  'Kolkata Knight Riders','Sunrisers Hyderabad','Delhi Capitals',
-  'Punjab Kings','Rajasthan Royals','Lucknow Super Giants','Gujarat Titans'
-];
-
-// Populate H2H dropdowns
-(function(){
-  var t1 = document.getElementById('h2h-t1');
-  var t2 = document.getElementById('h2h-t2');
-  _iplTeams.forEach(function(t, i){
-    var o1 = document.createElement('option'); o1.value = t; o1.textContent = t; t1.appendChild(o1);
-    var o2 = document.createElement('option'); o2.value = t; o2.textContent = t; t2.appendChild(o2);
-  });
-  if(t2.options.length > 1) t2.selectedIndex = 1;
-})();
-
-function _goH2H(){
-  var t1 = document.getElementById('h2h-t1').value;
-  var t2 = document.getElementById('h2h-t2').value;
-  if(t1 === t2){ alert('Please select two different teams.'); return; }
-  window.location.href = 'headtohead.html?t1=' + encodeURIComponent(t1) + '&t2=' + encodeURIComponent(t2);
-}
+var _colors = ['rgba(0,245,170,.85)','rgba(91,159,255,.85)','rgba(247,201,72,.85)','rgba(255,85,51,.85)','rgba(180,120,255,.85)'];
+function _ini(n){ return n.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase(); }
+function _col(i){ return _colors[i%_colors.length]; }
 
 // ── SEARCH ──
-fetch(_kapi + '/players').then(function(r){return r.json();}).then(function(d){ _allPlayers = d; }).catch(function(){});
+fetch(_kapi+'/players').then(function(r){return r.json();}).then(function(d){
+  _allPlayers=d;
+  _gamePlayers = d.filter(function(p){return p.runs>=500;});
+  if(!_gameReady){ _gameReady=true; _gameNext(); }
+}).catch(function(){});
 
 function fillSearch(name){
-  var inp = document.getElementById('hero-search'); if(!inp) return;
-  inp.value = name; _runSearch(name);
+  var inp=document.getElementById('hero-search'); if(!inp) return;
+  inp.value=name; _doSearch(name);
+}
+
+function _doSearch(q){
+  if(!q||q.length<2){_hideResults();return;}
+  clearTimeout(_t);
+  if(_allPlayers.length){
+    _renderResults(_allPlayers.filter(function(p){return _fuzzy(p.player,q);}));
+    return;
+  }
+  // API fallback (Render cold start)
+  _t=setTimeout(function(){
+    fetch(_kapi+'/search/'+encodeURIComponent(q))
+      .then(function(r){return r.json();}).then(_renderResults).catch(_hideResults);
+  },200);
 }
 
 function _renderResults(players){
-  var panel = document.getElementById('search-results-panel');
-  var list  = document.getElementById('srp-list');
-  var count = document.getElementById('srp-count');
-  var tags  = document.getElementById('search-tags');
+  var panel=document.getElementById('search-results-panel');
+  var list =document.getElementById('srp-list');
+  var count=document.getElementById('srp-count');
+  var tags =document.getElementById('search-tags');
   if(!players.length){
-    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted2);">No players found</div>';
-    count.textContent = '0 results'; panel.style.display = 'block';
-    if(tags) tags.style.display = 'none'; return;
+    list.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted2);">No players found</div>';
+    count.textContent='0 results'; panel.style.display='block';
+    if(tags) tags.style.display='none'; return;
   }
-  var sorted = players.slice().sort(function(a,b){ return (parseFloat(b[_currentSort])||0)-(parseFloat(a[_currentSort])||0); });
-  count.textContent = sorted.length + ' player' + (sorted.length!==1?'s':'');
-  list.innerHTML = sorted.map(function(p,i){
-    var id  = encodeURIComponent(p.player.replace(/ /g,'-'));
-    var c   = _colorFor(i);
+  var sorted=players.slice().sort(function(a,b){return (parseFloat(b[_currentSort])||0)-(parseFloat(a[_currentSort])||0);});
+  count.textContent=sorted.length+' player'+(sorted.length!==1?'s':'');
+  list.innerHTML=sorted.map(function(p,i){
+    var id=encodeURIComponent(p.player.replace(/ /g,'-'));
     return '<a href="player.html?id='+id+'" class="srp-row">'
       +'<div class="srp-rank">'+(i+1)+'</div>'
-      +'<div class="srp-avatar" style="color:'+c+'">'+_initials(p.player)+'</div>'
+      +'<div class="srp-avatar" style="color:'+_col(i)+'">'+_ini(p.player)+'</div>'
       +'<div class="srp-name">'+p.player+'</div>'
       +'<div class="srp-stats">'
       +'<div class="srp-s"><div class="srp-sv" style="color:var(--acc)">'+Math.round(p.runs||0).toLocaleString()+'</div><div class="srp-sk">Runs</div></div>'
@@ -454,243 +432,168 @@ function _renderResults(players){
       +'<div class="srp-s"><div class="srp-sv" style="color:var(--muted2)">'+Math.round(p.matches||0)+'</div><div class="srp-sk">M</div></div>'
       +'</div></a>';
   }).join('');
-  panel.style.display = 'block';
-  if(tags) tags.style.display = 'none';
+  panel.style.display='block';
+  if(tags) tags.style.display='none';
 }
 
 function _hideResults(){
-  var panel = document.getElementById('search-results-panel');
-  var tags  = document.getElementById('search-tags');
-  if(panel) panel.style.display = 'none';
-  if(tags)  tags.style.display  = 'flex';
+  var panel=document.getElementById('search-results-panel');
+  var tags =document.getElementById('search-tags');
+  if(panel) panel.style.display='none';
+  if(tags)  tags.style.display='flex';
 }
 
-var _nameAliases = {
-  'virat kohli':'V Kohli','rohit sharma':'RG Sharma','ms dhoni':'MS Dhoni',
-  'mahendra singh dhoni':'MS Dhoni','jasprit bumrah':'JJ Bumrah',
-  'hardik pandya':'HH Pandya','kl rahul':'KL Rahul','suresh raina':'SK Raina',
-  'ravindra jadeja':'RA Jadeja','shikhar dhawan':'S Dhawan',
-  'david warner':'DA Warner','ab de villiers':'AB de Villiers',
-  'chris gayle':'CH Gayle','shane watson':'SR Watson',
-  'rishabh pant':'RR Pant','sanju samson':'SV Samson',
-  'jos buttler':'JC Buttler','kane williamson':'KS Williamson',
-  'faf du plessis':'F du Plessis','dinesh karthik':'KD Karthik',
-  'yuzvendra chahal':'YS Chahal','kuldeep yadav':'Kuldeep Yadav',
-  'suryakumar yadav':'SA Yadav','washington sundar':'Washington Sundar',
-  'shubman gill':'Shubman Gill','ishan kishan':'IS Kishan',
-  'ruturaj gaikwad':'RD Gaikwad','yashasvi jaiswal':'YBK Jaiswal'
-};
-function _fuzzyMatch(player, q){
-  var pl = player.toLowerCase(), ql = q.toLowerCase().trim();
+var _aliases={'virat kohli':'V Kohli','rohit sharma':'RG Sharma','ms dhoni':'MS Dhoni','jasprit bumrah':'JJ Bumrah','hardik pandya':'HH Pandya','kl rahul':'KL Rahul','david warner':'DA Warner','ab de villiers':'AB de Villiers','chris gayle':'CH Gayle','rishabh pant':'RR Pant','sanju samson':'SV Samson','jos buttler':'JC Buttler','yuzvendra chahal':'YS Chahal','shubman gill':'Shubman Gill','yashasvi jaiswal':'YBK Jaiswal','suryakumar yadav':'SA Yadav','faf du plessis':'F du Plessis','suresh raina':'SK Raina','shikhar dhawan':'S Dhawan','ravindra jadeja':'RA Jadeja'};
+function _fuzzy(player,q){
+  var pl=player.toLowerCase(),ql=q.toLowerCase().trim();
   if(pl.indexOf(ql)!==-1) return true;
-  if(_nameAliases[ql] && player===_nameAliases[ql]) return true;
-  var plLast = pl.split(' ').pop(), qlLast = ql.split(' ').pop();
-  if(qlLast.length>=3 && plLast.indexOf(qlLast)!==-1) return true;
-  for(var key in _nameAliases){ if(_nameAliases[key]===player && key.indexOf(ql)!==-1) return true; }
+  if(_aliases[ql]&&player===_aliases[ql]) return true;
+  var plL=pl.split(' ').pop(),qlL=ql.split(' ').pop();
+  if(qlL.length>=3&&plL.indexOf(qlL)!==-1) return true;
+  for(var k in _aliases){ if(_aliases[k]===player&&k.indexOf(ql)!==-1) return true; }
   return false;
 }
-function _runSearch(q){
-  if(!q||q.length<2){ _hideResults(); return; }
-  if(_allPlayers.length){
-    _renderResults(_allPlayers.filter(function(p){ return _fuzzyMatch(p.player,q); }));
-    return;
-  }
-  clearTimeout(_t);
-  _t = setTimeout(function(){
-    fetch(_kapi+'/search/'+encodeURIComponent(q))
-      .then(function(r){return r.json();}).then(_renderResults).catch(_hideResults);
-  },300);
-}
+
 document.querySelectorAll('.srp-pill').forEach(function(btn){
   btn.addEventListener('click',function(){
     document.querySelectorAll('.srp-pill').forEach(function(b){b.classList.remove('on');});
-    this.classList.add('on'); _currentSort = this.dataset.sort;
-    var q = document.getElementById('hero-search').value.trim();
-    if(q.length>=2) _runSearch(q);
+    this.classList.add('on'); _currentSort=this.dataset.sort;
+    var q=document.getElementById('hero-search').value.trim();
+    if(q.length>=2) _doSearch(q);
   });
 });
+
 window.addEventListener('DOMContentLoaded',function(){
-  var inp = document.getElementById('hero-search');
-  var btn = document.getElementById('hero-btn');
+  var inp=document.getElementById('hero-search');
+  var btn=document.getElementById('hero-btn');
   if(!inp) return;
-  inp.addEventListener('input',function(){ clearTimeout(_t); var q=this.value.trim(); _t=setTimeout(function(){_runSearch(q);},200); });
-  inp.addEventListener('keydown',function(e){ if(e.key==='Enter') _runSearch(this.value.trim()); if(e.key==='Escape'){this.value='';_hideResults();} });
-  if(btn) btn.addEventListener('click',function(){ _runSearch(inp.value.trim()); });
+  inp.addEventListener('input',function(){clearTimeout(_t);var q=this.value.trim();_t=setTimeout(function(){_doSearch(q);},180);});
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter'){clearTimeout(_t);_doSearch(this.value.trim());}if(e.key==='Escape'){this.value='';_hideResults();}});
+  if(btn) btn.addEventListener('click',function(){clearTimeout(_t);_doSearch(document.getElementById('hero-search').value.trim());});
 });
 
-// ── TOP BATTERS ──
-fetch(_kapi+'/top-batters?limit=5')
-  .then(function(r){return r.json();})
-  .then(function(data){
-    data = data.slice(0,5);
-    var maxRuns = data.length ? data[0].runs : 1;
-    var tbody = document.getElementById('batters-body');
-    tbody.innerHTML = data.map(function(p,i){
-      var id  = encodeURIComponent(p.player.replace(/ /g,'-'));
-      var c   = _colorFor(i);
-      var pct = Math.round((p.runs/maxRuns)*100);
-      return '<tr class="pt-row" onclick="location.href=\'player.html?id='+id+'\'" style="cursor:pointer;">'
-        +'<td class="pt-rank">'+(i+1)+'</td>'
-        +'<td><div style="display:flex;align-items:center;gap:10px;">'
-        +'<div class="pt-avatar" style="color:'+c+'">'+_initials(p.player)+'</div>'
-        +'<div><div class="pt-name">'+p.player+'</div><div class="pt-team">'+(p.team||'')+'</div></div>'
-        +'</div></td>'
-        +'<td class="r"><div class="pt-runs">'+Math.round(p.runs).toLocaleString()+'</div></td>'
-        +'<td class="r hide-mob"><div class="pt-num">'+parseFloat(p.average||0).toFixed(1)+'</div></td>'
-        +'<td class="r hide-mob"><div class="pt-num">'+parseFloat(p.strike_rate||0).toFixed(1)+'</div></td>'
-        +'<td class="r hide-mob"><div class="pt-num" style="color:var(--acc4)">'+(p.hundreds||0)+'</div></td>'
-        +'<td class="r" style="color:var(--muted2)">'+(p.matches||0)+'</td>'
-        +'<td class="bar-cell hide-mob"><div class="mini-bar"><div class="mini-bar-fill" style="width:'+pct+'%;background:var(--acc)"></div></div></td>'
-        +'</tr>';
-    }).join('');
-  }).catch(function(){ document.getElementById('batters-body').innerHTML='<tr><td colspan="8" style="padding:20px;text-align:center;color:var(--muted)">Could not load data</td></tr>'; });
-
-// ── TOP BOWLERS ──
-fetch(_kapi+'/top-bowlers')
-  .then(function(r){return r.json();})
-  .then(function(data){
-    data = data.slice(0,5);
-    var maxWkts = data.length ? data[0].wickets : 1;
-    var tbody = document.getElementById('bowlers-body');
-    tbody.innerHTML = data.map(function(p,i){
-      var id  = encodeURIComponent(p.player.replace(/ /g,'-'));
-      var c   = _colorFor(i);
-      var pct = Math.round((p.wickets/maxWkts)*100);
-      return '<tr class="pt-row" onclick="location.href=\'player.html?id='+id+'\'" style="cursor:pointer;">'
-        +'<td class="pt-rank">'+(i+1)+'</td>'
-        +'<td><div style="display:flex;align-items:center;gap:10px;">'
-        +'<div class="pt-avatar" style="color:'+c+'">'+_initials(p.player)+'</div>'
-        +'<div><div class="pt-name">'+p.player+'</div><div class="pt-team">'+(p.team||'')+'</div></div>'
-        +'</div></td>'
-        +'<td class="r"><div class="pt-wkts">'+Math.round(p.wickets)+'</div></td>'
-        +'<td class="r hide-mob"><div class="pt-num">'+parseFloat(p.economy||0).toFixed(2)+'</div></td>'
-        +'<td class="r hide-mob"><div class="pt-num">'+(p.bowling_avg?parseFloat(p.bowling_avg).toFixed(1):'—')+'</div></td>'
-        +'<td class="r hide-mob"><div class="pt-num">'+(p.bowling_sr?parseFloat(p.bowling_sr).toFixed(1):'—')+'</div></td>'
-        +'<td class="r" style="color:var(--muted2)">'+(p.matches||0)+'</td>'
-        +'<td class="bar-cell hide-mob"><div class="mini-bar"><div class="mini-bar-fill" style="width:'+pct+'%;background:var(--acc2)"></div></div></td>'
-        +'</tr>';
-    }).join('');
-  }).catch(function(){ document.getElementById('bowlers-body').innerHTML='<tr><td colspan="8" style="padding:20px;text-align:center;color:var(--muted)">Could not load data</td></tr>'; });
-
-// ── TICKER ──
-var _tickerItems = [
-  'IPL data updated · 295,732 balls across 1,140+ matches',
-  '406 batters · 410 bowlers in KricIQ database',
-  'V Kohli · 8,899 IPL runs · 8 centuries',
-  'DJ Bravo · all-time IPL wicket leader',
-  'MS Dhoni · 264 IPL matches · 150+ stumpings',
-  'RG Sharma · 7 IPL titles as captain',
-  'AB de Villiers · 151.68 career IPL strike rate',
-  'SL Malinga · economy 7.1 across 122 IPL matches',
-];
-(function(){
-  var track = document.getElementById('ticker-track');
-  var wrap  = document.getElementById('ticker-wrap');
-  if(!track||!wrap) return;
-  var html = (_tickerItems.concat(_tickerItems)).map(function(t){
-    return '<div class="ticker-item"><div class="ticker-dot"></div><span>'+t+'</span></div>';
+// ── TOP 5 BATTERS ──
+fetch(_kapi+'/top-batters').then(function(r){return r.json();}).then(function(data){
+  data=data.slice(0,5);
+  var max=data.length?data[0].runs:1;
+  document.getElementById('batters-body').innerHTML=data.map(function(p,i){
+    var id=encodeURIComponent(p.player.replace(/ /g,'-'));
+    var pct=Math.round((p.runs/max)*100);
+    return '<tr class="pt-row" onclick="location.href=\'player.html?id='+id+'\'">'
+      +'<td class="pt-rank">'+(i+1)+'</td>'
+      +'<td><div style="display:flex;align-items:center;gap:10px;"><div class="pt-avatar" style="color:'+_col(i)+'">'+_ini(p.player)+'</div>'
+      +'<div><div class="pt-name">'+p.player+'</div><div class="pt-team">'+(p.team||'')+'</div></div></div></td>'
+      +'<td class="r"><div class="pt-runs">'+Math.round(p.runs).toLocaleString()+'</div></td>'
+      +'<td class="r hide-mob"><div class="pt-num">'+parseFloat(p.average||0).toFixed(1)+'</div></td>'
+      +'<td class="r hide-mob"><div class="pt-num">'+parseFloat(p.strike_rate||0).toFixed(1)+'</div></td>'
+      +'<td class="r hide-mob"><div class="pt-num" style="color:var(--acc4)">'+(p.hundreds||0)+'</div></td>'
+      +'<td class="r" style="color:var(--muted2)">'+(p.matches||0)+'</td>'
+      +'<td class="bar-cell hide-mob"><div class="mini-bar"><div class="mini-bar-fill" style="width:'+pct+'%;background:var(--acc)"></div></div></td>'
+      +'</tr>';
   }).join('');
-  track.innerHTML = html;
-  wrap.style.display = 'flex';
-})();
+}).catch(function(){document.getElementById('batters-body').innerHTML='<tr><td colspan="8" style="padding:16px;text-align:center;color:var(--muted)">Could not load</td></tr>';});
+
+// ── TOP 5 BOWLERS ──
+fetch(_kapi+'/top-bowlers').then(function(r){return r.json();}).then(function(data){
+  data=data.slice(0,5);
+  var max=data.length?data[0].wickets:1;
+  document.getElementById('bowlers-body').innerHTML=data.map(function(p,i){
+    var id=encodeURIComponent(p.player.replace(/ /g,'-'));
+    var pct=Math.round((p.wickets/max)*100);
+    return '<tr class="pt-row" onclick="location.href=\'player.html?id='+id+'\'">'
+      +'<td class="pt-rank">'+(i+1)+'</td>'
+      +'<td><div style="display:flex;align-items:center;gap:10px;"><div class="pt-avatar" style="color:'+_col(i)+'">'+_ini(p.player)+'</div>'
+      +'<div><div class="pt-name">'+p.player+'</div><div class="pt-team">'+(p.team||'')+'</div></div></div></td>'
+      +'<td class="r"><div class="pt-wkts">'+Math.round(p.wickets)+'</div></td>'
+      +'<td class="r hide-mob"><div class="pt-num">'+parseFloat(p.economy||0).toFixed(2)+'</div></td>'
+      +'<td class="r hide-mob"><div class="pt-num">'+(p.bowling_avg?parseFloat(p.bowling_avg).toFixed(1):'—')+'</div></td>'
+      +'<td class="r hide-mob"><div class="pt-num">'+(p.bowling_sr?parseFloat(p.bowling_sr).toFixed(1):'—')+'</div></td>'
+      +'<td class="r" style="color:var(--muted2)">'+(p.matches||0)+'</td>'
+      +'<td class="bar-cell hide-mob"><div class="mini-bar"><div class="mini-bar-fill" style="width:'+pct+'%;background:var(--acc2)"></div></div></td>'
+      +'</tr>';
+  }).join('');
+}).catch(function(){document.getElementById('bowlers-body').innerHTML='<tr><td colspan="8" style="padding:16px;text-align:center;color:var(--muted)">Could not load</td></tr>';});
 
 // ── HIGHER OR LOWER GAME ──
-var _gamePlayers = [];
-var _gameScore   = 0;
-var _gameBest    = parseInt(localStorage.getItem('kriciq_best')||'0');
-var _gameA, _gameB, _gameLocked;
-var _gColors = ['var(--acc)','var(--acc3)','var(--acc4)','var(--acc2)','rgba(180,120,255,.9)'];
-
-function _gInit(n){ return n.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase(); }
+var _gamePlayers=[], _gameA, _gameB, _gScore=0, _gLocked=false, _gameReady=false;
+var _gBest=parseInt(localStorage.getItem('kiq_best')||'0');
 
 function _gameStart(){
-  _gameScore  = 0;
-  _gameLocked = false;
-  document.getElementById('game-score').textContent = '0';
-  document.getElementById('game-over').style.display  = 'none';
-  document.getElementById('game-body').style.display  = '';
-  document.getElementById('game-result').className = 'game-result';
-  document.querySelectorAll('.game-btn').forEach(function(b){ b.className = b.dataset.base; });
+  _gScore=0; _gLocked=false;
+  document.getElementById('game-score').textContent='0';
+  document.getElementById('game-over').classList.remove('show');
+  document.getElementById('game-body').style.display='';
+  document.getElementById('game-msg').textContent='';
+  document.getElementById('game-msg').className='game-msg';
   _gameNext();
 }
 
 function _gameNext(){
-  if(_gamePlayers.length < 10) return;
-  _gameLocked = false;
-  document.getElementById('game-result').className = 'game-result';
-  document.querySelectorAll('.game-btn').forEach(function(b){ b.className = b.dataset.base || b.className.replace(' correct','').replace(' wrong',''); });
+  if(_gamePlayers.length<10) return;
+  _gLocked=false;
+  document.getElementById('game-msg').textContent='';
+  document.getElementById('game-msg').className='game-msg';
+  document.getElementById('g-btn-hi').disabled=false;
+  document.getElementById('g-btn-lo').disabled=false;
+  document.getElementById('g-btn-hi').className='game-btn g-hi';
+  document.getElementById('g-btn-lo').className='game-btn g-lo';
 
-  // Pick two different random players with decent runs (min 500)
-  var pool = _gamePlayers.filter(function(p){ return p.runs >= 500; });
-  var idxA = Math.floor(Math.random()*pool.length);
-  var idxB;
-  do { idxB = Math.floor(Math.random()*pool.length); } while(idxB===idxA);
-  _gameA = pool[idxA];
-  _gameB = pool[idxB];
+  var pool=_gamePlayers; var n=pool.length;
+  var iA=Math.floor(Math.random()*n), iB;
+  do{iB=Math.floor(Math.random()*n);}while(iB===iA);
+  _gameA=pool[iA]; _gameB=pool[iB];
 
-  var cA = _gColors[idxA % _gColors.length];
-  var cB = _gColors[idxB % _gColors.length];
-
-  document.getElementById('g-av-a').textContent  = _gInit(_gameA.player);
-  document.getElementById('g-av-a').style.color  = cA;
-  document.getElementById('g-name-a').textContent = _gameA.player;
-  document.getElementById('g-runs-a').textContent = Math.round(_gameA.runs).toLocaleString() + ' IPL runs';
-  document.getElementById('g-runs-a').style.color = cA;
-
-  document.getElementById('g-av-b').textContent  = _gInit(_gameB.player);
-  document.getElementById('g-av-b').style.color  = cB;
-  document.getElementById('g-name-b').textContent = _gameB.player;
-  document.getElementById('g-runs-b').textContent = '??? IPL runs';
-  document.getElementById('g-runs-b').style.color = 'var(--muted)';
+  var cA=_colors[iA%_colors.length], cB=_colors[iB%_colors.length];
+  document.getElementById('g-av-a').textContent=_ini(_gameA.player);
+  document.getElementById('g-av-a').style.color=cA;
+  document.getElementById('g-name-a').textContent=_gameA.player;
+  document.getElementById('g-stat-a').textContent=Math.round(_gameA.runs).toLocaleString()+' IPL runs';
+  document.getElementById('g-stat-a').style.color=cA;
+  document.getElementById('g-av-b').textContent=_ini(_gameB.player);
+  document.getElementById('g-av-b').style.color=cB;
+  document.getElementById('g-name-b').textContent=_gameB.player;
+  document.getElementById('g-stat-b').textContent='??? IPL runs';
+  document.getElementById('g-stat-b').style.color='var(--muted)';
 }
 
-function _gameGuess(guess){
-  if(_gameLocked || !_gameA || !_gameB) return;
-  _gameLocked = true;
-  var correct = (guess==='higher' && _gameB.runs >= _gameA.runs) ||
-                (guess==='lower'  && _gameB.runs <= _gameA.runs);
-
-  // Reveal B's runs
-  document.getElementById('g-runs-b').textContent = Math.round(_gameB.runs).toLocaleString() + ' IPL runs';
-  document.getElementById('g-runs-b').style.color = correct ? 'var(--acc)' : 'var(--acc2)';
-
-  // Show result message
-  var res = document.getElementById('game-result');
+function _guess(dir){
+  if(_gLocked) return;
+  _gLocked=true;
+  var correct=(dir==='higher'&&_gameB.runs>=_gameA.runs)||(dir==='lower'&&_gameB.runs<=_gameA.runs);
+  document.getElementById('g-stat-b').textContent=Math.round(_gameB.runs).toLocaleString()+' IPL runs';
+  document.getElementById('g-stat-b').style.color=correct?'var(--acc)':'var(--acc2)';
+  document.getElementById('g-btn-hi').disabled=true;
+  document.getElementById('g-btn-lo').disabled=true;
+  var msg=document.getElementById('game-msg');
   if(correct){
-    _gameScore++;
-    document.getElementById('game-score').textContent = _gameScore;
-    if(_gameScore > _gameBest){ _gameBest = _gameScore; localStorage.setItem('kriciq_best',_gameBest); }
-    res.textContent = '✓ Correct! +1';
-    res.className   = 'game-result show correct';
-    setTimeout(_gameNext, 1600);
+    _gScore++; document.getElementById('game-score').textContent=_gScore;
+    if(_gScore>_gBest){_gBest=_gScore;localStorage.setItem('kiq_best',_gBest);}
+    document.getElementById('g-btn-'+dir.slice(0,2)).className+=' correct';
+    msg.textContent='Correct! +1'; msg.className='game-msg correct';
+    setTimeout(_gameNext,1500);
   } else {
-    res.textContent = '✗ Wrong — ' + _gameB.player + ' scored ' + Math.round(_gameB.runs).toLocaleString();
-    res.className   = 'game-result show wrong';
+    document.getElementById('g-btn-'+dir.slice(0,2)).className+=' wrong';
+    msg.textContent=_gameB.player+' had '+Math.round(_gameB.runs).toLocaleString()+' runs — Game over!';
+    msg.className='game-msg wrong';
     setTimeout(function(){
-      document.getElementById('game-body').style.display = 'none';
-      var go = document.getElementById('game-over');
-      go.style.display = 'block';
-      document.getElementById('go-msg').textContent = 'Game Over — Score: ' + _gameScore;
-      document.getElementById('go-score').textContent = 'Best: ' + _gameBest + ' correct in a row';
-    }, 1800);
+      document.getElementById('game-body').style.display='none';
+      var go=document.getElementById('game-over');
+      go.classList.add('show');
+      document.getElementById('go-title').textContent='Score: '+_gScore+' correct';
+      document.getElementById('go-sub').textContent='Best: '+_gBest+' in a row';
+    },1800);
   }
 }
 
-// Load players for game when ready
+// ── TICKER ──
+var _facts=['V Kohli — 8,899 IPL runs, 9 centuries · all-time leading scorer','MS Dhoni — 5 IPL titles · the most decorated captain','CH Gayle hit 175* vs PWI in 2013 — the highest IPL score ever','AB de Villiers — 151.7 IPL career strike rate · one of the greatest','RG Sharma — 7 IPL titles across playing and captaincy career','DJ Bravo — all-time IPL wicket leader · 183 wickets','JJ Bumrah — one of the most economical IPL fast bowlers in history','SK Raina — 5,528 IPL runs · every team has feared him at No.3','DA Warner — two IPL Orange Caps · 5,881 runs for SRH','Sunrisers Hyderabad won IPL 2016 with the best bowling attack of that era'];
 (function(){
-  if(_allPlayers.length) { _gamePlayers = _allPlayers; _gameNext(); return; }
-  // Wait for player list to load
-  var check = setInterval(function(){
-    if(_allPlayers.length){
-      clearInterval(check);
-      _gamePlayers = _allPlayers;
-      _gameStart();
-    }
-  }, 300);
+  var track=document.getElementById('ticker-track');
+  var wrap=document.getElementById('ticker-wrap');
+  if(!track||!wrap) return;
+  var html=(_facts.concat(_facts)).map(function(f){return '<div class="ticker-item"><div class="ticker-dot"></div><span>'+f+'</span></div>';}).join('');
+  track.innerHTML=html; wrap.style.display='flex';
 })();
-
-// Store base classes for buttons
-document.querySelectorAll('.game-btn').forEach(function(b){ b.dataset.base = b.className; });
 </script>
 </body>
 </html>
